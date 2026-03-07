@@ -87,6 +87,27 @@ class WebPortalTest extends TestCase
         $response->assertSee('Community library');
     }
 
+    public function test_public_and_client_navigation_render_without_inline_alpine_directives(): void
+    {
+        /** @var User $client */
+        $client = User::factory()->create();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-disclosure-toggle', false)
+            ->assertSee('data-disclosure-panel', false)
+            ->assertDontSee('x-data', false)
+            ->assertDontSee('x-show', false);
+
+        $this->actingAs($client, 'client')
+            ->get(route('client.dashboard'))
+            ->assertOk()
+            ->assertSee('data-disclosure-toggle', false)
+            ->assertSee('data-disclosure-panel', false)
+            ->assertDontSee('x-data', false)
+            ->assertDontSee('x-show', false);
+    }
+
     public function test_client_logout_accepts_get_requests_and_redirects_to_login(): void
     {
         /** @var User $client */

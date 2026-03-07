@@ -103,8 +103,9 @@ Validation rules are centralized in Form Requests under [app/Http/Requests/](app
 Blade components are organized under [resources/views/components/](resources/views/components/):
 
 - **Layouts**: `layouts/app.blade.php`, `layouts/admin.blade.php`, `layouts/client.blade.php`
-- **Admin UI**: `admin-toast.blade.php`, `admin-confirm-modal.blade.php`, `admin-breadcrumb.blade.php`
-- **Common**: `stat-card.blade.php`, `empty-state.blade.php`, `footer.blade.php`
+- **Admin UI**: `admin/toast.blade.php`, `admin/confirm-modal.blade.php`, `admin/breadcrumb.blade.php`
+- **Client UI**: `client/footer.blade.php`
+- **Shared**: `shared/stat.blade.php`, `shared/empty-state.blade.php`
 
 ### Models & Relationships
 

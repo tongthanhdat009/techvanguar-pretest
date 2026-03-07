@@ -5,19 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? 'Admin Dashboard' }}</title>
         <link rel="icon" type="image/svg+xml" href="{{ asset('assets/icon-logo.svg') }}">
-        <script>
-            (function () {
-                try {
-                    document.documentElement.dataset.adminSidebarDesktop = localStorage.getItem('admin-sidebar-desktop') === 'collapsed'
-                        ? 'collapsed'
-                        : 'expanded';
-                } catch (error) {
-                    document.documentElement.dataset.adminSidebarDesktop = 'expanded';
-                }
-
-                document.documentElement.dataset.adminSidebarMobile = 'closed';
-            })();
-        </script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="app-shell font-sans antialiased bg-slate-50">
@@ -160,7 +147,7 @@
 
                     <!-- Breadcrumb -->
                     <div class="flex-1 min-w-0" data-admin-breadcrumb>
-                        <x-admin-breadcrumb :items="$breadcrumb ?? [['label' => 'Dashboard', 'url' => route('admin.overview')]]" />
+                        <x-admin.breadcrumb :items="$breadcrumb ?? [['label' => 'Dashboard', 'url' => route('admin.overview')]]" />
                     </div>
                 </header>
 
@@ -171,75 +158,7 @@
             </main>
         </div>
 
-        <x-admin-toast :toasts="$toasts" />
-        <x-admin-confirm-modal />
-
-        <style>
-            @media (min-width: 1024px) {
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar {
-                    width: 5rem;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #admin-main {
-                    padding-left: 5rem;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-text,
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-user {
-                    display: none;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-text-short {
-                    display: inline;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar nav a {
-                    justify-content: center;
-                    padding-left: 0.75rem;
-                    padding-right: 0.75rem;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar .p-3,
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar .p-4 {
-                    padding: 0.75rem;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-logo {
-                    text-align: center;
-                }
-
-                html[data-admin-sidebar-desktop='collapsed'] #toggle-icon {
-                    transform: rotate(180deg);
-                }
-
-                html[data-admin-sidebar-desktop='expanded'] #admin-main {
-                    padding-left: 16rem;
-                }
-
-                html[data-admin-sidebar-desktop='expanded'] #sidebar .sidebar-text-short {
-                    display: none;
-                }
-
-                html[data-admin-sidebar-desktop='expanded'] #sidebar .sidebar-text,
-                html[data-admin-sidebar-desktop='expanded'] #sidebar .sidebar-user {
-                    display: block;
-                }
-            }
-
-            @media (max-width: 1023px) {
-                html[data-admin-sidebar-mobile='open'] #sidebar {
-                    transform: translateX(0);
-                }
-
-                html[data-admin-sidebar-mobile='open'] #sidebar-overlay {
-                    display: block;
-                }
-            }
-
-            #sidebar .sidebar-text,
-            #sidebar .sidebar-user {
-                display: block;
-            }
-        </style>
+        <x-admin.toast :toasts="$toasts" />
+        <x-admin.confirm-modal />
     </body>
 </html>

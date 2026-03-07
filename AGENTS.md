@@ -81,14 +81,16 @@ resources/
 ├── css/app.css
 ├── js/
 │   ├── app.js
-│   ├── admin-ui.js          # Alpine.js-like interactions for admin
+│   ├── admin/              # Admin UI modules (sidebar, navigation, toasts, confirm modal)
+│   ├── client/             # Client-facing scripts
+│   └── shared/             # Shared frontend helpers
 │   └── bootstrap.js
 └── views/
     ├── components/          # Blade components
-    │   ├── layouts/         # app, admin, client layouts
-    │   ├── admin-toast.blade.php
-    │   ├── admin-confirm-modal.blade.php
-    │   └── ...
+    │   ├── admin/           # Admin-only components
+    │   ├── client/          # Client-only components
+    │   ├── shared/          # Shared components
+    │   └── layouts/         # app, admin, client layouts
     ├── admin/               # Admin portal views
     ├── client/              # Client portal views
     ├── auth/                # Login/register pages

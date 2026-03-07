@@ -5,7 +5,7 @@
             <p class="mt-2 text-slate-600">Create and manage user accounts.</p>
         </div>
 
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div class="glass-panel p-6">
             <h2 class="section-title">Create new user</h2>
             <form action="{{ route('admin.users.store') }}" method="POST" class="mt-4 space-y-4">
                 @csrf
@@ -23,10 +23,10 @@
             </form>
         </div>
 
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div class="glass-panel p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">All users ({{ $users->count() }})</h2>
             @if($users->isEmpty())
-                <x-empty-state message="No users found." />
+                <x-shared.empty-state message="No users found." />
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">

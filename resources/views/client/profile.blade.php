@@ -71,10 +71,10 @@
             </div>
 
             <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <x-stat-card label="Decks" :value="$user->decks_count" tone="slate" />
-                <x-stat-card label="Reviews" :value="$stats['reviews']" tone="sky" />
-                <x-stat-card label="Due today" :value="$stats['due_today']" tone="amber">done {{ $stats['completed_today'] }}</x-stat-card>
-                <x-stat-card label="Last study" :value="$user->last_studied_at?->format('M d') ?? 'N/A'" tone="slate" />
+                <x-shared.stat label="Decks" :value="$user->decks_count" tone="slate" />
+                <x-shared.stat label="Reviews" :value="$stats['reviews']" tone="sky" />
+                <x-shared.stat label="Due today" :value="$stats['due_today']" tone="amber">done {{ $stats['completed_today'] }}</x-shared.stat>
+                <x-shared.stat label="Last study" :value="$user->last_studied_at?->format('M d') ?? 'N/A'" tone="slate" />
             </div>
         </section>
 
@@ -155,7 +155,7 @@
                             </div>
                         </article>
                     @empty
-                        <x-empty-state title="No decks yet" description="Create your first deck here or import one from CSV." class="mt-6" />
+                        <x-shared.empty-state title="No decks yet" description="Create your first deck here or import one from CSV." class="mt-6" />
                     @endforelse
                 </div>
             </div>

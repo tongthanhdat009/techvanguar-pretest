@@ -4,10 +4,10 @@
             <span class="pill bg-sky-100 text-sky-700">Admin dashboard</span>
             <h1 class="mt-4 text-3xl font-black text-slate-950">Users, decks, flashcards, community moderation, and reporting are separated into focused sections.</h1>
             <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <x-stat-card label="Users" :value="$stats['users']" tone="sky">clients {{ $stats['clients'] }} · admins {{ $stats['admins'] }}</x-stat-card>
-                <x-stat-card label="Decks" :value="$stats['decks']" tone="amber">public {{ $stats['public_decks'] }}</x-stat-card>
-                <x-stat-card label="Flashcards" :value="$stats['flashcards']" tone="emerald" />
-                <x-stat-card label="Reviews" :value="$stats['reviews']" tone="slate">mastered {{ $stats['mastered'] }}</x-stat-card>
+                <x-shared.stat label="Users" :value="$stats['users']" tone="sky">clients {{ $stats['clients'] }} · admins {{ $stats['admins'] }}</x-shared.stat>
+                <x-shared.stat label="Decks" :value="$stats['decks']" tone="amber">public {{ $stats['public_decks'] }}</x-shared.stat>
+                <x-shared.stat label="Flashcards" :value="$stats['flashcards']" tone="emerald" />
+                <x-shared.stat label="Reviews" :value="$stats['reviews']" tone="slate">mastered {{ $stats['mastered'] }}</x-shared.stat>
             </div>
         </div>
 
@@ -141,7 +141,7 @@
                                 <p class="mt-3 text-sm leading-6 text-slate-600">{{ $review->comment }}</p>
                             </article>
                         @empty
-                            <x-empty-state title="No recent reviews" description="Community moderation entries will appear here." />
+                            <x-shared.empty-state title="No recent reviews" description="Community moderation entries will appear here." />
                         @endforelse
                     </div>
                 </div>

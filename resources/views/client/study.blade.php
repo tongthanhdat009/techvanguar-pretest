@@ -164,7 +164,7 @@
                 </aside>
             </div>
         @else
-            <x-empty-state title="No flashcards available" description="This study queue is empty right now." />
+            <x-shared.empty-state title="No flashcards available" description="This study queue is empty right now." />
         @endif
     </section>
 

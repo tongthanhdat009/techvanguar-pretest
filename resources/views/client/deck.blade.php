@@ -114,7 +114,7 @@
                         </div>
                     </details>
                 @empty
-                    <x-empty-state title="No flashcards yet" description="Add cards to start studying this deck." />
+                    <x-shared.empty-state title="No flashcards yet" description="Add cards to start studying this deck." />
                 @endforelse
             </div>
         </section>
@@ -160,7 +160,7 @@
                                 <p class="mt-3 text-sm leading-6 text-stone-600">{{ $review->comment }}</p>
                             </article>
                         @empty
-                            <x-empty-state title="No reviews yet" description="Be the first learner to leave feedback for this deck." />
+                            <x-shared.empty-state title="No reviews yet" description="Be the first learner to leave feedback for this deck." />
                         @endforelse
                     </div>
                 </div>

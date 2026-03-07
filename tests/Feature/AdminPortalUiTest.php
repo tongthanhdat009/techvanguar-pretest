@@ -17,15 +17,16 @@ class AdminPortalUiTest extends TestCase
         $admin = User::factory()->admin()->create();
         $managedUser = User::factory()->create();
 
-        $response = $this->actingAs($admin)
+        $response = $this->actingAs($admin, 'admin')
             ->withSession(['status' => 'User deleted.'])
             ->get(route('admin.users'));
 
         $response->assertOk();
         $response->assertSee('data-admin-toast-stack', false);
         $response->assertSee('User deleted.');
-        $response->assertSee('admin-sidebar-open');
+        $response->assertSee('data-admin-sidebar', false);
         $response->assertSee('data-admin-confirm', false);
+        $response->assertSee('data-admin-breadcrumb', false);
         $response->assertSee('data-confirm-message="Are you sure you want to delete this user?"', false);
         $response->assertDontSee("confirm('Are you sure you want to delete this user?')", false);
         $response->assertSee($managedUser->email);
@@ -43,13 +44,13 @@ class AdminPortalUiTest extends TestCase
             'comment' => 'Helpful deck.',
         ]);
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'admin')
             ->get(route('admin.decks'))
             ->assertOk()
             ->assertSee('data-confirm-message="Delete this deck and all its flashcards?"', false)
             ->assertSee('data-confirm-accept="Delete deck"', false);
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'admin')
             ->get(route('admin.reviews'))
             ->assertOk()
             ->assertSee('data-confirm-message="Remove this review?"', false)
