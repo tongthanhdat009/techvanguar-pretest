@@ -61,7 +61,9 @@
                                             @method('DELETE')
                                             <button type="submit"
                                                     class="text-red-600 hover:text-red-700 text-sm font-medium"
-                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                    data-confirm-title="Delete user"
+                                                    data-confirm-message="Are you sure you want to delete this user?"
+                                                    data-confirm-accept="Delete user">
                                                 Delete
                                             </button>
                                         </form>

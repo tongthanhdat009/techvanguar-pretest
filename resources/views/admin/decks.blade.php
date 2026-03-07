@@ -105,7 +105,9 @@
                                         @method('DELETE')
                                         <button type="submit"
                                                 class="text-red-600 hover:text-red-700 text-sm font-medium"
-                                                onclick="return confirm('Delete this deck and all its flashcards?')">
+                                                data-confirm-title="Delete deck"
+                                                data-confirm-message="Delete this deck and all its flashcards?"
+                                                data-confirm-accept="Delete deck">
                                             Delete
                                         </button>
                                     </form>
