@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserRole::class,
+            'set_session_cookie' => \App\Http\Middleware\SetSessionCookie::class,
         ]);
 
         // Configure redirect for authenticated users

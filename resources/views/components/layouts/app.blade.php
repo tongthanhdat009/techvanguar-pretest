@@ -15,17 +15,17 @@
                     <p class="mt-2 text-sm text-slate-300">Evidence-based learning platform with spaced repetition and active recall.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 text-sm">
-                    @guest
-                        <a href="{{ route('client.login') }}" class="rounded-full bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-sky-100">Scholar Login</a>
-                        <a href="{{ route('register') }}" class="rounded-full bg-amber-300 px-4 py-2 font-semibold text-slate-950 transition hover:bg-amber-200">Create Account</a>
-                    @else
+                    @if(auth()->guard('admin')->check() || auth()->guard('client')->check())
                         <!-- Redirect authenticated users to appropriate portal -->
-                        @if(auth()->user()->isAdmin())
+                        @if(auth()->guard('admin')->check())
                             <a href="{{ route('admin.overview') }}" class="rounded-full bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-sky-100">Admin Panel</a>
                         @else
                             <a href="{{ route('client.dashboard') }}" class="rounded-full bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-sky-100">Go to Learning Portal</a>
                         @endif
-                    @endguest
+                    @else
+                        <a href="{{ route('client.login') }}" class="rounded-full bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-sky-100">Scholar Login</a>
+                        <a href="{{ route('register') }}" class="rounded-full bg-amber-300 px-4 py-2 font-semibold text-slate-950 transition hover:bg-amber-200">Create Account</a>
+                    @endif
                 </div>
             </header>
 

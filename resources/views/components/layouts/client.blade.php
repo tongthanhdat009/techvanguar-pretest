@@ -15,7 +15,7 @@
                     <p class="mt-2 text-sm text-indigo-200">Evidence-based learning platform with spaced repetition and active recall.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 text-sm">
-                    @auth
+                    @auth('client')
                         <div class="flex items-center gap-3">
                             <div class="text-right">
                                 <p class="font-semibold text-white">{{ auth()->user()->name }}</p>
@@ -29,7 +29,7 @@
                             <a href="{{ route('client.portal') }}" class="rounded-full border border-white/20 px-3 py-2 font-medium text-white transition hover:bg-white/10">Study</a>
                             <a href="{{ route('client.profile') }}" class="rounded-full border border-white/20 px-3 py-2 font-medium text-white transition hover:bg-white/10">Profile</a>
                         </div>
-                        <form action="{{ route('logout') }}" method="POST">
+                        <form action="{{ route('client.logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="rounded-full bg-white/10 px-4 py-2 font-semibold text-white transition hover:bg-white/20 border border-white/20">Logout</button>
                         </form>
@@ -41,7 +41,7 @@
             </header>
 
             <!-- Quick Stats Bar for Logged-in Clients -->
-            @auth
+            @auth('client')
                 @if(auth()->user()->isClient())
                     <div class="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div class="rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 px-4 py-3 text-center">

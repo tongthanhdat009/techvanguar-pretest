@@ -108,12 +108,12 @@
                 <div class="mt-auto p-4 border-t border-slate-800 sticky bg-slate-950">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="flex-1 min-w-0 sidebar-user">
-                            <p class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-slate-400 truncate">{{ auth()->user()->email }}</p>
+                            <p class="text-sm font-medium text-white truncate">{{ auth()->guard('admin')->user()->name }}</p>
+                            <p class="text-xs text-slate-400 truncate">{{ auth()->guard('admin')->user()->email }}</p>
                         </div>
-                        <span class="pill bg-sky-400/20 text-sky-100 text-xs flex-shrink-0">{{ auth()->user()->role }}</span>
+                        <span class="pill bg-sky-400/20 text-sky-100 text-xs flex-shrink-0">{{ auth()->guard('admin')->user()->role }}</span>
                     </div>
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form action="{{ route('admin.logout') }}" method="POST">
                         @csrf
                         <button type="submit"
                                 class="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 hover:text-white transition"

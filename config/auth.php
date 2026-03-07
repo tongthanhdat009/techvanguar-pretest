@@ -13,6 +13,16 @@ return [
             'provider' => 'users',
         ],
 
+        'admin' => [
+            'driver' => 'admin_session',
+            'provider' => 'users',
+        ],
+
+        'client' => [
+            'driver' => 'client_session',
+            'provider' => 'users',
+        ],
+
         'api' => [
             'driver' => 'jwt',
             'provider' => 'users',

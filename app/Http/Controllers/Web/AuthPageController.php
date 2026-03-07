@@ -63,7 +63,7 @@ class AuthPageController extends Controller
             'role' => User::ROLE_CLIENT,
         ]);
 
-        Auth::login($user);
+        Auth::guard('client')->login($user);
         $request->session()->regenerate();
 
         return redirect()->route('client.portal');
@@ -71,50 +71,49 @@ class AuthPageController extends Controller
 
     public function clientLogin(Request $request): RedirectResponse
     {
-        return $this->attemptLogin($request, User::ROLE_CLIENT, 'client.portal');
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (!Auth::guard('client')->attempt($credentials)) {
+            return back()->withErrors([
+                'login' => 'The provided credentials are incorrect.',
+            ])->onlyInput('email');
+        }
+
+        $request->session()->regenerate();
+        return redirect()->route('client.portal');
     }
 
     public function adminLogin(Request $request): RedirectResponse
-    {
-        return $this->attemptLogin($request, User::ROLE_ADMIN, 'admin.overview');
-    }
-
-    public function logout(Request $request): RedirectResponse
-    {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('home');
-    }
-
-    private function attemptLogin(Request $request, string $role, string $route): RedirectResponse
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials)) {
+        if (!Auth::guard('admin')->attempt($credentials)) {
             return back()->withErrors([
                 'login' => 'The provided credentials are incorrect.',
             ])->onlyInput('email');
         }
 
-        /** @var User $user */
-        $user = Auth::user();
-
-        if ($user->role !== $role) {
-            Auth::logout();
-
-            return back()->withErrors([
-                'login' => sprintf('This portal is only available for %s accounts.', $role),
-            ])->onlyInput('email');
-        }
-
         $request->session()->regenerate();
+        return redirect()->route('admin.overview');
+    }
 
+    public function logout(Request $request): RedirectResponse
+    {
+        // Determine which guard to logout from based on route prefix
+        $guard = $request->route()->getPrefix() === 'admin' ? 'admin' : 'client';
+
+        Auth::guard($guard)->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        $route = $guard === 'admin' ? 'admin.login' : 'client.login';
         return redirect()->route($route);
     }
 }

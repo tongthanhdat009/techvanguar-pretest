@@ -12,9 +12,11 @@ Route::get('/login/admin', [AuthPageController::class, 'showAdminLogin'])->name(
 Route::post('/login/admin', [AuthPageController::class, 'adminLogin'])->name('admin.login.attempt');
 Route::get('/register', [AuthPageController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthPageController::class, 'register'])->name('register.store');
-Route::post('/logout', [AuthPageController::class, 'logout'])->middleware('auth')->name('logout');
 
-Route::middleware(['auth', 'role:client'])->group(function () {
+// Client routes with separate session
+Route::middleware(['set_session_cookie:client', 'auth:client'])->group(function () {
+    Route::post('/logout', [AuthPageController::class, 'logout'])->name('client.logout');
+
     Route::get('/client', [ClientPortalController::class, 'index'])->name('client.portal');
     Route::get('/client/dashboard', [ClientPortalController::class, 'index'])->name('client.dashboard');
     Route::get('/client/study', [ClientPortalController::class, 'studyAll'])->name('client.study.all');
@@ -37,7 +39,10 @@ Route::middleware(['auth', 'role:client'])->group(function () {
     Route::post('/client/flashcards/{flashcard}/progress', [ClientPortalController::class, 'updateProgress'])->name('client.progress.update');
 });
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+// Admin routes with separate session
+Route::prefix('admin')->name('admin.')->middleware(['set_session_cookie:admin', 'auth:admin'])->group(function () {
+    Route::post('/logout', [AuthPageController::class, 'logout'])->name('logout');
+
     // Overview - Dashboard stats only
     Route::get('/', [AdminDashboardController::class, 'overview'])->name('overview');
 
