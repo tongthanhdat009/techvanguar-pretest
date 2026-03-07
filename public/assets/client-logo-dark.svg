@@ -1,11 +1,47 @@
 <svg width="320" height="88" viewBox="0 0 320 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="1" y="1" width="318" height="86" rx="28" fill="#1C1917" stroke="#44403C"/>
-  <rect x="14" y="14" width="60" height="60" rx="20" fill="#F5F1E8"/>
-  <path d="M28 54.5C33.3333 45.8333 38.6667 41.5 44 41.5C49.3333 41.5 54.6667 45.8333 60 54.5" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-  <path d="M28 35.5C33.3333 44.1667 38.6667 48.5 44 48.5C49.3333 48.5 54.6667 44.1667 60 35.5" stroke="#34D399" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="44" cy="45" r="4.5" fill="#1C1917"/>
-  <text x="92" y="37" fill="#F5F5F4" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-weight="700">Flashcard</text>
-  <text x="92" y="60" fill="#D6D3D1" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3.5">LEARNING HUB</text>
-  <path d="M245 28H289" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
-  <path d="M245 59H275" stroke="#34D399" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.2"/>
+    </filter>
+
+    <linearGradient id="newBoxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338CA" />
+      <stop offset="100%" stop-color="#6D28D9" />
+    </linearGradient>
+
+    <linearGradient id="punchyGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <linearGradient id="punchyOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <linearGradient id="lightTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="100%" stop-color="#FFFFFF" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="316" height="84" rx="24" fill="#1E293B" stroke="#94A3B8" stroke-width="1.5" filter="url(#shadow)"/>
+
+  <rect x="14" y="14" width="60" height="60" rx="16" fill="url(#newBoxGrad)"/>
+
+  <g>
+    <rect x="25" y="27" width="26" height="34" rx="5" transform="rotate(-12 38 44)" fill="url(#punchyGreenGrad)" opacity="0.95"/>
+    <rect x="35" y="24" width="26" height="34" rx="5" transform="rotate(8 48 41)" fill="url(#punchyOrangeGrad)"/>
+    <path d="M48 31L49.5 35.5L54 37L49.5 38.5L48 43L46.5 38.5L42 37L46.5 35.5Z" fill="#FFFFFF"/>
+  </g>
+
+  <text x="92" y="42" fill="url(#lightTextGrad)" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="800" letter-spacing="-0.5">Flashcard</text>
+  <text x="94" y="62" fill="#CBD5E1" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="4">LEARNING HUB</text>
+
+  <g opacity="0.9">
+    <circle cx="270" cy="30" r="3.5" fill="url(#punchyGreenGrad)"/>
+    <circle cx="288" cy="44" r="4.5" fill="url(#punchyOrangeGrad)"/>
+    <circle cx="264" cy="56" r="2.5" fill="#E2E8F0"/>
+    <path d="M272 32.5L285 41.5" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+  </g>
 </svg>

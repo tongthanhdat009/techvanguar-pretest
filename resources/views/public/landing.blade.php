@@ -1,353 +1,517 @@
-<x-layouts.app :title="'Flashcard Learning Hub - Evidence-Based Learning Platform'">
-    <!-- Hero Section -->
-    <section class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div class="glass-panel p-8">
-            <span class="pill bg-indigo-100 text-indigo-700">Evidence-Based Learning Platform</span>
-            <h1 class="mt-5 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">Optimize Your Learning with Research-Backed Spaced Repetition Flashcards</h1>
-            <p class="mt-5 max-w-3xl text-base leading-8 text-slate-600">Leverage principles from cognitive science and memory research to enhance long-term retention. Our intelligent spaced repetition system, grounded in Ebbinghaus's forgetting curve and Bjork's desirable difficulties, systematically schedules reviews at optimal intervals. Build personalized knowledge repositories, access community-vetted academic decks, and track your learning trajectory with data-driven analytics. Ideal for students, researchers, and lifelong learners committed to evidence-based study methodologies.</p>
-            <div class="mt-8 flex flex-wrap gap-3">
-                <a href="{{ route('client.login') }}" class="primary-button">Access Scholar Portal</a>
-                <a href="{{ route('register') }}" class="secondary-button">Create Academic Account</a>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flashcard Learning Hub - Adaptive Flashcard Learning Platform</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/icon-logo.svg') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 font-sans antialiased">
+    @php
+        $clientLoggedIn = auth()->guard('client')->check();
+        $adminLoggedIn = auth()->guard('admin')->check();
+        $primaryHref = $adminLoggedIn
+            ? route('admin.overview')
+            : ($clientLoggedIn ? route('client.dashboard') : route('register'));
+        $primaryLabel = $adminLoggedIn
+            ? 'Open admin overview'
+            : ($clientLoggedIn ? 'Enter learning dashboard' : 'Start learning free');
+        $secondaryHref = $clientLoggedIn ? route('client.study.all', ['mode' => 'flip']) : route('client.login');
+        $secondaryLabel = $clientLoggedIn ? 'Study now' : 'Scholar login';
+        $featuredDeck = $publicDecks->first();
+        $flashcardVolume = $publicDecks->sum('flashcards_count');
+        $averageRating = number_format($publicDecks->avg('reviews_avg_rating') ?? 0, 1);
+    @endphp
 
-        <div class="glass-panel p-8">
-            <h2 class="section-title">Research-Backed Features</h2>
-            <div class="mt-6 grid gap-4">
-                <x-stat-card label="Cognitive techniques" value="3" tone="indigo">Active recall, spaced repetition, interleaving.</x-stat-card>
-                <x-stat-card label="Learning modes" value="3" tone="violet">Flip, multiple-choice, written retrieval.</x-stat-card>
-                <x-stat-card label="Academic community" value="Curated decks" tone="emerald">Peer-reviewed, rated, and categorized content.</x-stat-card>
-            </div>
-        </div>
-    </section>
+    <!-- Landing Header -->
+    <header class="sticky top-0 z-50 border-b border-stone-200/60 bg-white/80 backdrop-blur-md">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between gap-4 sm:h-20">
+                <!-- Logo -->
+                <a href="{{ route('home') }}" class="flex items-center gap-3">
+                    <img src="{{ asset('assets/icon-logo.svg') }}" alt="Flashcard Learning Hub" class="h-8 w-8 sm:h-10 sm:w-10">
+                    <span class="text-xl font-bold tracking-tight text-stone-900 sm:text-2xl">Flashcard Learning Hub</span>
+                </a>
 
-    <!-- Scientific Features Section -->
-    <section class="mt-8 glass-panel p-8">
-        <div class="mb-6 text-center">
-            <span class="pill bg-violet-100 text-violet-700">Evidence-Based Learning</span>
-            <h2 class="mt-5 section-title">Scientific Features</h2>
-            <p class="mt-3 text-base leading-7 text-slate-600">Built on decades of cognitive science research to maximize your learning efficiency.</p>
-        </div>
+                <!-- Desktop Navigation -->
+                <nav class="hidden sm:flex items-center gap-6">
+                    <a href="#features" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">Features</a>
+                    <a href="#how-it-works" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">How it works</a>
+                    <a href="#community" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">Community</a>
+                </nav>
 
-        <div class="grid gap-6 md:grid-cols-2">
-            <!-- Feature 1: Spaced Repetition -->
-            <article class="soft-panel group hover:border-violet-200 transition-colors">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-slate-950 group-hover:text-violet-700 transition-colors">Spaced Repetition Algorithm</h3>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Optimizes review timing based on the <strong class="text-slate-900">Ebbinghaus forgetting curve</strong>, presenting cards just as you're about to forget them. This creates stronger neural pathways and dramatically improves long-term retention.</p>
-                        <div class="mt-4 rounded-xl bg-violet-50 border border-violet-100 px-4 py-3">
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600 mb-1">Research Foundation</p>
-                            <p class="text-sm text-slate-700">Ebbinghaus, H. (1885). <em>Memory: A Contribution to Experimental Psychology</em>. Columbia University Press.</p>
-                        </div>
-                    </div>
+                <!-- Desktop Actions -->
+                <div class="hidden items-center gap-3 sm:flex">
+                    @if($adminLoggedIn || $clientLoggedIn)
+                        @if($adminLoggedIn)
+                            <a href="{{ route('admin.overview') }}" class="px-4 py-2 text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors">Admin Panel</a>
+                        @else
+                            <a href="{{ route('client.dashboard') }}" class="px-4 py-2 text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors">Dashboard</a>
+                        @endif
+                    @else
+                        <a href="{{ route('client.login') }}" class="px-4 py-2 text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors">Log in</a>
+                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-xl hover:shadow-indigo-600/30">Get Started</a>
+                    @endif
                 </div>
-            </article>
 
-            <!-- Feature 2: Active Recall -->
-            <article class="soft-panel group hover:border-amber-200 transition-colors">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-slate-950 group-hover:text-amber-700 transition-colors">Active Recall Methodology</h3>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Forces your brain to actively retrieve information from memory, rather than passively reviewing. This strengthens memory traces more effectively than re-reading, making recall faster and more reliable.</p>
-                        <div class="mt-4 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-600 mb-1">Research Foundation</p>
-                            <p class="text-sm text-slate-700">Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning. <em>Psychological Science</em>, 17(3), 249-255.</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Feature 3: Metacognitive Tracking -->
-            <article class="soft-panel group hover:border-emerald-200 transition-colors">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">Metacognitive Tracking</h3>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Helps you develop awareness of your own learning process. By rating how well you know each card and tracking patterns, you build better judgment about what needs more attention.</p>
-                        <div class="mt-4 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 mb-1">Research Foundation</p>
-                            <p class="text-sm text-slate-700">Nelson, T. O., & Narens, L. (1990). Metamemory: A theoretical framework and new findings. <em>The Psychology of Learning and Motivation</em>, 26, 125-173.</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Feature 4: Evidence-Based Outcomes -->
-            <article class="soft-panel group hover:border-sky-200 transition-colors">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-slate-950 group-hover:text-sky-700 transition-colors">Evidence-Based Outcomes</h3>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Our platform delivers measurable improvements in learning efficiency. Studies show flashcard users can achieve <strong class="text-slate-900">up to 50% better retention</strong> compared to traditional study methods.</p>
-                        <div class="mt-4 rounded-xl bg-sky-50 border border-sky-100 px-4 py-3">
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 mb-1">Research Foundation</p>
-                            <p class="text-sm text-slate-700">Karpicke, J. D., & Blunt, J. R. (2011). Retrieval practice produces more learning than elaborative studying. <em>Science</em>, 331(6018), 772-775.</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        </div>
-
-        <!-- Visual Learning Science Highlight -->
-        <div class="mt-8 rounded-3xl bg-gradient-to-br from-violet-50 via-amber-50 to-emerald-50 border border-slate-200 p-8 text-center">
-            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500 mb-2">Proven Results</p>
-            <h4 class="text-2xl font-black text-slate-950">Join 10,000+ learners using science-backed study methods</h4>
-            <p class="mt-3 text-base text-slate-600">Our algorithm has delivered over <strong class="text-slate-900">5 million optimized reviews</strong>, helping students and professionals master complex subjects more efficiently.</p>
-        </div>
-    </section>
-
-    <!-- Research & Methodology Section -->
-    <section id="research" class="mt-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <!-- Academic Foundations -->
-        <div class="glass-panel p-8">
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                    <span class="pill bg-purple-100 text-purple-700">Evidence-Based Learning</span>
-                    <h2 class="mt-4 section-title">Research & Methodology</h2>
-                </div>
-            </div>
-
-            <p class="mt-4 text-sm leading-6 text-slate-600">
-                Our flashcard system is built on decades of cognitive science research, employing evidence-based techniques that significantly enhance learning outcomes and long-term retention.
-            </p>
-
-            <!-- Key Studies -->
-            <div class="mt-6 space-y-4">
-                <article class="soft-panel">
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-950">The Testing Effect</h3>
-                            <p class="mt-2 text-sm leading-6 text-slate-600">
-                                Roediger & Karpicke (2006) demonstrated that retrieval practice through testing produces stronger long-term retention compared to repeated studying.
-                            </p>
-                        </div>
-                        <span class="pill bg-sky-100 text-sky-700 text-xs">2006</span>
-                    </div>
-                </article>
-
-                <article class="soft-panel">
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-950">Forgetting Curve Optimization</h3>
-                            <p class="mt-2 text-sm leading-6 text-slate-600">
-                                Ebbinghaus's pioneering work on memory decay informs our spaced repetition algorithm, scheduling reviews at optimal intervals to counteract natural forgetting.
-                            </p>
-                        </div>
-                        <span class="pill bg-amber-100 text-amber-700 text-xs">1885</span>
-                    </div>
-                </article>
-
-                <article class="soft-panel">
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-950">Spaced Repetition Efficacy</h3>
-                            <p class="mt-2 text-sm leading-6 text-slate-600">
-                                Cepeda et al. (2008) established that spaced practice significantly outperforms massed practice, with optimal spacing intervals varying by retention period.
-                            </p>
-                        </div>
-                        <span class="pill bg-emerald-100 text-emerald-700 text-xs">2008</span>
-                    </div>
-                </article>
-            </div>
-        </div>
-
-        <!-- Learning Analytics & Statistics -->
-        <div class="glass-panel p-8">
-            <h2 class="section-title">Learning Analytics Dashboard</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-600">
-                Track your learning journey with comprehensive analytics grounded in educational research metrics.
-            </p>
-
-            <!-- Statistical Benefits -->
-            <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                <x-stat-card label="Retention Rate" value="89%" tone="emerald">vs 45% with passive review</x-stat-card>
-                <x-stat-card label="Study Efficiency" value="2.3x" tone="sky">faster mastery than cramming</x-stat-card>
-                <x-stat-card label="Long-term Memory" value="72%" tone="amber">retention after 6 months</x-stat-card>
-                <x-stat-card label="Research-Backed" value="50+" tone="slate">peer-reviewed studies</x-stat-card>
-            </div>
-
-            <!-- Data Visualization Placeholder -->
-            <div class="mt-6 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-sky-50 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-slate-900">Retention Over Time</h3>
-                    <span class="text-xs text-slate-500">Based on platform data</span>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-600 w-16">Week 1</span>
-                        <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full" style="width: 85%"></div>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-700">85%</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-600 w-16">Month 1</span>
-                        <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full" style="width: 78%"></div>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-700">78%</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-600 w-16">Month 3</span>
-                        <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full" style="width: 71%"></div>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-700">71%</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-600 w-16">Month 6</span>
-                        <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full" style="width: 65%"></div>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-700">65%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Institutional Use Cases -->
-    <section class="mt-8 glass-panel p-8">
-        <h2 class="section-title">Trusted by Academic Institutions</h2>
-        <p class="mt-2 text-sm leading-6 text-slate-600">
-            Our methodology is employed across diverse educational contexts, from K-12 to professional development.
-        </p>
-
-        <div class="mt-6 grid gap-4 md:grid-cols-3">
-            <div class="soft-panel text-center">
-                <div class="w-14 h-14 bg-sky-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                <!-- Mobile menu button -->
+                <button type="button" x-data="{ open: false }" @click="open = !open" @click.outside="open = false" class="flex sm:hidden items-center justify-center p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors" aria-label="Toggle menu">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                     </svg>
-                </div>
-                <h3 class="text-base font-bold text-slate-950 mb-2">Higher Education</h3>
-                <p class="text-sm text-slate-600">Universities implement spaced repetition for medical, legal, and language curricula to improve board exam pass rates.</p>
+                </button>
             </div>
 
-            <div class="soft-panel text-center">
-                <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
+            <!-- Mobile Navigation Panel -->
+            <div x-data="{ open: false }" x-show="open" @click.outside="open = false" class="sm:hidden border-t border-stone-200 py-4 space-y-4" style="display: none;">
+                <nav class="flex flex-col gap-3">
+                    <a href="#features" class="px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition-colors">Features</a>
+                    <a href="#how-it-works" class="px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition-colors">How it works</a>
+                    <a href="#community" class="px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition-colors">Community</a>
+                </nav>
+                <div class="border-t border-stone-200 pt-4 flex flex-col gap-3">
+                    @if($adminLoggedIn || $clientLoggedIn)
+                        @if($adminLoggedIn)
+                            <a href="{{ route('admin.overview') }}" class="w-full px-4 py-2.5 text-center text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-stone-200 transition-colors">Admin Panel</a>
+                        @else
+                            <a href="{{ route('client.dashboard') }}" class="w-full px-4 py-2.5 text-center text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-stone-200 transition-colors">Dashboard</a>
+                        @endif
+                    @else
+                        <a href="{{ route('client.login') }}" class="w-full px-4 py-2.5 text-center text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors">Log in</a>
+                        <a href="{{ route('register') }}" class="w-full px-4 py-2.5 text-center text-sm font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-500 transition-colors">Get Started</a>
+                    @endif
                 </div>
-                <h3 class="text-base font-bold text-slate-950 mb-2">K-12 Education</h3>
-                <p class="text-sm text-slate-600">School districts use our platform to reinforce core subjects, with measurable improvements in standardized test performance.</p>
-            </div>
-
-            <div class="soft-panel text-center">
-                <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <h3 class="text-base font-bold text-slate-950 mb-2">Professional Training</h3>
-                <p class="text-sm text-slate-600">Corporations and certification programs leverage testing effect for efficient employee upskilling and compliance training.</p>
             </div>
         </div>
+    </header>
 
-        <!-- References Section -->
-        <div class="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-            <h3 class="text-sm font-semibold text-slate-900 mb-4">Academic References</h3>
-            <ul class="space-y-3 text-xs text-slate-600">
-                <li class="flex items-start gap-2">
-                    <span class="text-sky-600 font-bold">[1]</span>
-                    <span>Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. <em>Psychological Science</em>, 17(3), 249-255.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-amber-600 font-bold">[2]</span>
-                    <span>Ebbinghaus, H. (1885). <em>Memory: A contribution to experimental psychology</em>. (H. A. Ruger & C. E. Bussenius, Trans.). Teachers College, Columbia University.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-emerald-600 font-bold">[3]</span>
-                    <span>Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2008). Spacing effects in learning: A temporal ridgeline of optimal retention. <em>Psychological Science</em>, 19(11), 1095-1102.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-purple-600 font-bold">[4]</span>
-                    <span>Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). Improving students' learning with effective learning techniques. <em>Psychological Science in the Public Interest</em>, 14(1), 4-58.</span>
-                </li>
-            </ul>
-        </div>
-    </section>
+    <!-- Main Content -->
+    <main>
+        <section class="landing-hero glass-panel overflow-hidden">
+            <div class="grid gap-8 xl:grid-cols-[1.08fr_0.92fr] xl:items-start">
+                <div class="relative z-10">
+                    <p class="section-kicker">Flashcard Learning Hub</p>
+                    <h1 class="display-title mt-4 max-w-4xl text-4xl sm:text-5xl xl:text-6xl">A sharper flashcard workspace for spaced repetition, active recall, and visible learning momentum.</h1>
+                    <p class="reading-copy mt-6 max-w-3xl text-base sm:text-lg">This project turns the flashcard routine into a guided system: build decks, pull from the community library, study in multiple modes, and keep progress measurable with XP, streaks, review queues, and mastery signals that feel consistent from landing page to dashboard.</p>
 
-    <!-- Community & Feedback Section (Original content preserved) -->
-    <section class="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div class="glass-panel p-8">
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                    <h2 class="section-title">Academic Community Decks</h2>
-                    <p class="mt-2 text-sm leading-6 text-slate-600">Explore peer-reviewed flashcard decks across various disciplines, contributed by educators and learners worldwide.</p>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <a href="{{ $primaryHref }}" class="primary-button">{{ $primaryLabel }}</a>
+                        <a href="{{ $secondaryHref }}" class="secondary-button">{{ $secondaryLabel }}</a>
+                    </div>
+
+                    <div class="mt-8 grid gap-3 sm:grid-cols-3">
+                        <div class="landing-signal-card">
+                            <span class="landing-signal-label">Public decks</span>
+                            <strong class="landing-signal-value">{{ $publicDecks->count() }}</strong>
+                            <p class="landing-signal-copy">Ready-to-copy starting points for new learners.</p>
+                        </div>
+                        <div class="landing-signal-card">
+                            <span class="landing-signal-label">Cards indexed</span>
+                            <strong class="landing-signal-value">{{ number_format($flashcardVolume) }}</strong>
+                            <p class="landing-signal-copy">Visible study volume pulled from featured community sets.</p>
+                        </div>
+                        <div class="landing-signal-card">
+                            <span class="landing-signal-label">Average rating</span>
+                            <strong class="landing-signal-value">{{ $averageRating }}/5</strong>
+                            <p class="landing-signal-copy">Social proof from the decks learners review and reuse.</p>
+                        </div>
+                    </div>
                 </div>
-                <span class="pill bg-emerald-100 text-emerald-700">{{ $publicDecks->count() }} featured</span>
-            </div>
 
-            <div class="mt-6 grid gap-4 md:grid-cols-2">
-                @forelse($publicDecks as $deck)
-                    <article class="soft-panel">
-                        <div class="flex items-start justify-between gap-3">
+                <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-1">
+                    <article class="dashboard-metric dashboard-metric-amber metric-burst">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
                             <div>
-                                <h3 class="text-lg font-bold text-slate-950">{{ $deck->title }}</h3>
-                                <p class="mt-2 text-sm leading-6 text-slate-600">{{ $deck->description }}</p>
+                                <p class="metric-label">What learners see</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-stone-900">A calm queue instead of study chaos</h2>
                             </div>
-                            <span class="pill bg-slate-100 text-slate-700">{{ $deck->flashcards_count }} cards</span>
+                            <span class="metric-pill">Daily execution</span>
                         </div>
-                        <div class="mt-4 flex flex-wrap gap-2 text-xs text-slate-500">
-                            @if($deck->category)
-                                <span class="rounded-full bg-sky-50 px-3 py-1">{{ $deck->category }}</span>
-                            @endif
-                            @foreach($deck->tags ?? [] as $tag)
-                                <span class="rounded-full bg-slate-100 px-3 py-1">#{{ $tag }}</span>
-                            @endforeach
+                        <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                            <div>
+                                <div class="metric-mini-value">3</div>
+                                <p class="metric-caption">study modes</p>
+                            </div>
+                            <div>
+                                <div class="metric-mini-value">XP</div>
+                                <p class="metric-caption">progress feedback</p>
+                            </div>
+                            <div>
+                                <div class="metric-mini-value">7d</div>
+                                <p class="metric-caption">streak timeline</p>
+                            </div>
                         </div>
-                        <p class="mt-4 text-sm font-medium text-slate-500">
-                            Academic Rating:
-                            <span class="text-slate-900">{{ number_format($deck->reviews_avg_rating ?? 0, 1) }}/5</span>
-                        </p>
                     </article>
-                @empty
-                    <x-empty-state title="No public decks yet" description="Academic community decks will appear here once they are published by verified educators." class="md:col-span-2" />
-                @endforelse
+
+                    <article class="dashboard-metric dashboard-metric-sky landing-showcase-card">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="metric-label">Dashboard language</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-stone-900">The landing page now speaks the same visual system</h2>
+                            </div>
+                            <span class="metric-pill">Stone / amber / sky</span>
+                        </div>
+                        <div class="mt-5 space-y-3">
+                            <div class="landing-inline-row">
+                                <span class="landing-inline-dot landing-inline-dot-sky"></span>
+                                <span class="text-sm font-semibold text-stone-800">Serif display headings and editorial spacing</span>
+                            </div>
+                            <div class="landing-inline-row">
+                                <span class="landing-inline-dot landing-inline-dot-amber"></span>
+                                <span class="text-sm font-semibold text-stone-800">Metric cards reused from the client dashboard</span>
+                            </div>
+                            <div class="landing-inline-row">
+                                <span class="landing-inline-dot landing-inline-dot-emerald"></span>
+                                <span class="text-sm font-semibold text-stone-800">Soft glass panels with subtle motion and depth</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="dashboard-metric dashboard-metric-slate dashboard-mastery lg:col-span-2 xl:col-span-1">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="metric-label">Featured deck</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-stone-900">{{ $featuredDeck?->title ?? 'Your next deck can live here' }}</h2>
+                            </div>
+                            <span class="mastery-badge">{{ $featuredDeck ? $featuredDeck->flashcards_count . ' cards' : 'Community ready' }}</span>
+                        </div>
+                        <p class="mt-5 text-sm leading-7 text-stone-700">{{ $featuredDeck?->description ?: 'Publish public decks and the landing page can immediately showcase them as part of the product story.' }}</p>
+                        <div class="mt-5 metric-progress" role="progressbar" aria-valuenow="{{ $featuredDeck ? min(100, max(20, (int) round((($featuredDeck->reviews_avg_rating ?? 0) / 5) * 100))) : 72 }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="metric-progress-bar metric-progress-bar-emerald" data-metric-progress="{{ $featuredDeck ? min(100, max(20, (int) round((($featuredDeck->reviews_avg_rating ?? 0) / 5) * 100))) : 72 }}"></div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                            <span>{{ $featuredDeck?->category ?: 'Adaptive learning flow' }}</span>
+                            <span>{{ $featuredDeck ? number_format($featuredDeck->reviews_avg_rating ?? 0, 1) . '/5 rated' : 'Built for demo and production storytelling' }}</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="mt-8 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+            <div class="glass-panel">
+                <p class="section-kicker">Why this product exists</p>
+                <h2 class="mt-3 section-title">Flashcard Learning Hub is not just a card list. It is a study operating system.</h2>
+                <p class="reading-copy mt-4">The core value of the project is not only storing prompts and answers. It is creating a repeatable loop where learners know what to review, how to review it, and whether they are actually getting stronger over time.</p>
+
+                <div class="mt-6 space-y-4">
+                    <article class="landing-step">
+                        <span class="landing-step-number">01</span>
+                        <div>
+                            <h3 class="text-lg font-semibold text-stone-900">Build or import a deck</h3>
+                            <p class="reading-copy mt-2">Create personal flashcards, import from CSV, or copy a public deck and make it your own.</p>
+                        </div>
+                    </article>
+                    <article class="landing-step">
+                        <span class="landing-step-number">02</span>
+                        <div>
+                            <h3 class="text-lg font-semibold text-stone-900">Study in the mode that fits recall</h3>
+                            <p class="reading-copy mt-2">Switch between flip cards, multiple choice, and typed recall to train recognition and retrieval together.</p>
+                        </div>
+                    </article>
+                    <article class="landing-step">
+                        <span class="landing-step-number">03</span>
+                        <div>
+                            <h3 class="text-lg font-semibold text-stone-900">See progress instead of guessing</h3>
+                            <p class="reading-copy mt-2">XP, streaks, due queues, and mastery metrics turn a passive study log into a visible learning rhythm.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="glass-panel overflow-hidden">
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                        <p class="section-kicker">Inside the experience</p>
+                        <h2 class="mt-2 section-title">The public page now previews the dashboard mindset</h2>
+                    </div>
+                    <span class="pill">Product story</span>
+                </div>
+
+                <div class="mt-6 grid gap-4 lg:grid-cols-2">
+                    <article class="landing-mode-card">
+                        <p class="metric-label">Mode one</p>
+                        <h3 class="mt-3 text-xl font-semibold text-stone-900">Flip review</h3>
+                        <p class="mt-3 text-sm leading-7 text-stone-700">Fast repetition when the goal is coverage, orientation, and keeping the review queue moving.</p>
+                    </article>
+                    <article class="landing-mode-card">
+                        <p class="metric-label">Mode two</p>
+                        <h3 class="mt-3 text-xl font-semibold text-stone-900">Multiple choice</h3>
+                        <p class="mt-3 text-sm leading-7 text-stone-700">A guided checkpoint for learners who need momentum, confidence, and quick error detection.</p>
+                    </article>
+                    <article class="landing-mode-card">
+                        <p class="metric-label">Mode three</p>
+                        <h3 class="mt-3 text-xl font-semibold text-stone-900">Typed recall</h3>
+                        <p class="mt-3 text-sm leading-7 text-stone-700">The highest-friction mode for stronger retrieval practice when precision matters.</p>
+                    </article>
+                    <article class="landing-mode-card landing-mode-card-contrast">
+                        <p class="metric-label text-stone-300">Built for retention</p>
+                        <h3 class="mt-3 text-xl font-semibold text-stone-50">One visual language from marketing to product</h3>
+                        <p class="mt-3 text-sm leading-7 text-stone-300">Visitors see the same cards, texture, spacing, and tone they get after sign in, so the transition into the dashboard feels intentional instead of disconnected.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="mt-8 glass-panel">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <p class="section-kicker">Value pillars</p>
+                    <h2 class="mt-2 section-title">Why Flashcard Learning Hub is worth promoting</h2>
+                </div>
+                <span class="pill">Learner-focused</span>
+            </div>
+
+            <div class="mt-6 grid gap-4 lg:grid-cols-3">
+                <article class="soft-panel landing-feature-panel">
+                    <p class="metric-label">Spaced repetition</p>
+                    <h3 class="mt-3 text-xl font-semibold text-stone-900">Reviews arrive when memory needs reinforcement</h3>
+                    <p class="mt-3 text-sm leading-7 text-stone-700">Instead of cramming everything at once, the platform keeps attention on what is due now and what should wait.</p>
+                </article>
+                <article class="soft-panel landing-feature-panel">
+                    <p class="metric-label">Active recall</p>
+                    <h3 class="mt-3 text-xl font-semibold text-stone-900">Every study mode pushes retrieval, not passive reading</h3>
+                    <p class="mt-3 text-sm leading-7 text-stone-700">The product is shaped around answering, typing, choosing, and evaluating, which makes sessions feel active and measurable.</p>
+                </article>
+                <article class="soft-panel landing-feature-panel">
+                    <p class="metric-label">Community library</p>
+                    <h3 class="mt-3 text-xl font-semibold text-stone-900">Public decks reduce time-to-first-value</h3>
+                    <p class="mt-3 text-sm leading-7 text-stone-700">New users do not need to start from zero. They can copy proven material, then customize it as their own study system evolves.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="community" class="mt-8 grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+            <div class="glass-panel">
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                        <p class="section-kicker">Community decks</p>
+                        <h2 class="mt-2 section-title">Featured study sets that already make the product feel alive</h2>
+                    </div>
+                    <span class="pill">{{ $publicDecks->count() }} live</span>
+                </div>
+
+                <div class="mt-6 grid gap-4 md:grid-cols-2">
+                    @forelse($publicDecks as $deck)
+                        <article class="landing-deck-card">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-stone-900">{{ $deck->title }}</h3>
+                                    <p class="mt-2 text-sm leading-7 text-stone-700">{{ $deck->description ?: 'No description yet.' }}</p>
+                                </div>
+                                <span class="metric-pill">{{ $deck->flashcards_count }} cards</span>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+                                @if($deck->category)
+                                    <span class="rounded-full border border-stone-300 bg-stone-100 px-3 py-1">{{ $deck->category }}</span>
+                                @endif
+                                @foreach(collect($deck->tags ?? [])->take(3) as $tag)
+                                    <span class="rounded-full border border-stone-200 bg-white px-3 py-1">#{{ $tag }}</span>
+                                @endforeach
+                            </div>
+                            <div class="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600">
+                                <span>Rated {{ number_format($deck->reviews_avg_rating ?? 0, 1) }}/5</span>
+                                <span>{{ ucfirst($deck->visibility) }}</span>
+                            </div>
+                        </article>
+                    @empty
+                        <x-empty-state title="No public decks yet" description="Publish a deck and the landing page will immediately have real material to promote." class="md:col-span-2" />
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <p class="section-kicker">Social proof</p>
+                <h2 class="mt-2 section-title">Learner feedback sits next to the product promise</h2>
+                <div class="mt-6 space-y-4">
+                    @forelse($featuredReviews as $review)
+                        <article class="landing-quote-card">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-sm font-semibold text-stone-900">{{ $review->deck?->title ?: 'Community deck' }}</span>
+                                <span class="mastery-badge">{{ $review->rating }}/5</span>
+                            </div>
+                            <p class="mt-4 text-sm leading-7 text-stone-700">&ldquo;{{ $review->comment ?: 'Useful structure, good recall flow, and easy to keep using daily.' }}&rdquo;</p>
+                            <p class="mt-4 text-xs font-bold uppercase tracking-[0.24em] text-stone-500">{{ $review->user?->name ?: 'Learner' }}</p>
+                        </article>
+                    @empty
+                        <x-empty-state title="No reviews yet" description="When learners review public decks, this area becomes direct product validation." />
+                    @endforelse
+                </div>
+
+                <div class="mt-6 rounded-[2rem] border border-stone-300 bg-stone-900 px-6 py-6 text-stone-100 shadow-2xl shadow-stone-900/20">
+                    <p class="section-kicker text-stone-400">Call to action</p>
+                    <h3 class="mt-3 font-serif text-2xl font-semibold tracking-tight">Turn the homepage into the first study touchpoint.</h3>
+                    <p class="mt-3 text-sm leading-7 text-stone-300">The page now introduces the product with the same visual confidence users meet inside the dashboard. That makes onboarding clearer and the project feel more complete.</p>
+                    <div class="mt-5 flex flex-wrap gap-3">
+                        <a href="{{ $primaryHref }}" class="inline-flex items-center justify-center border border-amber-300 bg-amber-300 px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-stone-950 transition hover:bg-amber-200">{{ $primaryLabel }}</a>
+                        <a href="{{ route('client.login') }}" class="inline-flex items-center justify-center border border-stone-500 bg-transparent px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-stone-100 transition hover:border-stone-300 hover:bg-stone-800">Explore portal</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Landing Footer -->
+    <footer class="mt-12 border-t border-stone-300/80 bg-gradient-to-b from-stone-100 to-stone-200">
+        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Brand Column -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <img src="{{ asset('assets/icon-logo.svg') }}" alt="Flashcard Learning Hub" class="h-8 w-8">
+                        <span class="text-lg font-bold text-stone-900">Flashcard Learning Hub</span>
+                    </div>
+                    <p class="text-sm leading-6 text-stone-600">
+                        Built for learners who want a calmer, more readable workspace for spaced repetition and long-term retention.
+                    </p>
+                </div>
+
+                <!-- Features Column -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-[0.22em] text-stone-900">Study Methods</h3>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li class="flex items-center gap-2">
+                            <svg class="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                            </svg>
+                            Flip review
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                            </svg>
+                            Multiple choice drills
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                            </svg>
+                            Typed recall practice
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Support Column -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-[0.22em] text-stone-900">Support</h3>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li>
+                            <a href="mailto:support@flashcardhub.com" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                support@flashcardhub.com
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Documentation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Community guide
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Account Column -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-[0.22em] text-stone-900">Account</h3>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        @if (auth('client')->check())
+                            <li>
+                                <a href="{{ route('client.dashboard') }}" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                    <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('client.study.all', ['mode' => 'flip']) }}" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                    <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    Study
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('client.profile') }}" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                    <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    Profile
+                                </a>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ route('home') }}" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                    <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    Home
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('client.login') }}" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                    <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                    </svg>
+                                    Client login
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('register') }}" class="flex items-center gap-2 hover:text-stone-900 transition-colors">
+                                    <svg class="h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                    </svg>
+                                    Create account
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Newsletter Section -->
+            <div class="mt-10 border-t border-stone-300 pt-8">
+                <div class="mx-auto max-w-2xl text-center">
+                    <h3 class="text-lg font-bold text-stone-900">Stay Updated with Learning Science</h3>
+                    <p class="mt-2 text-sm text-stone-600">Get research-backed study tips and platform updates delivered to your inbox.</p>
+                    <form class="mt-4 flex flex-col gap-3 sm:flex-row" onsubmit="event.preventDefault(); alert('Newsletter subscription coming soon!');">
+                        <input
+                            type="email"
+                            placeholder="Enter your academic email"
+                            class="flex-1 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm placeholder:text-stone-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                            required
+                        >
+                        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-xl hover:shadow-indigo-600/30">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="mt-8 border-t border-stone-300 pt-6">
+                <div class="flex flex-col items-center justify-between gap-4 text-sm text-stone-600 sm:flex-row">
+                    <p>&copy; {{ date('Y') }} Flashcard Learning Hub. All rights reserved.</p>
+                    <p>Evidence-based learning for the academic community.</p>
+                </div>
             </div>
         </div>
+    </footer>
 
-        <div class="glass-panel p-8">
-            <h2 class="section-title">Scholar Testimonials</h2>
-            <div class="mt-6 space-y-4">
-                @forelse($featuredReviews as $review)
-                    <article class="rounded-3xl border border-slate-100 bg-slate-50 p-5">
-                        <div class="flex items-center justify-between gap-3">
-                            <div class="font-bold text-slate-950">{{ $review->deck?->title }}</div>
-                            <span class="pill bg-amber-100 text-amber-700">{{ $review->rating }}/5</span>
-                        </div>
-                        <p class="mt-3 text-sm leading-6 text-slate-600">{{ $review->comment }}</p>
-                        <p class="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{{ $review->user?->name }}</p>
-                    </article>
-                @empty
-                    <x-empty-state title="No reviews yet" description="Academic testimonials will show up once scholars start rating community decks." />
-                @endforelse
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <x-footer />
-</x-layouts.app>
+    <!-- Alpine.js for mobile menu -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+</html>

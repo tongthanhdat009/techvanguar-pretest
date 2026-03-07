@@ -1,0 +1,25 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="lightShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1E293B" flood-opacity="0.08"/>
+    </filter>
+
+    <linearGradient id="softGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ADE80" />
+      <stop offset="100%" stop-color="#16A34A" />
+    </linearGradient>
+
+    <linearGradient id="softOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#EA580C" />
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="#FFFFFF" stroke="#E7E5E4" stroke-width="1.5" filter="url(#lightShadow)"/>
+
+  <g transform="translate(18, 12) scale(1.6)">
+    <rect x="25" y="27" width="26" height="34" rx="5" transform="rotate(-12 38 44)" fill="url(#softGreenGrad)" opacity="0.9"/>
+    <rect x="35" y="24" width="26" height="34" rx="5" transform="rotate(8 48 41)" fill="url(#softOrangeGrad)"/>
+    <path d="M48 31L49.5 35.5L54 37L49.5 38.5L48 43L46.5 38.5L42 37L46.5 35.5Z" fill="#FFFBEB"/>
+  </g>
+</svg>

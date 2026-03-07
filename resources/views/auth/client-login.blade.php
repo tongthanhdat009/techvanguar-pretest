@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Client Login'">
+<x-layouts.client :title="'Client Login'">
     <section class="mx-auto max-w-xl glass-panel p-8">
         <span class="pill">Client portal</span>
         <h1 class="display-title mt-4 text-3xl">Sign in to study, review due cards, and manage your decks.</h1>
@@ -15,6 +15,4 @@
             <button type="submit" class="primary-button w-full">Login as client</button>
         </form>
     </section>
-
-    <x-footer :show-newsletter="false" />
-</x-layouts.app>
+</x-layouts.client>

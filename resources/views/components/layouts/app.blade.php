@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? 'Flashcard Learning Hub' }}</title>
+        <link rel="icon" type="image/svg+xml" href="{{ asset('assets/icon-logo.svg') }}">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="app-shell font-sans antialiased">

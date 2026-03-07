@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Create Account'">
+<x-layouts.client :title="'Create Account'">
     <section class="mx-auto max-w-2xl glass-panel p-8">
         <span class="pill bg-emerald-100 text-emerald-700">Client registration</span>
         <h1 class="mt-4 text-3xl font-black text-slate-950">Create a learner account.</h1>
@@ -25,6 +25,4 @@
             </div>
         </form>
     </section>
-
-    <x-footer :show-newsletter="false" />
-</x-layouts.app>
+</x-layouts.client>

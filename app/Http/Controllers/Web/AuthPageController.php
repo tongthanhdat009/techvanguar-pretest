@@ -113,7 +113,7 @@ class AuthPageController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        $route = $guard === 'admin' ? 'admin.login' : 'client.login';
+        $route = $guard === 'admin' ? 'admin.login' : 'home';
         return redirect()->route($route);
     }
 }

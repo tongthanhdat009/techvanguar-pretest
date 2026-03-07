@@ -244,6 +244,13 @@
             @apply p-4;
         }
 
+        .landing-signal-card,
+        .landing-mode-card,
+        .landing-deck-card,
+        .landing-quote-card {
+            @apply p-4;
+        }
+
         .metric-value {
             @apply text-3xl;
         }
@@ -281,6 +288,10 @@
         .reading-copy {
             @apply leading-6;
         }
+
+        .landing-step {
+            @apply gap-3;
+        }
     }
 
     .metric-burst {
@@ -306,6 +317,100 @@
 
     .data-row {
         @apply grid gap-3 py-4 lg:grid-cols-[1fr_auto];
+    }
+
+    .landing-hero {
+        @apply relative border-stone-300;
+        background:
+            radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 24%),
+            radial-gradient(circle at 18% 18%, rgba(251, 191, 36, 0.16), transparent 22%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 241, 232, 0.95) 100%);
+    }
+
+    .landing-signal-card {
+        @apply border border-stone-300 bg-white/80 px-4 py-4;
+        box-shadow: 0 14px 28px rgba(41, 37, 36, 0.08);
+    }
+
+    .landing-signal-label {
+        @apply text-[10px] font-bold uppercase tracking-[0.24em] text-stone-500;
+    }
+
+    .landing-signal-value {
+        @apply mt-3 block text-3xl font-semibold tracking-tight text-stone-950;
+    }
+
+    .landing-signal-copy {
+        @apply mt-2 text-sm leading-6 text-stone-600;
+    }
+
+    .landing-showcase-card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 249, 255, 0.96) 100%);
+    }
+
+    .landing-inline-row {
+        @apply flex items-center gap-3 rounded-full border border-stone-200 bg-white/80 px-4 py-3;
+    }
+
+    .landing-inline-dot {
+        @apply inline-flex h-3 w-3 rounded-full;
+    }
+
+    .landing-inline-dot-sky {
+        background: #38bdf8;
+    }
+
+    .landing-inline-dot-amber {
+        background: #f59e0b;
+    }
+
+    .landing-inline-dot-emerald {
+        background: #34d399;
+    }
+
+    .landing-step {
+        @apply grid gap-4 border-t border-stone-200 py-4 sm:grid-cols-[auto_1fr] sm:items-start;
+    }
+
+    .landing-step:first-of-type {
+        @apply pt-0;
+        border-top: 0;
+    }
+
+    .landing-step-number {
+        @apply inline-flex h-12 w-12 items-center justify-center rounded-full border border-stone-300 bg-white text-sm font-bold uppercase tracking-[0.18em] text-stone-700;
+        box-shadow: 0 10px 20px rgba(41, 37, 36, 0.08);
+    }
+
+    .landing-mode-card {
+        @apply border border-stone-300 p-5;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 34px rgba(41, 37, 36, 0.08);
+    }
+
+    .landing-mode-card-contrast {
+        background: linear-gradient(145deg, rgba(41, 37, 36, 0.98) 0%, rgba(68, 64, 60, 0.96) 100%);
+    }
+
+    .landing-feature-panel {
+        @apply border-l-4 border-stone-900;
+    }
+
+    .landing-deck-card {
+        @apply border border-stone-300 p-5 transition;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 16px 30px rgba(41, 37, 36, 0.08);
+    }
+
+    .landing-deck-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 40px rgba(41, 37, 36, 0.12);
+    }
+
+    .landing-quote-card {
+        @apply rounded-[1.75rem] border border-stone-300 p-5;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 16px 28px rgba(41, 37, 36, 0.08);
     }
 
     .study-shell {
