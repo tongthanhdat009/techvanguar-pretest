@@ -4,17 +4,40 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? 'Admin Dashboard' }}</title>
+        <script>
+            (function () {
+                try {
+                    document.documentElement.dataset.adminSidebar = localStorage.getItem('admin-sidebar-open') === 'false'
+                        ? 'closed'
+                        : 'open';
+                } catch (error) {
+                    document.documentElement.dataset.adminSidebar = 'open';
+                }
+            })();
+        </script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="app-shell font-sans antialiased bg-slate-50">
-        <div class="flex h-screen overflow-hidden relative">
+        @php
+            $toasts = [];
+
+            if (session('status')) {
+                $toasts[] = ['type' => 'success', 'message' => session('status')];
+            }
+
+            foreach ($errors->all() as $error) {
+                $toasts[] = ['type' => 'error', 'message' => $error];
+            }
+        @endphp
+
+        <div class="relative flex min-h-screen overflow-hidden">
             <!-- Mobile Sidebar Overlay -->
             <div id="sidebar-overlay"
-                 onclick="closeSidebar()"
-                 class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden"
+                 data-sidebar-close
+                 class="fixed inset-0 z-40 hidden bg-slate-950/60 lg:hidden"
                  aria-hidden="true"></div>
             <!-- Sidebar -->
-            <aside id="sidebar" class="w-64 bg-slate-950 text-white flex flex-col transition-all duration-300 ease-in-out">
+            <aside id="sidebar" data-admin-sidebar class="fixed inset-y-0 left-0 z-50 flex w-[17rem] max-w-[85vw] -translate-x-full flex-col bg-slate-950 text-white shadow-2xl transition-all duration-300 ease-in-out lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 lg:shadow-none">
                 <!-- Logo & Toggle -->
                 <div class="p-4 border-b border-slate-800 flex items-center justify-between gap-2">
                     <a href="{{ route('admin.overview') }}"
@@ -24,7 +47,7 @@
                         <span class="sidebar-text-short hidden">A</span>
                     </a>
                     <button type="button"
-                            onclick="closeSidebar()"
+                            data-sidebar-close
                             class="lg:hidden p-2 rounded-lg hover:bg-slate-800 transition flex-shrink-0 ml-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -95,12 +118,12 @@
             </aside>
 
             <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto flex flex-col">
+            <main class="flex min-w-0 flex-1 flex-col overflow-y-auto">
                 <!-- Breadcrumb Header -->
                 <header class="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sticky top-0 z-10 flex items-center gap-4">
                     <!-- Desktop Toggle Button -->
                     <button type="button"
-                            onclick="toggleSidebar()"
+                            data-sidebar-toggle
                             class="hidden lg:flex p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition"
                             title="Toggle sidebar">
                         <svg id="toggle-icon" class="w-5 h-5 text-slate-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +133,7 @@
 
                     <!-- Mobile Toggle Button (Hamburger) -->
                     <button type="button"
-                            onclick="toggleSidebar()"
+                            data-sidebar-toggle
                             class="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition"
                             title="Open menu">
                         <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,118 +148,66 @@
                 </header>
 
                 <!-- Content Area -->
-                <div class="flex-1 p-8">
-                    @if (session('status'))
-                        <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                            <ul class="list-disc space-y-1 pl-5">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
+                <div class="flex-1 p-4 sm:p-6 lg:p-8">
                     {{ $slot }}
                 </div>
             </main>
         </div>
 
-        <script>
-            let sidebarOpen = localStorage.getItem('sidebarOpen') !== 'false';
-
-            function toggleSidebar() {
-                sidebarOpen = !sidebarOpen;
-                localStorage.setItem('sidebarOpen', sidebarOpen);
-                updateSidebar();
-            }
-
-            function closeSidebar() {
-                sidebarOpen = false;
-                localStorage.setItem('sidebarOpen', 'false');
-                updateSidebar();
-            }
-
-            function updateSidebar() {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebar-overlay');
-                const toggleIcon = document.getElementById('toggle-icon');
-
-                if (sidebarOpen) {
-                    sidebar.classList.remove('-translate-x-full', 'lg:w-20');
-                    sidebar.classList.add('w-64');
-                    // Show overlay on mobile
-                    if (overlay) overlay.classList.remove('hidden');
-                } else {
-                    sidebar.classList.add('lg:w-20');
-                    sidebar.classList.remove('w-64');
-                    // Hide overlay on mobile
-                    if (overlay) overlay.classList.add('hidden');
-                }
-
-                // Update icon rotation
-                if (toggleIcon) {
-                    toggleIcon.style.transform = sidebarOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-                }
-            }
-
-            // Initialize on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                updateSidebar();
-            });
-        </script>
+        <x-admin-toast :toasts="$toasts" />
+        <x-admin-confirm-modal />
 
         <style>
             /* Hide sidebar text when collapsed on desktop */
             @media (min-width: 1024px) {
-                aside.lg\:w-20 .sidebar-text,
-                aside.lg\:w-20 .sidebar-user {
+                html[data-admin-sidebar='closed'] #sidebar {
+                    width: 5rem;
+                }
+
+                html[data-admin-sidebar='closed'] #sidebar .sidebar-text,
+                html[data-admin-sidebar='closed'] #sidebar .sidebar-user {
                     display: none;
                 }
 
-                aside.lg\:w-20 .sidebar-text-short {
+                html[data-admin-sidebar='closed'] #sidebar .sidebar-text-short {
                     display: inline;
                 }
 
-                aside.lg\:w-20 nav a {
+                html[data-admin-sidebar='closed'] #sidebar nav a {
                     justify-content: center;
                     padding-left: 0.75rem;
                     padding-right: 0.75rem;
                 }
 
-                aside.lg\:w-20 .p-3,
-                aside.lg\:w-20 .p-4 {
+                html[data-admin-sidebar='closed'] #sidebar .p-3,
+                html[data-admin-sidebar='closed'] #sidebar .p-4 {
                     padding: 0.75rem;
                 }
 
                 /* Center logo when collapsed */
-                aside.lg\:w-20 .sidebar-logo {
+                html[data-admin-sidebar='closed'] #sidebar .sidebar-logo {
                     text-align: center;
+                }
+
+                html[data-admin-sidebar='closed'] #toggle-icon {
+                    transform: rotate(180deg);
                 }
             }
 
             /* Mobile sidebar */
             @media (max-width: 1023px) {
-                #sidebar {
-                    position: fixed;
-                    inset: 0;
-                    z-index: 50;
-                    transform: translateX(-100%);
+                html[data-admin-sidebar='open'] #sidebar {
+                    transform: translateX(0);
                 }
 
-                #sidebar:not(.-translate-x-full) {
-                    transform: translateX(0);
+                html[data-admin-sidebar='open'] #sidebar-overlay {
+                    display: block;
                 }
             }
 
             /* Hide short text when expanded */
             @media (min-width: 1024px) {
-                aside:not(.lg\:w-20) .sidebar-text-short {
+                html[data-admin-sidebar='open'] #sidebar .sidebar-text-short {
                     display: none;
                 }
             }

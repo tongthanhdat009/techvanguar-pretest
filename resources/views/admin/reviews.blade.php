@@ -34,7 +34,9 @@
                                     @method('DELETE')
                                     <button type="submit"
                                             class="text-red-600 hover:text-red-700 text-sm font-medium"
-                                            onclick="return confirm('Remove this review?')">
+                                            data-confirm-title="Remove review"
+                                            data-confirm-message="Remove this review?"
+                                            data-confirm-accept="Remove review">
                                         Remove
                                     </button>
                                 </form>
