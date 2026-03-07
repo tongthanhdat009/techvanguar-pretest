@@ -1,29 +1,43 @@
-const SIDEBAR_STORAGE_KEY = 'admin-sidebar-open';
+const DESKTOP_SIDEBAR_STORAGE_KEY = 'admin-sidebar-desktop';
+const MOBILE_BREAKPOINT = '(max-width: 1023px)';
+let activeAdminNavigationRequest = null;
 
-const getStoredSidebarState = () => {
+const getStoredDesktopSidebarState = () => {
     try {
-        return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) !== 'false';
+        return window.localStorage.getItem(DESKTOP_SIDEBAR_STORAGE_KEY) === 'collapsed'
+            ? 'collapsed'
+            : 'expanded';
     } catch (error) {
-        return true;
+        return 'expanded';
     }
 };
 
-const persistSidebarState = (isOpen) => {
+const persistDesktopSidebarState = (desktopState) => {
     try {
-        window.localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+        window.localStorage.setItem(DESKTOP_SIDEBAR_STORAGE_KEY, desktopState);
     } catch (error) {
         // Ignore storage access issues.
     }
 };
 
-const applySidebarState = (isOpen) => {
-    document.documentElement.dataset.adminSidebar = isOpen ? 'open' : 'closed';
+const setExpandedState = (buttons, isExpanded) => {
+    buttons.forEach((button) => {
+        button.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+    });
+};
 
-    if (window.matchMedia('(max-width: 1023px)').matches) {
-        document.body.classList.toggle('overflow-hidden', isOpen);
+const applySidebarState = ({ desktopState, mobileState, desktopButtons, mobileButtons }) => {
+    document.documentElement.dataset.adminSidebarDesktop = desktopState;
+    document.documentElement.dataset.adminSidebarMobile = mobileState;
+
+    if (window.matchMedia(MOBILE_BREAKPOINT).matches) {
+        document.body.classList.toggle('overflow-hidden', mobileState === 'open');
     } else {
         document.body.classList.remove('overflow-hidden');
     }
+
+    setExpandedState(desktopButtons, desktopState === 'expanded');
+    setExpandedState(mobileButtons, mobileState === 'open');
 };
 
 const initializeSidebar = () => {
@@ -31,39 +45,223 @@ const initializeSidebar = () => {
         return;
     }
 
-    let isOpen = getStoredSidebarState();
+    let desktopState = getStoredDesktopSidebarState();
+    let mobileState = 'closed';
+    const desktopButtons = Array.from(document.querySelectorAll('[data-sidebar-toggle-mode="desktop"]'));
+    const mobileButtons = Array.from(document.querySelectorAll('[data-sidebar-toggle-mode="mobile"]'));
+    const mobileMediaQuery = window.matchMedia(MOBILE_BREAKPOINT);
 
     const syncSidebar = () => {
-        persistSidebarState(isOpen);
-        applySidebarState(isOpen);
+        persistDesktopSidebarState(desktopState);
+        applySidebarState({ desktopState, mobileState, desktopButtons, mobileButtons });
     };
 
     document.querySelectorAll('[data-sidebar-toggle]').forEach((button) => {
         button.addEventListener('click', () => {
-            isOpen = !isOpen;
+            if (button.dataset.sidebarToggleMode === 'desktop') {
+                desktopState = desktopState === 'expanded' ? 'collapsed' : 'expanded';
+            } else {
+                mobileState = mobileState === 'open' ? 'closed' : 'open';
+            }
+
             syncSidebar();
         });
     });
 
     document.querySelectorAll('[data-sidebar-close]').forEach((button) => {
         button.addEventListener('click', () => {
-            isOpen = false;
+            mobileState = 'closed';
             syncSidebar();
         });
     });
 
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && isOpen && window.matchMedia('(max-width: 1023px)').matches) {
-            isOpen = false;
+    document.addEventListener('admin:navigate', () => {
+        if (mobileState === 'open') {
+            mobileState = 'closed';
             syncSidebar();
         }
     });
 
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && mobileState === 'open' && mobileMediaQuery.matches) {
+            mobileState = 'closed';
+            syncSidebar();
+        }
+    });
+
+    const handleViewportChange = (event) => {
+        if (!event.matches && mobileState === 'open') {
+            mobileState = 'closed';
+        }
+
+        applySidebarState({ desktopState, mobileState, desktopButtons, mobileButtons });
+    };
+
+    if (typeof mobileMediaQuery.addEventListener === 'function') {
+        mobileMediaQuery.addEventListener('change', handleViewportChange);
+    } else {
+        mobileMediaQuery.addListener(handleViewportChange);
+    }
+
     window.addEventListener('resize', () => {
-        applySidebarState(isOpen);
+        applySidebarState({ desktopState, mobileState, desktopButtons, mobileButtons });
     });
 
     syncSidebar();
+};
+
+const getAdminBasePath = () => {
+    const firstAdminLink = document.querySelector('[data-admin-sidebar-nav] a[href]');
+
+    if (!firstAdminLink) {
+        return null;
+    }
+
+    return new URL(firstAdminLink.href, window.location.origin).pathname.replace(/\/+$/, '');
+};
+
+const isAdminPageUrl = (url) => {
+    const basePath = getAdminBasePath();
+
+    if (!basePath || url.origin !== window.location.origin) {
+        return false;
+    }
+
+    return url.pathname === basePath || url.pathname.startsWith(`${basePath}/`);
+};
+
+const setAdminNavigationLoading = (isLoading) => {
+    const content = document.querySelector('[data-admin-page-content]');
+
+    if (!content) {
+        return;
+    }
+
+    content.classList.toggle('pointer-events-none', isLoading);
+    content.classList.toggle('opacity-60', isLoading);
+};
+
+const replaceAdminPage = (nextDocument) => {
+    const nextNav = nextDocument.querySelector('[data-admin-sidebar-nav]');
+    const nextBreadcrumb = nextDocument.querySelector('[data-admin-breadcrumb]');
+    const nextContent = nextDocument.querySelector('[data-admin-page-content]');
+    const currentNav = document.querySelector('[data-admin-sidebar-nav]');
+    const currentBreadcrumb = document.querySelector('[data-admin-breadcrumb]');
+    const currentContent = document.querySelector('[data-admin-page-content]');
+
+    if (!nextNav || !nextBreadcrumb || !nextContent || !currentNav || !currentBreadcrumb || !currentContent) {
+        return false;
+    }
+
+    currentNav.innerHTML = nextNav.innerHTML;
+    currentBreadcrumb.innerHTML = nextBreadcrumb.innerHTML;
+    currentContent.innerHTML = nextContent.innerHTML;
+    document.title = nextDocument.title;
+
+    const adminMain = document.getElementById('admin-main');
+
+    if (adminMain) {
+        adminMain.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    document.dispatchEvent(new CustomEvent('admin:navigate'));
+
+    return true;
+};
+
+const navigateAdminPage = async (url, { pushState = true } = {}) => {
+    if (activeAdminNavigationRequest) {
+        activeAdminNavigationRequest.abort();
+    }
+
+    const controller = new AbortController();
+    activeAdminNavigationRequest = controller;
+    setAdminNavigationLoading(true);
+
+    try {
+        const response = await window.fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Admin-Navigation': 'true',
+            },
+            signal: controller.signal,
+        });
+
+        if (response.redirected) {
+            window.location.assign(response.url);
+            return;
+        }
+
+        if (!response.ok) {
+            window.location.assign(url);
+            return;
+        }
+
+        const responseText = await response.text();
+        const nextDocument = new DOMParser().parseFromString(responseText, 'text/html');
+
+        if (!replaceAdminPage(nextDocument)) {
+            window.location.assign(url);
+            return;
+        }
+
+        if (pushState) {
+            window.history.pushState({ adminNavigate: true }, '', url);
+        }
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            window.location.assign(url);
+        }
+    } finally {
+        if (activeAdminNavigationRequest === controller) {
+            activeAdminNavigationRequest = null;
+        }
+
+        setAdminNavigationLoading(false);
+    }
+};
+
+const initializeAdminNavigation = () => {
+    if (!document.querySelector('[data-admin-sidebar-nav]')) {
+        return;
+    }
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[data-admin-navigate]');
+
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+        }
+
+        if (link.target && link.target !== '_self') {
+            return;
+        }
+
+        const url = new URL(link.href, window.location.origin);
+
+        if (!isAdminPageUrl(url)) {
+            return;
+        }
+
+        if (url.href === window.location.href) {
+            event.preventDefault();
+            return;
+        }
+
+        event.preventDefault();
+        navigateAdminPage(url.href);
+    });
+
+    window.addEventListener('popstate', () => {
+        const url = new URL(window.location.href);
+
+        if (!isAdminPageUrl(url)) {
+            window.location.reload();
+            return;
+        }
+
+        navigateAdminPage(url.href, { pushState: false });
+    });
 };
 
 const dismissToast = (toast) => {
@@ -212,6 +410,7 @@ const initializeConfirmModal = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeSidebar();
+    initializeAdminNavigation();
     initializeToasts();
     initializeConfirmModal();
 });
