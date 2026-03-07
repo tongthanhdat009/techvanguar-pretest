@@ -118,7 +118,7 @@
                             </div>
                         </article>
                     @empty
-                        <x-empty-state title="No due cards" description="Your review queue is clear. Start a study session anyway to keep momentum." class="mt-6" />
+                        <x-shared.empty-state title="No due cards" description="Your review queue is clear. Start a study session anyway to keep momentum." class="mt-6" />
                     @endforelse
                 </div>
 
@@ -163,7 +163,7 @@
                             </div>
                         </article>
                     @empty
-                        <x-empty-state title="No personal decks yet" description="Use the Profile page to create your first deck or import one from CSV." class="mt-6" />
+                        <x-shared.empty-state title="No personal decks yet" description="Use the Profile page to create your first deck or import one from CSV." class="mt-6" />
                     @endforelse
                 </div>
             </div>
@@ -195,7 +195,7 @@
                         </div>
                     </article>
                 @empty
-                    <x-empty-state title="No public decks" description="Once decks are published publicly, they will appear here." class="mt-6" />
+                    <x-shared.empty-state title="No public decks" description="Once decks are published publicly, they will appear here." class="mt-6" />
                 @endforelse
             </div>
         </section>

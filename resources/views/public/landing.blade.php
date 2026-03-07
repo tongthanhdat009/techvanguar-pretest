@@ -27,6 +27,7 @@
     <!-- Landing Header -->
     <header class="sticky top-0 z-50 border-b border-stone-200/60 bg-white/80 backdrop-blur-md">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="relative" data-disclosure>
             <div class="flex h-16 items-center justify-between gap-4 sm:h-20">
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
@@ -56,15 +57,18 @@
                 </div>
 
                 <!-- Mobile menu button -->
-                <button type="button" x-data="{ open: false }" @click="open = !open" @click.outside="open = false" class="flex sm:hidden items-center justify-center p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors" aria-label="Toggle menu">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <button type="button" data-disclosure-toggle class="flex sm:hidden items-center justify-center p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors" aria-label="Toggle menu" aria-expanded="false">
+                    <svg data-disclosure-icon-open class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                    <svg data-disclosure-icon-close class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
             <!-- Mobile Navigation Panel -->
-            <div x-data="{ open: false }" x-show="open" @click.outside="open = false" class="sm:hidden border-t border-stone-200 py-4 space-y-4" style="display: none;">
+            <div data-disclosure-panel class="hidden sm:hidden border-t border-stone-200 py-4 space-y-4">
                 <nav class="flex flex-col gap-3">
                     <a href="#features" class="px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition-colors">Features</a>
                     <a href="#how-it-works" class="px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition-colors">How it works</a>
@@ -82,6 +86,7 @@
                         <a href="{{ route('register') }}" class="w-full px-4 py-2.5 text-center text-sm font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-500 transition-colors">Get Started</a>
                     @endif
                 </div>
+            </div>
             </div>
         </div>
     </header>
@@ -316,7 +321,7 @@
                             </div>
                         </article>
                     @empty
-                        <x-empty-state title="No public decks yet" description="Publish a deck and the landing page will immediately have real material to promote." class="md:col-span-2" />
+                        <x-shared.empty-state title="No public decks yet" description="Publish a deck and the landing page will immediately have real material to promote." class="md:col-span-2" />
                     @endforelse
                 </div>
             </div>
@@ -335,7 +340,7 @@
                             <p class="mt-4 text-xs font-bold uppercase tracking-[0.24em] text-stone-500">{{ $review->user?->name ?: 'Learner' }}</p>
                         </article>
                     @empty
-                        <x-empty-state title="No reviews yet" description="When learners review public decks, this area becomes direct product validation." />
+                        <x-shared.empty-state title="No reviews yet" description="When learners review public decks, this area becomes direct product validation." />
                     @endforelse
                 </div>
 

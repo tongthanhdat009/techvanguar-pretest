@@ -8,9 +8,9 @@
                     <p class="reading-copy mt-4">This view keeps a classic reading layout while still letting you flip cards inline and mark progress quickly.</p>
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
-                    <x-stat-card label="New" :value="$progressSummary['new']" tone="sky" />
-                    <x-stat-card label="Learning" :value="$progressSummary['learning']" tone="amber" />
-                    <x-stat-card label="Mastered" :value="$progressSummary['mastered']" tone="emerald" />
+                    <x-shared.stat label="New" :value="$progressSummary['new']" tone="sky" />
+                    <x-shared.stat label="Learning" :value="$progressSummary['learning']" tone="amber" />
+                    <x-shared.stat label="Mastered" :value="$progressSummary['mastered']" tone="emerald" />
                 </div>
             </div>
         </div>
@@ -68,7 +68,7 @@
                     </div>
                 </section>
             @empty
-                <x-empty-state title="No active decks are available right now." />
+                <x-shared.empty-state title="No active decks are available right now." />
             @endforelse
         </div>
     </section>

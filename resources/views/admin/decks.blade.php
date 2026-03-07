@@ -6,7 +6,7 @@
         </div>
 
         <div class="grid gap-6 md:grid-cols-2">
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <div class="glass-panel p-6">
                 <h2 class="section-title">Create deck</h2>
                 <form action="{{ route('admin.decks.store') }}" method="POST" class="mt-4 space-y-4">
                     @csrf
@@ -36,7 +36,7 @@
                 </form>
             </div>
 
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <div class="glass-panel p-6">
                 <h2 class="section-title">Import CSV deck</h2>
                 <form action="{{ route('admin.decks.import') }}" method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
                     @csrf
@@ -67,10 +67,10 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div class="glass-panel p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">All decks ({{ $decks->count() }})</h2>
             @if($decks->isEmpty())
-                <x-empty-state message="No decks found." />
+                <x-shared.empty-state message="No decks found." />
             @else
                 <div class="mt-4 space-y-4">
                     @foreach($decks as $deck)

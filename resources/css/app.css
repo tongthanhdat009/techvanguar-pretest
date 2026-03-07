@@ -9,8 +9,7 @@
     }
 
     .glass-panel {
-        @apply border border-stone-300 bg-white/90 px-6 py-6;
-        box-shadow: 0 24px 60px rgba(41, 37, 36, 0.08);
+        @apply border-y border-stone-300/90 bg-transparent px-0 py-6;
     }
 
     @media (max-width: 640px) {
@@ -20,11 +19,11 @@
     }
 
     .soft-panel {
-        @apply border-l-4 border-stone-800 bg-stone-50 px-5 py-5;
+        @apply border-l-2 border-stone-800 bg-transparent px-5 py-5;
     }
 
     .dashboard-card {
-        @apply border-l-4 border-stone-700 bg-stone-50 p-4;
+        @apply border-y border-stone-300/80 bg-transparent p-4;
     }
 
     .field-input {
@@ -112,8 +111,7 @@
     }
 
     .dashboard-metric {
-        @apply relative overflow-hidden border border-stone-300 bg-white/95 p-5;
-        box-shadow: 0 18px 40px rgba(41, 37, 36, 0.12);
+        @apply relative overflow-hidden border-l-2 border-stone-300 bg-transparent p-5 pl-6;
     }
 
     .dashboard-metric::before {
@@ -204,7 +202,7 @@
     }
 
     .dashboard-mastery {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 241, 232, 0.92) 100%);
+        background: linear-gradient(135deg, rgba(245, 241, 232, 0.45) 0%, rgba(245, 241, 232, 0.2) 100%);
     }
 
     .mastery-badge {
@@ -302,12 +300,12 @@
         0%,
         100% {
             transform: translateY(0);
-            box-shadow: 0 18px 40px rgba(41, 37, 36, 0.12);
+            opacity: 1;
         }
 
         50% {
-            transform: translateY(-3px);
-            box-shadow: 0 26px 48px rgba(217, 119, 6, 0.18);
+            transform: translateY(-2px);
+            opacity: 0.9;
         }
     }
 
@@ -328,8 +326,7 @@
     }
 
     .landing-signal-card {
-        @apply border border-stone-300 bg-white/80 px-4 py-4;
-        box-shadow: 0 14px 28px rgba(41, 37, 36, 0.08);
+        @apply border-y border-stone-300 bg-transparent px-4 py-4;
     }
 
     .landing-signal-label {
@@ -349,7 +346,7 @@
     }
 
     .landing-inline-row {
-        @apply flex items-center gap-3 rounded-full border border-stone-200 bg-white/80 px-4 py-3;
+        @apply flex items-center gap-3 border-y border-stone-200 bg-transparent px-4 py-3;
     }
 
     .landing-inline-dot {
@@ -378,14 +375,12 @@
     }
 
     .landing-step-number {
-        @apply inline-flex h-12 w-12 items-center justify-center rounded-full border border-stone-300 bg-white text-sm font-bold uppercase tracking-[0.18em] text-stone-700;
-        box-shadow: 0 10px 20px rgba(41, 37, 36, 0.08);
+        @apply inline-flex h-12 w-12 items-center justify-center border border-stone-300 bg-transparent text-sm font-bold uppercase tracking-[0.18em] text-stone-700;
     }
 
     .landing-mode-card {
-        @apply border border-stone-300 p-5;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 18px 34px rgba(41, 37, 36, 0.08);
+        @apply border-y border-stone-300 p-5;
+        background: rgba(255, 255, 255, 0.5);
     }
 
     .landing-mode-card-contrast {
@@ -397,20 +392,17 @@
     }
 
     .landing-deck-card {
-        @apply border border-stone-300 p-5 transition;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 16px 30px rgba(41, 37, 36, 0.08);
+        @apply border-y border-stone-300 p-5 transition;
+        background: rgba(255, 255, 255, 0.5);
     }
 
     .landing-deck-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 22px 40px rgba(41, 37, 36, 0.12);
     }
 
     .landing-quote-card {
-        @apply rounded-[1.75rem] border border-stone-300 p-5;
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: 0 16px 28px rgba(41, 37, 36, 0.08);
+        @apply border-y border-stone-300 p-5;
+        background: rgba(255, 255, 255, 0.45);
     }
 
     .study-shell {
@@ -418,7 +410,7 @@
     }
 
     .study-card {
-        @apply relative min-h-[24rem] border border-stone-300 bg-white;
+        @apply relative min-h-[24rem] border-y border-stone-300 bg-white/70;
     }
 
     .study-response {
@@ -446,10 +438,78 @@
 
     .flashcard-face {
         backface-visibility: hidden;
-        @apply absolute inset-0 flex flex-col justify-between border border-stone-300 bg-white p-8;
+        @apply absolute inset-0 flex flex-col justify-between border-y border-stone-300 bg-white/80 p-8;
     }
 
     .flashcard-back {
         transform: rotateY(180deg);
     }
+
+
+    @media (min-width: 1024px) {
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar {
+            width: 5rem;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #admin-main {
+            padding-left: 5rem;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-text,
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-user {
+            display: none;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-text-short {
+            display: inline;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar nav a {
+            justify-content: center;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar .p-3,
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar .p-4 {
+            padding: 0.75rem;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #sidebar .sidebar-logo {
+            text-align: center;
+        }
+
+        html[data-admin-sidebar-desktop='collapsed'] #toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        html[data-admin-sidebar-desktop='expanded'] #admin-main {
+            padding-left: 16rem;
+        }
+
+        html[data-admin-sidebar-desktop='expanded'] #sidebar .sidebar-text-short {
+            display: none;
+        }
+
+        html[data-admin-sidebar-desktop='expanded'] #sidebar .sidebar-text,
+        html[data-admin-sidebar-desktop='expanded'] #sidebar .sidebar-user {
+            display: block;
+        }
+    }
+
+    @media (max-width: 1023px) {
+        html[data-admin-sidebar-mobile='open'] #sidebar {
+            transform: translateX(0);
+        }
+
+        html[data-admin-sidebar-mobile='open'] #sidebar-overlay {
+            display: block;
+        }
+    }
+
+    #sidebar .sidebar-text,
+    #sidebar .sidebar-user {
+        display: block;
+    }
+
 }

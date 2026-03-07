@@ -5,10 +5,10 @@
             <p class="mt-2 text-slate-600">Review and moderate community feedback.</p>
         </div>
 
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div class="glass-panel p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Community Reviews ({{ $reviews->total() }})</h2>
             @if($reviews->isEmpty())
-                <x-empty-state message="No reviews found." />
+                <x-shared.empty-state message="No reviews found." />
             @else
                 <div class="mt-4 space-y-4">
                     @foreach($reviews as $review)

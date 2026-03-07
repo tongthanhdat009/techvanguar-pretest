@@ -45,7 +45,7 @@
     <body class="app-shell font-sans antialiased">
         <header class="border-b border-stone-200 bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
             <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div x-data="{ mobileMenuOpen: false }">
+                <div data-disclosure>
                     <div class="flex justify-between h-16 sm:h-20 items-center gap-4">
                         <!-- Logo -->
                         <div class="flex-shrink-0 flex items-center">
@@ -95,14 +95,12 @@
 
                         <!-- Mobile menu button -->
                         <div class="flex items-center lg:hidden">
-                            <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-stone-500 hover:text-stone-700 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-expanded="false">
+                            <button type="button" data-disclosure-toggle class="inline-flex items-center justify-center p-2 rounded-md text-stone-500 hover:text-stone-700 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-expanded="false">
                                 <span class="sr-only">Open main menu</span>
-                                <!-- Icon when menu is closed -->
-                                <svg x-show="!mobileMenuOpen" class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <svg data-disclosure-icon-open class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                                 </svg>
-                                <!-- Icon when menu is open -->
-                                <svg x-show="mobileMenuOpen" class="hidden h-6 w-6" :class="{'hidden': !mobileMenuOpen, 'block': mobileMenuOpen}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" style="display: none;">
+                                <svg data-disclosure-icon-close class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -110,16 +108,7 @@
                     </div>
 
                     <!-- Mobile Menu Panel -->
-                    <div x-show="mobileMenuOpen" 
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        @click.away="mobileMenuOpen = false"
-                        class="absolute top-16 sm:top-20 inset-x-0 bg-white shadow-lg lg:hidden z-50 border-t border-stone-200 origin-top" 
-                        style="display: none; left: 0; right: 0;">
+                    <div data-disclosure-panel class="absolute top-16 sm:top-20 inset-x-0 hidden bg-white lg:hidden z-50 border-t border-stone-200 origin-top">
                         <div class="pt-2 pb-3 space-y-1 px-4 sm:px-6">
                             @foreach ($navigationItems as $item)
                                 <a href="{{ $item['href'] }}"
@@ -177,6 +166,6 @@
             {{ $slot }}
         </main>
 
-        <x-footer :showNewsletter="false" :compact="true" />
+        <x-client.footer :showNewsletter="false" :compact="true" />
     </body>
 </html>

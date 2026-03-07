@@ -173,7 +173,7 @@
                     @endforeach
                 </div>
             @else
-                <x-empty-state message="No decks available yet. Be the first to create one!" />
+                <x-shared.empty-state message="No decks available yet. Be the first to create one!" />
             @endif
         </section>
 
@@ -200,5 +200,5 @@
         @endguest
     </div>
 
-    <x-footer />
+    <x-client.footer />
 </x-layouts.app>
