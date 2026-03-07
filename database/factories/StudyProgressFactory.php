@@ -19,6 +19,9 @@ class StudyProgressFactory extends Factory
             'flashcard_id' => Flashcard::factory(),
             'status' => fake()->randomElement(StudyProgress::statuses()),
             'last_reviewed_at' => now(),
+            'next_review_at' => now()->addDay(),
+            'review_count' => fake()->numberBetween(0, 8),
+            'correct_streak' => fake()->numberBetween(0, 5),
         ];
     }
 }

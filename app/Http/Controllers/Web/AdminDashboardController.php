@@ -3,32 +3,69 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminDeckImportRequest;
+use App\Http\Requests\AdminDeckRequest;
+use App\Http\Requests\AdminFlashcardRequest;
 use App\Models\Deck;
+use App\Models\DeckReview;
 use App\Models\Flashcard;
 use App\Models\StudyProgress;
 use App\Models\User;
+use App\Services\CsvExportService;
+use App\Services\CsvImportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminDashboardController extends Controller
 {
-    public function index()
+    public function overview(): View
     {
         $stats = [
             'users' => User::count(),
+            'clients' => User::where('role', User::ROLE_CLIENT)->count(),
+            'admins' => User::where('role', User::ROLE_ADMIN)->count(),
             'decks' => Deck::count(),
-            'active_decks' => Deck::where('is_active', true)->count(),
+            'public_decks' => Deck::where('visibility', Deck::VISIBILITY_PUBLIC)->count(),
             'flashcards' => Flashcard::count(),
             'mastered' => StudyProgress::where('status', StudyProgress::STATUS_MASTERED)->count(),
+            'reviews' => DeckReview::count(),
         ];
 
-        return view('admin.dashboard', [
+        return view('admin.overview', [
             'stats' => $stats,
+        ]);
+    }
+
+    public function users(): View
+    {
+        return view('admin.users', [
             'users' => User::query()->latest()->get(),
-            'decks' => Deck::query()->with('flashcards')->latest()->get(),
-            'statuses' => StudyProgress::statuses(),
+        ]);
+    }
+
+    public function decks(): View
+    {
+        return view('admin.decks', [
+            'decks' => Deck::query()
+                ->with(['owner', 'flashcards'])
+                ->withAvg('reviews', 'rating')
+                ->latest()
+                ->get(),
+        ]);
+    }
+
+    public function reviews(): View
+    {
+        return view('admin.reviews', [
+            'reviews' => DeckReview::query()
+                ->with(['deck', 'user'])
+                ->latest()
+                ->paginate(20),
         ]);
     }
 
@@ -39,11 +76,12 @@ class AdminDashboardController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CLIENT])],
+            'bio' => ['nullable', 'string', 'max:1200'],
         ]);
 
         User::create($validated);
 
-        return back()->with('status', 'User created successfully.');
+        return back()->with('status', 'User created.');
     }
 
     public function updateUser(Request $request, User $user): RedirectResponse
@@ -53,6 +91,9 @@ class AdminDashboardController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8'],
             'role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CLIENT])],
+            'bio' => ['nullable', 'string', 'max:1200'],
+            'experience_points' => ['required', 'integer', 'min:0'],
+            'daily_streak' => ['required', 'integer', 'min:0'],
         ]);
 
         if (blank($validated['password'] ?? null)) {
@@ -61,7 +102,7 @@ class AdminDashboardController extends Controller
 
         $user->update($validated);
 
-        return back()->with('status', 'User updated successfully.');
+        return back()->with('status', 'User updated.');
     }
 
     public function destroyUser(Request $request, User $user): RedirectResponse
@@ -70,72 +111,80 @@ class AdminDashboardController extends Controller
 
         $user->delete();
 
-        return back()->with('status', 'User deleted successfully.');
+        return back()->with('status', 'User deleted.');
     }
 
-    public function storeDeck(Request $request): RedirectResponse
+    public function storeDeck(AdminDeckRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
-        ]);
+        Deck::create($request->validatedPayload());
 
-        Deck::create($validated);
-
-        return back()->with('status', 'Deck created successfully.');
+        return back()->with('status', 'Deck created.');
     }
 
-    public function updateDeck(Request $request, Deck $deck): RedirectResponse
+    public function updateDeck(AdminDeckRequest $request, Deck $deck): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
-        ]);
+        $deck->update($request->validatedPayload());
 
-        $deck->update($validated);
-
-        return back()->with('status', 'Deck updated successfully.');
+        return back()->with('status', 'Deck updated.');
     }
 
     public function destroyDeck(Deck $deck): RedirectResponse
     {
         $deck->delete();
 
-        return back()->with('status', 'Deck deleted successfully.');
+        return back()->with('status', 'Deck deleted.');
     }
 
-    public function storeFlashcard(Request $request): RedirectResponse
+    public function storeFlashcard(AdminFlashcardRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'deck_id' => ['required', 'exists:decks,id'],
-            'front_content' => ['required', 'string'],
-            'back_content' => ['required', 'string'],
-        ]);
+        Flashcard::create($request->validated());
 
-        Flashcard::create($validated);
-
-        return back()->with('status', 'Flashcard created successfully.');
+        return back()->with('status', 'Flashcard created.');
     }
 
-    public function updateFlashcard(Request $request, Flashcard $flashcard): RedirectResponse
+    public function updateFlashcard(AdminFlashcardRequest $request, Flashcard $flashcard): RedirectResponse
     {
-        $validated = $request->validate([
-            'deck_id' => ['required', 'exists:decks,id'],
-            'front_content' => ['required', 'string'],
-            'back_content' => ['required', 'string'],
-        ]);
+        $flashcard->update($request->validated());
 
-        $flashcard->update($validated);
-
-        return back()->with('status', 'Flashcard updated successfully.');
+        return back()->with('status', 'Flashcard updated.');
     }
 
     public function destroyFlashcard(Flashcard $flashcard): RedirectResponse
     {
         $flashcard->delete();
 
-        return back()->with('status', 'Flashcard deleted successfully.');
+        return back()->with('status', 'Flashcard deleted.');
     }
+
+    public function importDeck(AdminDeckImportRequest $request, CsvImportService $csvImport): RedirectResponse
+    {
+        $validated = $request->validatedPayload();
+
+        $deck = Deck::create([
+            'user_id' => $validated['user_id'] ?? null,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'visibility' => $validated['visibility'],
+            'category' => $validated['category'] ?? null,
+            'tags' => $validated['tags'],
+            'is_active' => (bool) $validated['is_active'],
+        ]);
+
+        $importedCount = $csvImport->importFlashcards($deck, $request->file('csv_file'));
+
+        return back()->with("status", "Deck imported. {$importedCount} flashcard(s) added.");
+    }
+
+    public function exportDeck(Deck $deck, CsvExportService $csvExport): StreamedResponse
+    {
+        return $csvExport->exportFlashcards($deck);
+    }
+
+    public function destroyReview(DeckReview $review): RedirectResponse
+    {
+        $review->delete();
+
+        return back()->with('status', 'Review removed.');
+    }
+
 }

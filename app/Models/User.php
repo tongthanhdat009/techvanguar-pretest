@@ -20,7 +20,11 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'bio',
         'role',
+        'experience_points',
+        'daily_streak',
+        'last_studied_at',
     ];
 
     protected $hidden = [
@@ -32,6 +36,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_studied_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -53,8 +58,23 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(StudyProgress::class);
     }
 
+    public function decks(): HasMany
+    {
+        return $this->hasMany(Deck::class);
+    }
+
+    public function deckReviews(): HasMany
+    {
+        return $this->hasMany(DeckReview::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function level(): int
+    {
+        return max(1, (int) floor($this->experience_points / 250) + 1);
     }
 }

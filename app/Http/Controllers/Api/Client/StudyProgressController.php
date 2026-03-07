@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RecordStudyProgressRequest;
 use App\Models\Flashcard;
 use App\Models\StudyProgress;
 use App\Models\User;
+use App\Services\StudyScheduler;
+use App\Support\DeckAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 class StudyProgressController extends Controller
@@ -27,26 +29,21 @@ class StudyProgressController extends Controller
         return response()->json($progress);
     }
 
-    public function update(Request $request, Flashcard $flashcard): JsonResponse
+    public function update(RecordStudyProgressRequest $request, Flashcard $flashcard, StudyScheduler $scheduler, DeckAccess $deckAccess): JsonResponse
     {
-        abort_unless($flashcard->deck()->where('is_active', true)->exists(), Response::HTTP_NOT_FOUND);
-
-        $validated = $request->validate([
-            'status' => ['required', Rule::in(StudyProgress::statuses())],
-        ]);
+        $flashcard->load('deck');
+        $validated = $request->validated();
 
         /** @var User $user */
         $user = $request->user();
 
-        $progress = StudyProgress::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'flashcard_id' => $flashcard->id,
-            ],
-            [
-                'status' => $validated['status'],
-                'last_reviewed_at' => now(),
-            ]
+        abort_unless($deckAccess->canAccess($user, $flashcard->deck), Response::HTTP_NOT_FOUND);
+
+        $progress = $scheduler->recordReview(
+            $user,
+            $flashcard,
+            $validated['status'],
+            $validated['result'] ?? null
         );
 
         return response()->json($progress->load('flashcard.deck'));

@@ -4,19 +4,48 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deck;
+use App\Models\DeckReview;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthPageController extends Controller
 {
-    public function index()
+    public function landing(): View
     {
-        return view('home', [
-            'activeDecks' => Deck::query()->active()->withCount('flashcards')->get(),
+        return view('public.landing', [
+            'publicDecks' => Deck::query()
+                ->active()
+                ->public()
+                ->withCount('flashcards')
+                ->withAvg('reviews', 'rating')
+                ->latest()
+                ->take(6)
+                ->get(),
+            'featuredReviews' => DeckReview::query()
+                ->with(['deck', 'user'])
+                ->latest()
+                ->take(3)
+                ->get(),
             'currentUser' => Auth::user(),
         ]);
+    }
+
+    public function showClientLogin(): View
+    {
+        return view('auth.client-login');
+    }
+
+    public function showAdminLogin(): View
+    {
+        return view('auth.admin-login');
+    }
+
+    public function showRegister(): View
+    {
+        return view('auth.register');
     }
 
     public function register(Request $request): RedirectResponse
@@ -40,7 +69,27 @@ class AuthPageController extends Controller
         return redirect()->route('client.portal');
     }
 
-    public function login(Request $request): RedirectResponse
+    public function clientLogin(Request $request): RedirectResponse
+    {
+        return $this->attemptLogin($request, User::ROLE_CLIENT, 'client.portal');
+    }
+
+    public function adminLogin(Request $request): RedirectResponse
+    {
+        return $this->attemptLogin($request, User::ROLE_ADMIN, 'admin.overview');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
+    }
+
+    private function attemptLogin(Request $request, string $role, string $route): RedirectResponse
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -53,18 +102,19 @@ class AuthPageController extends Controller
             ])->onlyInput('email');
         }
 
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->role !== $role) {
+            Auth::logout();
+
+            return back()->withErrors([
+                'login' => sprintf('This portal is only available for %s accounts.', $role),
+            ])->onlyInput('email');
+        }
+
         $request->session()->regenerate();
 
-        return redirect()->route(Auth::user()?->isAdmin() ? 'admin.dashboard' : 'client.portal');
-    }
-
-    public function logout(Request $request): RedirectResponse
-    {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('home');
+        return redirect()->route($route);
     }
 }

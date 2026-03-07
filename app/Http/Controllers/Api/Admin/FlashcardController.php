@@ -21,6 +21,9 @@ class FlashcardController extends Controller
             'deck_id' => ['required', 'exists:decks,id'],
             'front_content' => ['required', 'string'],
             'back_content' => ['required', 'string'],
+            'image_url' => ['nullable', 'url'],
+            'audio_url' => ['nullable', 'url'],
+            'hint' => ['nullable', 'string', 'max:255'],
         ]);
 
         $flashcard = Flashcard::create($validated);
@@ -39,6 +42,9 @@ class FlashcardController extends Controller
             'deck_id' => ['sometimes', 'required', 'exists:decks,id'],
             'front_content' => ['sometimes', 'required', 'string'],
             'back_content' => ['sometimes', 'required', 'string'],
+            'image_url' => ['nullable', 'url'],
+            'audio_url' => ['nullable', 'url'],
+            'hint' => ['nullable', 'string', 'max:255'],
         ]);
 
         $flashcard->update($validated);

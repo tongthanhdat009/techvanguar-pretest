@@ -23,12 +23,16 @@ class StudyProgress extends Model
         'flashcard_id',
         'status',
         'last_reviewed_at',
+        'next_review_at',
+        'review_count',
+        'correct_streak',
     ];
 
     protected function casts(): array
     {
         return [
             'last_reviewed_at' => 'datetime',
+            'next_review_at' => 'datetime',
         ];
     }
 

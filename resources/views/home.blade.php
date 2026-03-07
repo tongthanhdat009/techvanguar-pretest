@@ -8,7 +8,7 @@
                     <p class="mt-5 max-w-2xl text-base leading-8 text-slate-600">This app includes JWT authentication APIs, an admin dashboard for managing content, and a client portal with animated flip cards, progress tracking, and active deck filtering.</p>
                     <div class="mt-8 flex flex-wrap gap-3">
                         @auth
-                            <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('client.portal') }}" class="rounded-full bg-slate-950 px-6 py-3 font-semibold text-white transition hover:bg-slate-800">Open your dashboard</a>
+                            <a href="{{ auth()->user()->isAdmin() ? route('admin.overview') : route('client.portal') }}" class="rounded-full bg-slate-950 px-6 py-3 font-semibold text-white transition hover:bg-slate-800">Open your dashboard</a>
                         @else
                             <a href="#auth-panels" class="rounded-full bg-slate-950 px-6 py-3 font-semibold text-white transition hover:bg-slate-800">Login or register</a>
                         @endauth

@@ -15,6 +15,9 @@ class Flashcard extends Model
         'deck_id',
         'front_content',
         'back_content',
+        'image_url',
+        'audio_url',
+        'hint',
     ];
 
     public function deck(): BelongsTo
