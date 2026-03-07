@@ -15,4 +15,6 @@
             <button type="submit" class="primary-button w-full">Login as client</button>
         </form>
     </section>
+
+    <x-footer :show-newsletter="false" />
 </x-layouts.app>

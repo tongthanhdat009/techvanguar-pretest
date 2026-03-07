@@ -73,6 +73,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->role === self::ROLE_ADMIN;
     }
 
+    public function isClient(): bool
+    {
+        return $this->role === self::ROLE_CLIENT;
+    }
+
     public function level(): int
     {
         return max(1, (int) floor($this->experience_points / 250) + 1);

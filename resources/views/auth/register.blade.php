@@ -25,4 +25,6 @@
             </div>
         </form>
     </section>
+
+    <x-footer :show-newsletter="false" />
 </x-layouts.app>

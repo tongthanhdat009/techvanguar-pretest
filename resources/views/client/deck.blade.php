@@ -1,4 +1,4 @@
-<x-layouts.app :title="$deck->title">
+<x-layouts.client :title="$deck->title">
     <section class="space-y-6">
         <div class="glass-panel p-8">
             <div class="flex flex-wrap items-start justify-between gap-4">
@@ -149,4 +149,4 @@
             </section>
         @endif
     </section>
-</x-layouts.app>
+</x-layouts.client>

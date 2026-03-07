@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Client Portal'">
+<x-layouts.client :title="'Study Portal'">
     <section class="grid gap-6 lg:grid-cols-[0.3fr_0.7fr]">
         <div class="glass-panel p-6">
             <span class="pill bg-amber-100 text-amber-700">Client portal</span>
@@ -79,4 +79,4 @@
             card.addEventListener('click', () => card.classList.toggle('is-flipped'));
         });
     </script>
-</x-layouts.app>
+</x-layouts.client>

@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Client Portal'">
+<x-layouts.client :title="'Learning Dashboard'">
     <section class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <div class="space-y-6">
             <div class="glass-panel p-8">
@@ -162,4 +162,4 @@
             </div>
         </div>
     </section>
-</x-layouts.app>
+</x-layouts.client>

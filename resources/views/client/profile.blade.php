@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Profile'">
+<x-layouts.client :title="'Learner Profile'">
     <section class="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <div class="glass-panel p-8">
             <span class="pill bg-emerald-100 text-emerald-700">Learner profile</span>
@@ -39,4 +39,4 @@
             </div>
         </div>
     </section>
-</x-layouts.app>
+</x-layouts.client>

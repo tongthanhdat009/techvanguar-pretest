@@ -16,6 +16,7 @@ Route::post('/logout', [AuthPageController::class, 'logout'])->middleware('auth'
 
 Route::middleware(['auth', 'role:client'])->group(function () {
     Route::get('/client', [ClientPortalController::class, 'index'])->name('client.portal');
+    Route::get('/client/dashboard', [ClientPortalController::class, 'index'])->name('client.dashboard');
     Route::get('/client/study', [ClientPortalController::class, 'studyAll'])->name('client.study.all');
     Route::get('/client/profile', [ClientPortalController::class, 'profile'])->name('client.profile');
     Route::put('/client/profile', [ClientPortalController::class, 'updateProfile'])->name('client.profile.update');
