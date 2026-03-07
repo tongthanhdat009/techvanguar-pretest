@@ -14,18 +14,18 @@ This is a Laravel 11 flashcard/study application with a separate admin portal an
 composer dev
 
 # Individual services
-php artisan serve              # Start Laravel server
-php artisan queue:listen       # Start queue worker
-php artisan pail               # Start log watcher
+D:\xampp\php\php.exe artisan serve              # Start Laravel server
+D:\xampp\php\php.exe artisan queue:listen       # Start queue worker
+D:\xampp\php\php.exe artisan pail               # Start log watcher
 
 # Database
-php artisan migrate            # Run migrations
-php artisan migrate:fresh      # Fresh migration with seeding
-php artisan db:seed            # Seed the database
+D:\xampp\php\php.exe artisan migrate            # Run migrations
+D:\xampp\php\php.exe artisan migrate:fresh      # Fresh migration with seeding
+D:\xampp\php\php.exe artisan db:seed            # Seed the database
 
 # Testing
-php artisan test               # Run all tests
-php artisan test --filter      # Run specific test filter
+D:\xampp\php\php.exe artisan test               # Run all tests
+D:\xampp\php\php.exe artisan test --filter      # Run specific test filter
 vendor/bin/phpunit             # Run PHPUnit directly
 vendor/bin/phpunit tests/Unit/Services/StudySchedulerTest.php  # Run single test file
 
@@ -33,12 +33,12 @@ vendor/bin/phpunit tests/Unit/Services/StudySchedulerTest.php  # Run single test
 ./vendor/bin/pint              # Laravel Pint code formatter
 
 # Clear caches (run after modifying config, routes, or views)
-php artisan config:clear        # Clear configuration cache
-php artisan route:clear         # Clear route cache
-php artisan cache:clear         # Clear application cache
-php artisan view:clear          # Clear compiled views
+D:\xampp\php\php.exe artisan config:clear        # Clear configuration cache
+D:\xampp\php\php.exe artisan route:clear         # Clear route cache
+D:\xampp\php\php.exe artisan cache:clear         # Clear application cache
+D:\xampp\php\php.exe artisan view:clear          # Clear compiled views
 # All-in-one clear:
-php artisan optimize:clear      # Clear all caches (config, routes, views, cache)
+D:\xampp\php\php.exe artisan optimize:clear      # Clear all caches (config, routes, views, cache)
 ```
 
 ### Frontend Development

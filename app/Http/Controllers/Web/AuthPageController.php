@@ -105,8 +105,8 @@ class AuthPageController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
-        // Determine which guard to logout from based on route prefix
-        $guard = $request->route()->getPrefix() === 'admin' ? 'admin' : 'client';
+        // Determine which guard to logout from based on route name
+        $guard = $request->route()->named('admin.*') ? 'admin' : 'client';
 
         Auth::guard($guard)->logout();
 

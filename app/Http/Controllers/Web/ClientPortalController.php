@@ -34,6 +34,8 @@ class ClientPortalController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
+        $dashboardSummary = $this->buildDashboardSummary($user, $scheduler);
+        $masteredCount = $dashboardSummary['mastery']['count'];
 
         $ownedDecks = $user->decks()
             ->withCount('flashcards')
@@ -68,11 +70,12 @@ class ClientPortalController extends Controller
             'dueCards' => $dueCards,
             'reviewTimeline' => $reviewTimeline,
             'leaderboard' => User::query()->orderByDesc('experience_points')->take(5)->get(),
+            'dashboardSummary' => $dashboardSummary,
             'progressSummary' => [
                 'new' => $user->studyProgress()->where('status', StudyProgress::STATUS_NEW)->count(),
                 'learning' => $user->studyProgress()->where('status', StudyProgress::STATUS_LEARNING)->count(),
-                'mastered' => $user->studyProgress()->where('status', StudyProgress::STATUS_MASTERED)->count(),
-                'due_today' => $scheduler->dueTodayCount($user),
+                'mastered' => $masteredCount,
+                'due_today' => $dashboardSummary['due_today'],
             ],
             'deckDefaults' => [
                 'visibility' => Deck::VISIBILITY_PRIVATE,
@@ -106,7 +109,12 @@ class ClientPortalController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        return $this->studyView($user, null, (string) $request->query('mode', 'flip'));
+        return $this->studyView(
+            $user,
+            null,
+            (string) $request->query('mode', 'flip'),
+            (int) $request->query('card', 0)
+        );
     }
 
     public function studyDeck(Request $request, Deck $deck): View
@@ -116,7 +124,12 @@ class ClientPortalController extends Controller
 
         $this->ensureDeckAccessible($user, $deck);
 
-        return $this->studyView($user, $deck, (string) $request->query('mode', 'flip'));
+        return $this->studyView(
+            $user,
+            $deck,
+            (string) $request->query('mode', 'flip'),
+            (int) $request->query('card', 0)
+        );
     }
 
     public function updateProgress(RecordStudyProgressRequest $request, Flashcard $flashcard, StudyScheduler $scheduler, DeckAccess $deckAccess): RedirectResponse
@@ -136,6 +149,29 @@ class ClientPortalController extends Controller
             $validated['result'] ?? null
         );
 
+        $mode = (string) $request->input('study_mode', '');
+
+        if (in_array($mode, ['flip', 'multiple-choice', 'typed'], true)) {
+            $nextCard = max(0, (int) $request->input('card_index', 0) + 1);
+
+            if ($request->filled('study_deck_id') && (int) $request->input('study_deck_id') === $flashcard->deck->id) {
+                return redirect()
+                    ->route('client.decks.study', [
+                        'deck' => $flashcard->deck,
+                        'mode' => $mode,
+                        'card' => $nextCard,
+                    ])
+                    ->with('status', 'Study progress updated.');
+            }
+
+            return redirect()
+                ->route('client.study.all', [
+                    'mode' => $mode,
+                    'card' => $nextCard,
+                ])
+                ->with('status', 'Study progress updated.');
+        }
+
         return back()->with('status', 'Study progress updated.');
     }
 
@@ -144,9 +180,9 @@ class ClientPortalController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $user->decks()->create($request->validatedPayload());
+        $deck = $user->decks()->create($request->validatedPayload());
 
-        return redirect()->route('client.portal')->with('status', 'Deck created.');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck created.');
     }
 
     public function updateDeck(ClientDeckRequest $request, Deck $deck): RedirectResponse
@@ -237,21 +273,25 @@ class ClientPortalController extends Controller
         return redirect()->route('client.decks.show', $deck)->with('status', 'Review saved.');
     }
 
-    public function profile(Request $request): View
+    public function profile(Request $request, StudyScheduler $scheduler): View
     {
         /** @var User $user */
         $user = $request->user();
+        $dashboardSummary = $this->buildDashboardSummary($user, $scheduler);
 
         return view('client.profile', [
             'user' => $user->loadCount('decks'),
+            'dashboardSummary' => $dashboardSummary,
+            'recentDecks' => $user->decks()
+                ->withCount('flashcards')
+                ->latest()
+                ->take(6)
+                ->get(),
             'stats' => [
                 'reviews' => $user->studyProgress()->count(),
-                'mastered' => $user->studyProgress()->where('status', StudyProgress::STATUS_MASTERED)->count(),
-                'due_today' => $user->studyProgress()
-                    ->where(function ($query) {
-                        $query->whereNull('next_review_at')
-                            ->orWhere('next_review_at', '<=', now());
-                    })->count(),
+                'mastered' => $dashboardSummary['mastery']['count'],
+                'due_today' => $dashboardSummary['due_today'],
+                'completed_today' => $dashboardSummary['completed_today'],
             ],
         ]);
     }
@@ -298,16 +338,26 @@ class ClientPortalController extends Controller
         return $csvExport->exportFlashcards($deck);
     }
 
-    private function studyView(User $user, ?Deck $deck, string $mode): View
+    private function studyView(User $user, ?Deck $deck, string $mode, int $requestedIndex): View
     {
         abort_unless(in_array($mode, ['flip', 'multiple-choice', 'typed'], true), Response::HTTP_NOT_FOUND);
 
-        $cards = app(StudySessionService::class)->prepareStudyCards($user, $deck, 12, 24);
+        $cards = app(StudySessionService::class)
+            ->prepareStudyCards($user, $deck, 12, 24)
+            ->values();
+
+        $totalCards = $cards->count();
+        $currentIndex = $totalCards === 0
+            ? 0
+            : min(max($requestedIndex, 0), $totalCards - 1);
 
         return view('client.study', [
             'mode' => $mode,
             'deck' => $deck,
             'cards' => $cards,
+            'currentCard' => $cards->get($currentIndex),
+            'currentIndex' => $currentIndex,
+            'totalCards' => $totalCards,
         ]);
     }
 
@@ -319,6 +369,93 @@ class ClientPortalController extends Controller
     private function accessibleDecksQuery(User $user): Builder
     {
         return app(DeckAccess::class)->accessibleQuery($user);
+    }
+
+    private function buildDashboardSummary(User $user, StudyScheduler $scheduler): array
+    {
+        $completedTodayCount = $user->studyProgress()
+            ->whereDate('last_reviewed_at', now()->toDateString())
+            ->count();
+        $masteredCount = $user->studyProgress()
+            ->where('status', StudyProgress::STATUS_MASTERED)
+            ->count();
+
+        return [
+            'today_label' => now()->format('D, M j'),
+            'due_today' => $scheduler->dueTodayCount($user),
+            'completed_today' => $completedTodayCount,
+            'level' => $user->levelProgress(),
+            'streak_timeline' => $this->buildStreakTimeline($user),
+            'mastery' => $this->buildMasterySummary($masteredCount, $user->studyProgress()->count()),
+        ];
+    }
+
+    private function buildStreakTimeline(User $user, int $days = 7): Collection
+    {
+        $anchorDay = ($user->last_studied_at ?? now())->copy()->startOfDay();
+        $windowStart = $anchorDay->copy()->subDays($days - 1);
+        $activeDays = min($days, max(0, (int) $user->daily_streak));
+        $activeWindowStart = $activeDays > 0
+            ? $anchorDay->copy()->subDays($activeDays - 1)
+            : null;
+
+        return collect(range(0, $days - 1))->map(function (int $offset) use ($windowStart, $anchorDay, $activeWindowStart) {
+            $date = $windowStart->copy()->addDays($offset);
+            $isActive = $activeWindowStart
+                ? $date->gte($activeWindowStart) && $date->lte($anchorDay)
+                : false;
+
+            return [
+                'label' => $date->format('D'),
+                'day' => $date->format('d'),
+                'full' => $date->format('M d'),
+                'is_active' => $isActive,
+                'is_today' => $date->isToday(),
+            ];
+        });
+    }
+
+    private function buildMasterySummary(int $masteredCount, int $trackedCards): array
+    {
+        $milestones = [
+            10 => 'Momentum',
+            25 => 'Scholar',
+            50 => 'Archivist',
+            100 => 'Grand Archive',
+        ];
+
+        $tier = 'First Spark';
+
+        foreach ($milestones as $threshold => $label) {
+            if ($masteredCount >= $threshold) {
+                $tier = $label;
+            }
+        }
+
+        $nextThreshold = collect(array_keys($milestones))->first(fn (int $threshold) => $masteredCount < $threshold);
+        $rate = $trackedCards === 0
+            ? 0
+            : min(100, (int) round(($masteredCount / $trackedCards) * 100));
+
+        $message = match (true) {
+            $masteredCount >= 100 => 'Your review base is turning into a reference library. Keep the cadence and protect the streak.',
+            $masteredCount >= 50 => 'This is no longer casual practice. You are building durable recall across multiple decks.',
+            $masteredCount >= 25 => 'A strong mastery core is forming. Push a few more cards each day to turn it into a moat.',
+            $masteredCount >= 10 => 'You have real momentum now. Keep stacking clean reviews before the queue grows again.',
+            default => 'Every mastered card reduces future friction. Start with the easiest wins and compound from there.',
+        };
+
+        $nextMilestone = $nextThreshold
+            ? ($nextThreshold - $masteredCount).' cards to '.$milestones[$nextThreshold]
+            : 'Top mastery tier unlocked';
+
+        return [
+            'count' => $masteredCount,
+            'tier' => $tier,
+            'rate' => $rate,
+            'message' => $message,
+            'next_milestone' => $nextMilestone,
+        ];
     }
 
     private function ensureDeckAccessible(User $user, Deck $deck): void

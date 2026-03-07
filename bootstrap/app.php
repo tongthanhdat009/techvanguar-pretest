@@ -12,9 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(prepend: [
+            \App\Http\Middleware\SetSessionCookie::class,
+        ]);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserRole::class,
             'set_session_cookie' => \App\Http\Middleware\SetSessionCookie::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
 
         // Configure redirect for authenticated users

@@ -14,16 +14,31 @@ class SetSessionCookie
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @param  string  $guard  The guard name (admin or client)
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, string $guard)
+    public function handle(Request $request, Closure $next, ?string $guard = null)
     {
-        // Set guard-specific session cookie name
-        config([
-            'session.cookie' => 'flashcard_learning_hub_' . $guard . '_session'
-        ]);
+        $guard ??= $this->resolveGuardFromRequest($request);
+
+        if ($guard !== null) {
+            config([
+                'session.cookie' => 'flashcard_learning_hub_' . $guard . '_session',
+            ]);
+        }
 
         return $next($request);
+    }
+
+    private function resolveGuardFromRequest(Request $request): ?string
+    {
+        if ($request->is('admin') || $request->is('admin/*') || $request->is('login/admin')) {
+            return 'admin';
+        }
+
+        if ($request->is('client') || $request->is('client/*') || $request->is('login/client') || $request->is('register')) {
+            return 'client';
+        }
+
+        return null;
     }
 }

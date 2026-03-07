@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Admin Login'">
+<x-layouts.admin-auth :title="'Admin Login'">
     <section class="mx-auto max-w-xl glass-panel p-8">
         <span class="pill bg-sky-100 text-sky-700">Admin portal</span>
         <h1 class="mt-4 text-3xl font-black text-slate-950">Sign in to manage users, content, moderation, and statistics.</h1>

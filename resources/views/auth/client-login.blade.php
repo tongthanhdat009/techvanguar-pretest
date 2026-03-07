@@ -1,7 +1,7 @@
 <x-layouts.app :title="'Client Login'">
     <section class="mx-auto max-w-xl glass-panel p-8">
-        <span class="pill bg-amber-100 text-amber-700">Client portal</span>
-        <h1 class="mt-4 text-3xl font-black text-slate-950">Sign in to study, review due cards, and manage your decks.</h1>
+        <span class="pill">Client portal</span>
+        <h1 class="display-title mt-4 text-3xl">Sign in to study, review due cards, and manage your decks.</h1>
         <form action="{{ route('client.login.attempt') }}" method="POST" class="mt-8 space-y-4">
             @csrf
             <div>
