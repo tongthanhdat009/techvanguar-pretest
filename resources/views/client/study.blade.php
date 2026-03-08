@@ -9,6 +9,19 @@
     $totalCards = $cards->count();
     $currentCard = $cards->get($currentIndex);
     $isAllDue = $deck === null; // studying all due cards
+    $cardPayload = $cards->map(fn ($c) => [
+        'id' => $c['flashcard']->id,
+        'front' => $c['flashcard']->front_content,
+        'back' => $c['flashcard']->back_content,
+        'hint' => $c['flashcard']->hint,
+        'image_url' => $c['flashcard']->image_url,
+        'audio_url' => $c['flashcard']->audio_url,
+        'choices' => $c['choices'] ?? [],
+    ])->values();
+    $backUrl = $deck ? route('client.decks.show', $deck) : route('client.dashboard');
+    $restartUrl = $deck
+        ? route('client.decks.study', ['deck' => $deck, 'mode' => $mode])
+        : route('client.study.all', ['mode' => $mode]);
 @endphp
 
 @if($totalCards === 0)
@@ -38,7 +51,11 @@
          data-mode="{{ $mode }}"
          data-current-index="{{ $currentIndex }}"
          data-total-cards="{{ $totalCards }}"
-         data-cards="{{ json_encode($cards->map(fn($c) => ['id' => $c['flashcard']->id, 'front' => $c['flashcard']->front_content, 'back' => $c['flashcard']->back_content, 'hint' => $c['flashcard']->hint, 'image_url' => $c['flashcard']->image_url, 'audio_url' => $c['flashcard']->audio_url, 'choices' => $c['choices'] ?? []])) }}">
+         data-progress-url="{{ route('client.study.progress') }}"
+         data-csrf-token="{{ csrf_token() }}"
+         data-back-url="{{ $backUrl }}"
+         data-restart-url="{{ $restartUrl }}"
+         data-cards='@json($cardPayload)'>
 
         {{-- Study Header --}}
         <div class="study-header">
@@ -216,6 +233,8 @@
                         @csrf
                         <input type="hidden" name="flashcard_id" value="{{ $currentCard['flashcard']->id }}">
                         @if($deck) <input type="hidden" name="deck_id" value="{{ $deck->id }}"> @endif
+                        <input type="hidden" name="study_mode" value="{{ $mode }}">
+                        <input type="hidden" name="card_index" value="{{ $currentIndex }}" data-card-index-input>
                         <input type="hidden" name="result" value="again" data-result-input>
 
                         <div class="control-buttons-row">
@@ -264,7 +283,11 @@
         mode: '{{ $mode }}',
         currentIndex: {{ $currentIndex }},
         totalCards: {{ $totalCards }},
-        cards: {{ $cards->map(fn($c) => ['id' => $c['flashcard']->id, 'front' => $c['flashcard']->front_content, 'back' => $c['flashcard']->back_content, 'hint' => $c['flashcard']->hint, 'image_url' => $c['flashcard']->image_url, 'audio_url' => $c['flashcard']->audio_url, 'choices' => $c['choices'] ?? []])->toJson() ?? '[]' }}
+        progressUrl: @json(route('client.study.progress')),
+        csrfToken: @json(csrf_token()),
+        backUrl: @json($backUrl),
+        restartUrl: @json($restartUrl),
+        cards: @json($cardPayload)
     };
 </script>
 @endpush

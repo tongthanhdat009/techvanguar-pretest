@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Deck;
 use App\Models\Flashcard;
+use App\Models\StudyProgress;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -49,5 +50,54 @@ class ClientPortalDeckFlowTest extends TestCase
         $this->actingAs($user)
             ->post(route('client.decks.copy', $deck))
             ->assertNotFound();
+    }
+
+    public function test_deck_study_view_includes_all_cards_in_the_current_deck_session(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $deck = Deck::factory()->privateOwned($user)->create();
+
+        Flashcard::factory()->count(13)->create([
+            'deck_id' => $deck->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('client.decks.study', $deck))
+            ->assertOk()
+            ->assertSee('data-total-cards="13"', false);
+    }
+
+    public function test_client_can_save_study_progress_via_ajax_for_a_deck_session(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $deck = Deck::factory()->privateOwned($user)->create();
+        $flashcard = Flashcard::factory()->create([
+            'deck_id' => $deck->id,
+        ]);
+
+        $this->actingAs($user)
+            ->postJson(route('client.study.progress'), [
+                'flashcard_id' => $flashcard->id,
+                'deck_id' => $deck->id,
+                'status' => StudyProgress::STATUS_LEARNING,
+                'result' => 'good',
+                'study_mode' => 'flip',
+                'card_index' => 0,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'success' => true,
+                'flashcard_id' => $flashcard->id,
+                'deck_id' => $deck->id,
+            ]);
+
+        $this->assertDatabaseHas('study_progress', [
+            'user_id' => $user->id,
+            'flashcard_id' => $flashcard->id,
+            'status' => StudyProgress::STATUS_LEARNING,
+            'review_count' => 1,
+        ]);
     }
 }

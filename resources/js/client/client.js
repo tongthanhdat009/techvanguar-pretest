@@ -179,7 +179,11 @@ const StudyRoom = {
         this.deckId = this.studyRoom.dataset.deckId;
         this.mode = this.studyRoom.dataset.mode || 'flip';
         this.currentIndex = parseInt(this.studyRoom.dataset.currentIndex) || 0;
-        this.totalCards = parseInt(this.studyRoom.dataset.totalCards) || 0;
+        this.totalCards = parseInt(this.studyRoom.dataset.totalCards, 10) || 0;
+        this.progressUrl = this.studyRoom.dataset.progressUrl || window.studyRoomData?.progressUrl || '/client/study/progress';
+        this.backUrl = this.studyRoom.dataset.backUrl || window.studyRoomData?.backUrl || '/client/dashboard';
+        this.restartUrl = this.studyRoom.dataset.restartUrl || window.studyRoomData?.restartUrl || window.location.href;
+        this.csrfToken = this.studyRoom.dataset.csrfToken || window.studyRoomData?.csrfToken || '';
         this.isFlipped = false;
         this.isSubmitting = false;
 
@@ -325,40 +329,19 @@ const StudyRoom = {
 
     async submitResult(form, result) {
         if (this.isSubmitting) return;
-        this.isSubmitting = true;
+        this.setSubmittingState(true);
 
         try {
-            const formData = new FormData(form);
-            // Add required status field
-            formData.append('status', 'learning');
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Show success feedback
-                this.showRatingFeedback(result);
-                // Move to next card after short delay
-                setTimeout(() => {
-                    this.showNextCard();
-                }, 300);
-            } else if (data.redirect) {
-                window.location.href = data.redirect;
-            } else {
-                Toast.error('Failed to save progress');
-            }
+            await this.persistProgress(result, form?.action);
+            this.showRatingFeedback(result);
+            setTimeout(() => {
+                this.showNextCard();
+            }, 300);
         } catch (error) {
             console.error('Error submitting result:', error);
             Toast.error('Failed to save progress');
         } finally {
-            this.isSubmitting = false;
+            this.setSubmittingState(false);
         }
     },
 
@@ -441,12 +424,23 @@ const StudyRoom = {
         const flipCard = this.studyRoom.querySelector('[data-flip-card]');
         const flipInner = this.studyRoom.querySelector('[data-flip-card-inner]');
         const controls = this.studyRoom.querySelector('[data-study-controls]');
+        const cardIndexInput = this.studyRoom.querySelector('[data-card-index-input]');
+        const resultInput = this.studyRoom.querySelector('[data-result-input]');
 
+        if (flipCard) {
+            flipCard.classList.remove('flipped');
+        }
         if (flipInner) {
             flipInner.classList.remove('flipped');
         }
         if (controls) {
             controls.style.display = 'none';
+        }
+        if (cardIndexInput) {
+            cardIndexInput.value = this.currentIndex;
+        }
+        if (resultInput) {
+            resultInput.value = 'again';
         }
     },
 
@@ -602,16 +596,18 @@ const StudyRoom = {
 
     showCompletionMessage() {
         const studyRoom = this.studyRoom;
+        const message = this.deckId
+            ? `You've saved progress for all ${this.totalCards} cards in this deck.`
+            : `You've reviewed all ${this.totalCards} cards in this session.`;
+        const backLabel = this.deckId ? 'Back to Deck Details' : 'Back to Dashboard';
         studyRoom.innerHTML = `
             <div class="study-complete">
                 <div class="complete-icon">🎉</div>
                 <h2>Study Session Complete!</h2>
-                <p>You've reviewed all ${this.totalCards} cards.</p>
+                <p>${message}</p>
                 <div class="complete-actions">
-                    ${this.deckId ? `
-                        <a href="/client/decks/${this.deckId}" class="btn btn-primary">Back to Deck</a>
-                    ` : ''}
-                    <a href="/client/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+                    <a href="${this.restartUrl}" class="btn btn-primary">Study Again</a>
+                    <a href="${this.backUrl}" class="btn btn-secondary">${backLabel}</a>
                 </div>
             </div>
         `;
@@ -619,7 +615,7 @@ const StudyRoom = {
 
     async submitMultipleChoice(choiceIndex) {
         if (this.isSubmitting) return;
-        this.isSubmitting = true;
+        this.setSubmittingState(true);
 
         const currentCard = this.cards[this.currentIndex];
         const correctAnswer = currentCard.back;
@@ -642,44 +638,23 @@ const StudyRoom = {
         // Submit result and move to next card
         setTimeout(async () => {
             try {
-                const formData = new FormData();
-                formData.append('flashcard_id', currentCard.id);
-                formData.append('status', 'learning');
-                formData.append('result', isCorrect ? 'good' : 'again');
-                if (this.deckId) {
-                    formData.append('deck_id', this.deckId);
-                }
-
-                const response = await fetch('/client/study/progress', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    this.showRatingFeedback(isCorrect ? 'good' : 'again');
-                    setTimeout(() => {
-                        this.showNextCard();
-                    }, 300);
-                } else if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
+                await this.persistProgress(isCorrect ? 'good' : 'again');
+                this.showRatingFeedback(isCorrect ? 'good' : 'again');
+                setTimeout(() => {
+                    this.showNextCard();
+                }, 300);
             } catch (error) {
                 console.error('Error submitting result:', error);
                 Toast.error('Failed to save progress');
             } finally {
-                this.isSubmitting = false;
+                this.setSubmittingState(false);
             }
         }, 800);
     },
 
     async submitTypedAnswer(answer) {
         if (this.isSubmitting) return;
-        this.isSubmitting = true;
+        this.setSubmittingState(true);
 
         const currentCard = this.cards[this.currentIndex];
         const correctAnswer = currentCard.back.trim().toLowerCase();
@@ -692,39 +667,82 @@ const StudyRoom = {
         // Submit result and move to next card
         setTimeout(async () => {
             try {
-                const formData = new FormData();
-                formData.append('flashcard_id', currentCard.id);
-                formData.append('status', 'learning');
-                formData.append('result', isCorrect ? 'good' : 'again');
-                if (this.deckId) {
-                    formData.append('deck_id', this.deckId);
-                }
-
-                const response = await fetch('/client/study/progress', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    this.showRatingFeedback(isCorrect ? 'good' : 'again');
-                    setTimeout(() => {
-                        this.showNextCard();
-                    }, 300);
-                } else if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
+                await this.persistProgress(isCorrect ? 'good' : 'again');
+                this.showRatingFeedback(isCorrect ? 'good' : 'again');
+                setTimeout(() => {
+                    this.showNextCard();
+                }, 300);
             } catch (error) {
                 console.error('Error submitting result:', error);
                 Toast.error('Failed to save progress');
             } finally {
-                this.isSubmitting = false;
+                this.setSubmittingState(false);
             }
         }, 1200);
+    },
+
+    getCurrentCard() {
+        return this.cards[this.currentIndex] || null;
+    },
+
+    buildProgressFormData(result, status = 'learning') {
+        const currentCard = this.getCurrentCard();
+        const formData = new FormData();
+
+        if (!currentCard) {
+            return formData;
+        }
+
+        if (this.csrfToken) {
+            formData.append('_token', this.csrfToken);
+        }
+
+        formData.append('flashcard_id', currentCard.id);
+        formData.append('status', status);
+        formData.append('result', result);
+        formData.append('study_mode', this.mode);
+        formData.append('card_index', this.currentIndex);
+
+        if (this.deckId) {
+            formData.append('deck_id', this.deckId);
+        }
+
+        return formData;
+    },
+
+    async persistProgress(result, url = null) {
+        const response = await fetch(url || this.progressUrl, {
+            method: 'POST',
+            body: this.buildProgressFormData(result),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Failed to save progress');
+        }
+
+        if (data.back_url) {
+            this.backUrl = data.back_url;
+        }
+
+        if (data.restart_url) {
+            this.restartUrl = data.restart_url;
+        }
+
+        return data;
+    },
+
+    setSubmittingState(isSubmitting) {
+        this.isSubmitting = isSubmitting;
+
+        this.studyRoom.querySelectorAll('.control-btn, .mcq-choice, [data-typed-submit]').forEach((button) => {
+            button.disabled = isSubmitting;
+        });
     }
 };
 

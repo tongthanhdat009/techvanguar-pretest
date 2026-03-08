@@ -16,14 +16,14 @@ use App\Models\User;
 use App\Services\CsvExportService;
 use App\Services\CsvImportService;
 use App\Services\DeckCopyService;
-use App\Services\StudySessionService;
 use App\Services\StudyScheduler;
+use App\Services\StudySessionService;
 use App\Support\DeckAccess;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -137,19 +137,18 @@ class ClientPortalController extends Controller
         );
     }
 
-    public function updateProgress(RecordStudyProgressRequest $request, Flashcard $flashcard, StudyScheduler $scheduler, DeckAccess $deckAccess): Response
+    public function updateProgress(RecordStudyProgressRequest $request, StudyScheduler $scheduler, DeckAccess $deckAccess): JsonResponse|RedirectResponse
     {
         /** @var User $user */
         $user = $request->user();
-
-        // Load the deck relationship explicitly
-        $deck = Deck::find($flashcard->deck_id);
-
-        // Check if flashcard belongs to a valid deck
-        abort_if(is_null($deck), Response::HTTP_NOT_FOUND, 'Flashcard does not belong to any deck.');
-        abort_unless($deckAccess->canAccess($user, $deck), Response::HTTP_NOT_FOUND);
-
         $validated = $request->validated();
+
+        $flashcard = Flashcard::query()
+            ->with('deck')
+            ->findOrFail($validated['flashcard_id']);
+        $deck = $flashcard->deck;
+
+        abort_unless($deckAccess->canAccess($user, $deck), Response::HTTP_NOT_FOUND);
 
         $scheduler->recordReview(
             $user,
@@ -158,21 +157,29 @@ class ClientPortalController extends Controller
             $validated['result'] ?? null
         );
 
-        // Handle AJAX requests - return JSON success response
+        $mode = (string) ($validated['study_mode'] ?? 'flip');
+        $backUrl = $validated['deck_id'] ?? null
+            ? route('client.decks.show', $deck)
+            : route('client.dashboard');
+        $restartUrl = $validated['deck_id'] ?? null
+            ? route('client.decks.study', ['deck' => $deck, 'mode' => $mode])
+            : route('client.study.all', ['mode' => $mode]);
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Progress saved!'
+                'message' => 'Progress saved!',
+                'flashcard_id' => $flashcard->id,
+                'deck_id' => $deck->id,
+                'back_url' => $backUrl,
+                'restart_url' => $restartUrl,
             ]);
         }
 
-        // Handle non-AJAX requests - redirect as before
-        $mode = (string) $request->input('study_mode', '');
-
         if (in_array($mode, ['flip', 'multiple-choice', 'typed'], true)) {
-            $nextCard = max(0, (int) $request->input('card_index', 0) + 1);
+            $nextCard = max(0, (int) ($validated['card_index'] ?? 0) + 1);
 
-            if ($request->filled('study_deck_id') && (int) $request->input('study_deck_id') === $deck->id) {
+            if (($validated['deck_id'] ?? null) === $deck->id) {
                 return redirect()
                     ->route('client.decks.study', [
                         'deck' => $deck,
@@ -211,7 +218,7 @@ class ClientPortalController extends Controller
             ]);
         }
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck created with ' . count($request->cards()) . ' card(s).');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck created with '.count($request->cards()).' card(s).');
     }
 
     public function updateDeck(ClientDeckRequest $request, Deck $deck): RedirectResponse
@@ -373,8 +380,10 @@ class ClientPortalController extends Controller
     {
         abort_unless(in_array($mode, ['flip', 'multiple-choice', 'typed'], true), Response::HTTP_NOT_FOUND);
 
-        $cards = app(StudySessionService::class)
-            ->prepareStudyCards($user, $deck, 12, 24)
+        $studySession = app(StudySessionService::class);
+        $cards = ($deck
+            ? $studySession->prepareDeckStudyCards($user, $deck)
+            : $studySession->prepareStudyCards($user, null, 12, 24))
             ->values();
 
         $totalCards = $cards->count();

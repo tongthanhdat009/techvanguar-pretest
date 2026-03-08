@@ -9,7 +9,7 @@
 <div class="text-center py-12">
     @if($icon)
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-            {{ $icon }}
+            {!! $icon !!}
         </div>
     @endif
 
