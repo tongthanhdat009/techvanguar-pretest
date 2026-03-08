@@ -602,16 +602,24 @@
 
 .sidebar-toggle {
     display: none;
-    background: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
     cursor: pointer;
     padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .sidebar-toggle svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
 }
 
 .sidebar-nav {
@@ -727,13 +735,50 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* Collapsed Sidebar State */
+.client-sidebar.collapsed {
+    width: 70px;
+}
+
+.client-sidebar.collapsed .logo-text,
+.client-sidebar.collapsed .nav-text,
+.client-sidebar.collapsed .nav-badge,
+.client-sidebar.collapsed .sidebar-footer {
+    display: none;
+}
+
+.client-sidebar.collapsed .sidebar-logo {
+    justify-content: center;
+}
+
+.client-sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 0.75rem 0;
+}
+
+.client-sidebar.collapsed .nav-divider {
+    margin: 0.75rem 1rem;
+}
+
+.client-sidebar.collapsed .sidebar-toggle svg {
+    transform: rotate(180deg);
+}
+
+.client-sidebar.collapsed .sidebar-toggle {
+    margin: 0 auto;
+}
+
 /* Main Content Wrapper */
 .client-main-wrapper {
     flex: 1;
     margin-left: 260px;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.client-main-wrapper.collapsed {
+    margin-left: 70px;
 }
 
 /* Topbar */
@@ -1791,13 +1836,30 @@
 @media (max-width: 1024px) {
     .client-sidebar {
         transform: translateX(-100%);
+        width: 260px !important;
     }
 
     .client-sidebar.active {
         transform: translateX(0);
     }
 
+    /* Override collapsed state when sidebar is active on mobile */
+    .client-sidebar.active.collapsed .logo-text,
+    .client-sidebar.active.collapsed .nav-text,
+    .client-sidebar.active.collapsed .nav-badge,
+    .client-sidebar.active.collapsed .sidebar-footer {
+        display: block !important;
+    }
+
+    .client-sidebar.active.collapsed {
+        width: 260px !important;
+    }
+
     .client-main-wrapper {
+        margin-left: 0;
+    }
+
+    .client-main-wrapper.collapsed {
         margin-left: 0;
     }
 
@@ -1805,8 +1867,18 @@
         display: block;
     }
 
+    .sidebar-toggle {
+        display: none !important;
+    }
+
     .mcq-choices {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 1025px) {
+    .sidebar-toggle {
+        display: flex;
     }
 }
 

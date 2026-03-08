@@ -1,3 +1,4 @@
+import confetti from 'canvas-confetti';
 /**
  * Client JavaScript Module
  * Handles client portal functionality
@@ -74,10 +75,12 @@ const ClientApp = {
 
     initSidebar() {
         const sidebar = document.querySelector('.client-sidebar');
+        const mainWrapper = document.querySelector('.client-main-wrapper');
         const toggleBtn = document.querySelector('[data-sidebar-toggle]');
 
         toggleBtn?.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
+            mainWrapper?.classList.toggle('collapsed');
         });
     },
 
@@ -600,6 +603,16 @@ const StudyRoom = {
             ? `You've saved progress for all ${this.totalCards} cards in this deck.`
             : `You've reviewed all ${this.totalCards} cards in this session.`;
         const backLabel = this.deckId ? 'Back to Deck Details' : 'Back to Dashboard';
+        
+        // Haptic Feedback (if supported) & Sound
+        if (navigator.vibrate) {
+            navigator.vibrate([100, 50, 100, 50, 200]);
+        }
+        this.playCompletionSound();
+        
+        // Fire Confetti!
+        this.fireConfetti();
+
         studyRoom.innerHTML = `
             <div class="study-complete">
                 <div class="complete-icon">🎉</div>
@@ -611,6 +624,58 @@ const StudyRoom = {
                 </div>
             </div>
         `;
+    },
+
+    fireConfetti() {
+        var duration = 3 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        var interval = setInterval(function() {
+            var timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            var particleCount = 50 * (timeLeft / duration);
+            
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+    },
+    
+    playCompletionSound() {
+        try {
+            // Using a simple Web Audio API oscillator for a synthesized "Tada/Success" sound
+            // to avoid needing external audio assets immediately, while still providing the haptic sound.
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            
+            // Success Arpeggio
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+            oscillator.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3); // C6
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.8);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.8);
+        } catch (e) {
+            console.log("Audio not supported or blocked");
+        }
     },
 
     async submitMultipleChoice(choiceIndex) {
