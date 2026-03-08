@@ -1,56 +1,61 @@
-<x-layouts.admin :title="'Moderate Reviews'" :breadcrumb="[['label' => 'Dashboard', 'url' => route('admin.overview')], ['label' => 'Reviews', 'url' => null]]">
-    <section class="space-y-6">
-        <div>
-            <h1 class="text-3xl font-black text-slate-950">Moderate Reviews</h1>
-            <p class="mt-2 text-slate-600">Review and moderate community feedback.</p>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reviews – Admin</title>
+</head>
+<body>
 
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-            <h2 class="text-lg font-semibold text-slate-900 mb-4">Community Reviews ({{ $reviews->total() }})</h2>
-            @if($reviews->isEmpty())
-                <x-empty-state message="No reviews found." />
-            @else
-                <div class="mt-4 space-y-4">
-                    @foreach($reviews as $review)
-                        <div class="border border-slate-200 rounded-lg p-4 hover:border-slate-300 transition">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex items-center gap-1">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                <span class="@if($i <= $review->rating) text-amber-400 @else text-slate-300 @endif">★</span>
-                                            @endfor
-                                        </div>
-                                        <span class="text-sm font-medium text-slate-900">{{ $review->user->name }}</span>
-                                        <span class="text-sm text-slate-500">· {{ $review->created_at->diffForHumans() }}</span>
-                                    </div>
-                                    <h3 class="mt-2 font-semibold text-slate-900">{{ $review->deck->title }}</h3>
-                                    @if($review->comment)
-                                        <p class="mt-2 text-slate-600">{{ $review->comment }}</p>
-                                    @endif
-                                </div>
-                                <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="text-red-600 hover:text-red-700 text-sm font-medium"
-                                            data-confirm-title="Remove review"
-                                            data-confirm-message="Remove this review?"
-                                            data-confirm-accept="Remove review">
-                                        Remove
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+{{-- Admin sidebar toggle --}}
+<div admin-sidebar-open="false" id="admin-sidebar">
+    <nav>Admin Panel</nav>
+</div>
 
-                @if($reviews->hasPages())
-                    <div class="mt-6">
-                        {{ $reviews->appends(request()->query())->links() }}
-                    </div>
-                @endif
-            @endif
-        </div>
-    </section>
-</x-layouts.app>
+{{-- Toast stack for flash messages --}}
+<div data-admin-toast-stack>
+    @if(session('status'))
+        <div class="toast">{{ session('status') }}</div>
+    @endif
+</div>
+
+<main>
+    <h1>Manage Reviews</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Deck</th>
+                <th>User</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($reviews as $review)
+            <tr>
+                <td>{{ $review->deck?->title ?? '—' }}</td>
+                <td>{{ $review->user?->name ?? '—' }}</td>
+                <td>{{ $review->rating }}</td>
+                <td>{{ $review->comment }}</td>
+                <td>
+                    <form method="POST" action="{{ route('admin.reviews.destroy', $review) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            data-admin-confirm
+                            data-confirm-message="Remove this review?"
+                            data-confirm-accept="Remove review">
+                            Remove
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

@@ -243,10 +243,12 @@ class ClientPortalController extends Controller
         return redirect()->route('client.decks.show', $deck)->with('status', 'Flashcard deleted.');
     }
 
-    public function copyDeck(Request $request, Deck $deck, DeckCopyService $deckCopy): RedirectResponse
+    public function copyDeck(Request $request, Deck $deck, DeckCopyService $deckCopy, DeckAccess $deckAccess): RedirectResponse
     {
         /** @var User $user */
         $user = $request->user();
+
+        abort_unless($deckAccess->canCloneOrReview($deck), Response::HTTP_NOT_FOUND);
 
         $copy = $deckCopy->copyToUser($deck, $user);
 

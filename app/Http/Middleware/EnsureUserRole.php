@@ -20,12 +20,16 @@ class EnsureUserRole
 
         // Redirect admin to admin panel when trying to access client routes
         if ($user->role === 'admin' && $role === 'client') {
-            return redirect()->route('admin.overview')->with('status', 'Admins should use the admin panel.');
+            return $request->expectsJson()
+                ? response()->json(['message' => 'You are not authorized to access this resource.'], Response::HTTP_FORBIDDEN)
+                : redirect()->route('admin.overview')->with('status', 'Admins should use the admin panel.');
         }
 
         // Redirect client to client panel when trying to access admin routes
         if ($user->role === 'client' && $role === 'admin') {
-            return redirect()->route('client.dashboard')->with('status', 'Clients should use the learning portal.');
+            return $request->expectsJson()
+                ? response()->json(['message' => 'You are not authorized to access this resource.'], Response::HTTP_FORBIDDEN)
+                : redirect()->route('client.portal')->with('status', 'Clients should use the learning portal.');
         }
 
         if ($user->role !== $role) {

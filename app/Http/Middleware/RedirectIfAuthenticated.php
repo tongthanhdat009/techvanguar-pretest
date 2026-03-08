@@ -18,7 +18,7 @@ class RedirectIfAuthenticated
 
                 return match($guardName) {
                     'admin' => redirect()->route('admin.overview'),
-                    'client' => redirect()->route('client.dashboard'),
+                    'client' => redirect()->route('client.portal'),
                     default => redirect()->route('home'),
                 };
             }
