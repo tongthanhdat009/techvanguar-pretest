@@ -1,0 +1,299 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e4]:
+      - link "Flashcard Hub" [ref=e5] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000
+        - img [ref=e7]
+        - generic [ref=e12]: Flashcard Hub
+      - button "Mở điều hướng" [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+  - generic [ref=e17]:
+    - generic [ref=e18]:
+      - generic [ref=e19]: Học nhanh hơn. Nhớ lâu hơn. Vận hành gọn hơn.
+      - generic [ref=e20]: Flashcard Learning Hub – Evidence-Based Learning Platform
+      - heading "Biến việc ôn tập hằng ngày thành một nhịp học có cấu trúc." [level=1] [ref=e21]
+      - paragraph [ref=e22]: Tạo deck riêng, theo dõi tiến độ thật sự quan trọng và quay lại đúng lúc trí nhớ bắt đầu yếu đi. Một bề mặt học tập đủ nghiêm túc cho người học và đủ rõ ràng cho quản trị vận hành.
+      - generic [ref=e23]:
+        - link "Bắt đầu miễn phí" [ref=e24] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000/register
+        - link "Xem trải nghiệm demo" [ref=e25] [cursor=pointer]:
+          - /url: "#demo"
+      - generic [ref=e26]:
+        - generic [ref=e27]: Spaced repetition tích hợp
+        - generic [ref=e28]: Deck riêng và deck cộng đồng
+        - generic [ref=e29]: Dashboard tiến độ và streak
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]: Study cadence
+        - strong [ref=e33]: Review on time, not by mood.
+        - paragraph [ref=e34]: "Thiết kế ưu tiên đúng việc cần học tiếp theo: tạo thẻ, ôn lại đúng lúc và giữ tín hiệu tiến bộ luôn nhìn thấy được."
+      - generic "Quy trình học tập" [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: "01"
+          - generic [ref=e38]:
+            - strong [ref=e39]: Tạo hoặc sao chép deck
+            - paragraph [ref=e40]: Bắt đầu từ bộ thẻ cá nhân hoặc dùng deck public làm nền để đi nhanh hơn.
+        - generic [ref=e41]:
+          - generic [ref=e42]: "02"
+          - generic [ref=e43]:
+            - strong [ref=e44]: Ôn theo mức độ ghi nhớ
+            - paragraph [ref=e45]: Thẻ đến hạn, thẻ mới và thẻ đang học được gom vào đúng nhịp thay vì trộn lẫn ngẫu nhiên.
+        - generic [ref=e46]:
+          - generic [ref=e47]: "03"
+          - generic [ref=e48]:
+            - strong [ref=e49]: Giữ streak và nâng độ bền trí nhớ
+            - paragraph [ref=e50]: XP, level và lịch review tạo vòng phản hồi ngắn nhưng đủ rõ để duy trì thói quen.
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - strong [ref=e53]: 5+
+          - text: Học viên
+        - generic [ref=e54]:
+          - strong [ref=e55]: 2+
+          - text: Deck công khai
+        - generic [ref=e56]:
+          - strong [ref=e57]: 13+
+          - text: Flashcard
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]: Workflow
+          - strong [ref=e61]: Create → Study → Review → Master
+        - generic [ref=e62]: Built for consistency
+  - generic [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]: Nền tảng cốt lõi
+      - heading "Một sản phẩm học tập nhìn chuyên nghiệp và làm việc như một công cụ thật." [level=2] [ref=e67]
+      - paragraph [ref=e68]: Không chỉ là bộ thẻ lật. Đây là một hệ thống học có nhịp, có tín hiệu ưu tiên và có bề mặt quản trị rõ ràng.
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - img [ref=e72]
+        - heading "Lặp lại thông minh" [level=3] [ref=e74]
+        - paragraph [ref=e75]: Thuật toán SRS tự động ưu tiên đúng thẻ sắp quên để giảm thời gian ôn và tăng độ bền của trí nhớ.
+        - generic [ref=e76]: SRS engine
+      - generic [ref=e77]:
+        - img [ref=e79]
+        - heading "Chuỗi học mỗi ngày" [level=3] [ref=e81]
+        - paragraph [ref=e82]: Streak, XP và level tạo vòng phản hồi đủ rõ để biến việc ôn tập thành thói quen chứ không chỉ là ý định.
+        - generic [ref=e83]: Habit loop
+      - generic [ref=e84]:
+        - img [ref=e86]
+        - heading "Thư viện cộng đồng" [level=3] [ref=e88]
+        - paragraph [ref=e89]: Deck public có thể được khám phá, sao chép và dùng như điểm khởi đầu thay vì luôn phải tạo từ số 0.
+        - generic [ref=e90]: Shared starting points
+      - generic [ref=e91]:
+        - img [ref=e93]
+        - heading "Thống kê tiến độ" [level=3] [ref=e95]
+        - paragraph [ref=e96]: Nhìn ngay số thẻ mới, đang học, đã mastery và khối lượng đến hạn trong cùng một bức tranh rõ ràng.
+        - generic [ref=e97]: Readable signals
+      - generic [ref=e98]:
+        - img [ref=e100]
+        - heading "Nhập / Xuất CSV" [level=3] [ref=e102]
+        - paragraph [ref=e103]: Đưa nội dung vào hệ thống nhanh, chuẩn hóa quy trình tạo deck và chia sẻ dữ liệu giữa các công cụ học tập.
+        - generic [ref=e104]: Portable content
+      - generic [ref=e105]:
+        - img [ref=e107]
+        - heading "Giao diện trực quan" [level=3] [ref=e109]
+        - paragraph [ref=e110]: Cả landing, dashboard học viên và khu vực admin đều dùng cùng một ngôn ngữ hình ảnh nhất quán và chuyên nghiệp.
+        - generic [ref=e111]: Clear operations
+  - generic [ref=e113]:
+    - generic [ref=e114]:
+      - generic [ref=e115]: Không cần đăng nhập
+      - heading "Demo nhỏ, cảm giác học thật." [level=2] [ref=e116]
+      - paragraph [ref=e117]: Nhấn vào bất kỳ thẻ nào để lật và xem đáp án. Cấu trúc tương tác giống với trải nghiệm học chính, chỉ được rút gọn để xem nhanh.
+      - generic [ref=e118]:
+        - img [ref=e119]
+        - text: Nhấn vào thẻ để lật
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]: Study preview
+        - heading "Một vòng học rút gọn để người mới hiểu ngay cách nền tảng vận hành." [level=3] [ref=e124]
+        - paragraph [ref=e125]: Thay vì chỉ xem landing page, bạn có thể chạm trực tiếp vào các khái niệm cốt lõi và cảm nhận logic lật thẻ, nhịp học và mức độ tập trung của giao diện.
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - generic [ref=e128]: "01"
+            - generic [ref=e129]:
+              - strong [ref=e130]: Chọn một thẻ
+              - paragraph [ref=e131]: Mỗi thẻ đại diện cho một khái niệm căn bản trong hệ thống học tập.
+          - generic [ref=e132]:
+            - generic [ref=e133]: "02"
+            - generic [ref=e134]:
+              - strong [ref=e135]: Lật để kiểm tra trí nhớ
+              - paragraph [ref=e136]: Từ mặt trước sang mặt sau, giao diện giữ một nhịp chuyển rõ và không gây nhiễu.
+          - generic [ref=e137]:
+            - generic [ref=e138]: "03"
+            - generic [ref=e139]:
+              - strong [ref=e140]: Khởi động học thật
+              - paragraph [ref=e141]: Khi sẵn sàng, đăng ký để tạo deck, dùng public deck hoặc bắt đầu study session của riêng bạn.
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - generic [ref=e146]: "Bộ thẻ Demo: Phương pháp học"
+            - generic [ref=e147]: 6 thẻ
+          - generic [ref=e148]:
+            - img [ref=e149]
+            - text: Nhấn vào thẻ để lật
+        - generic [ref=e151]:
+          - generic "Nhấn để lật thẻ" [ref=e152] [cursor=pointer]:
+            - generic [ref=e153]:
+              - generic [ref=e154]:
+                - generic [ref=e155]:
+                  - generic [ref=e156]: 🧠
+                  - generic [ref=e157]: Câu hỏi
+                  - paragraph [ref=e158]: Spaced Repetition
+                - generic [ref=e159]: Nhấn để lật
+              - generic [ref=e160]:
+                - generic [ref=e161]:
+                  - generic [ref=e162]: Đáp án
+                  - paragraph [ref=e163]: "Phương pháp lặp lại ngắt quãng: ôn tập đúng lúc bạn sắp quên để ghi nhớ lâu dài hơn."
+                - generic [ref=e164]: Nhấn để lật lại
+          - generic "Nhấn để lật thẻ" [ref=e165] [cursor=pointer]:
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - generic [ref=e168]:
+                  - generic [ref=e169]: 📝
+                  - generic [ref=e170]: Câu hỏi
+                  - paragraph [ref=e171]: Flashcard
+                - generic [ref=e172]: Nhấn để lật
+              - generic [ref=e173]:
+                - generic [ref=e174]:
+                  - generic [ref=e175]: Đáp án
+                  - paragraph [ref=e176]: "Thẻ học hai mặt: mặt trước là câu hỏi, mặt sau là đáp án để kích hoạt nhớ lại chủ động."
+                - generic [ref=e177]: Nhấn để lật lại
+          - generic "Nhấn để lật thẻ" [ref=e178] [cursor=pointer]:
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - generic [ref=e181]:
+                  - generic [ref=e182]: 💡
+                  - generic [ref=e183]: Câu hỏi
+                  - paragraph [ref=e184]: Active Recall
+                - generic [ref=e185]: Nhấn để lật
+              - generic [ref=e186]:
+                - generic [ref=e187]:
+                  - generic [ref=e188]: Đáp án
+                  - paragraph [ref=e189]: Chủ động nhớ lại thay vì chỉ đọc lại. Đây là lõi của học hiệu quả với flashcard.
+                - generic [ref=e190]: Nhấn để lật lại
+          - generic "Nhấn để lật thẻ" [ref=e191] [cursor=pointer]:
+            - generic [ref=e192]:
+              - generic [ref=e193]:
+                - generic [ref=e194]:
+                  - generic [ref=e195]: 🔥
+                  - generic [ref=e196]: Câu hỏi
+                  - paragraph [ref=e197]: Streak
+                - generic [ref=e198]: Nhấn để lật
+              - generic [ref=e199]:
+                - generic [ref=e200]:
+                  - generic [ref=e201]: Đáp án
+                  - paragraph [ref=e202]: Chuỗi ngày học liên tiếp giúp việc ôn tập trở thành thói quen thay vì quyết tâm nhất thời.
+                - generic [ref=e203]: Nhấn để lật lại
+          - generic "Nhấn để lật thẻ" [ref=e204] [cursor=pointer]:
+            - generic [ref=e205]:
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - generic [ref=e208]: ⭐
+                  - generic [ref=e209]: Câu hỏi
+                  - paragraph [ref=e210]: Experience Points
+                - generic [ref=e211]: Nhấn để lật
+              - generic [ref=e212]:
+                - generic [ref=e213]:
+                  - generic [ref=e214]: Đáp án
+                  - paragraph [ref=e215]: XP phản ánh mức độ hoạt động và tạo một lớp phản hồi tức thời cho mỗi phiên học.
+                - generic [ref=e216]: Nhấn để lật lại
+          - generic "Nhấn để lật thẻ" [ref=e217] [cursor=pointer]:
+            - generic [ref=e218]:
+              - generic [ref=e219]:
+                - generic [ref=e220]:
+                  - generic [ref=e221]: 🌐
+                  - generic [ref=e222]: Câu hỏi
+                  - paragraph [ref=e223]: Public Deck
+                - generic [ref=e224]: Nhấn để lật
+              - generic [ref=e225]:
+                - generic [ref=e226]:
+                  - generic [ref=e227]: Đáp án
+                  - paragraph [ref=e228]: Deck công khai giúp người dùng bắt đầu nhanh, sao chép nội dung tốt và học theo cấu trúc có sẵn.
+                - generic [ref=e229]: Nhấn để lật lại
+        - button "Lật lại tất cả thẻ" [ref=e231] [cursor=pointer]:
+          - img [ref=e232]
+          - text: Lật lại tất cả thẻ
+    - generic [ref=e234]:
+      - paragraph [ref=e235]: Thấy workflow này hợp lý? Tạo tài khoản để bắt đầu với bộ thẻ của riêng bạn.
+      - link "Đăng ký miễn phí" [ref=e236] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/register
+        - img [ref=e237]
+        - text: Đăng ký miễn phí
+  - generic [ref=e240]:
+    - generic [ref=e241]:
+      - generic [ref=e242]: Thư viện cộng đồng
+      - heading "Một vài deck đang được xuất bản công khai." [level=2] [ref=e243]
+      - paragraph [ref=e244]: "Mỗi deck là một điểm bắt đầu tốt: có cấu trúc, có nội dung và sẵn sàng để sao chép vào thư viện học tập cá nhân."
+    - generic [ref=e245]:
+      - generic [ref=e246]:
+        - generic [ref=e247]:
+          - generic [ref=e248]:
+            - generic [ref=e249]: Deck public
+            - heading "hghhrhrrghr" [level=3] [ref=e250]
+            - text: hehehe
+          - img [ref=e252]
+        - paragraph [ref=e254]: ẻgsdfsdgsdfsdf
+        - generic [ref=e256]:
+          - img [ref=e257]
+          - text: 0 thẻ
+      - generic [ref=e260]:
+        - generic [ref=e261]:
+          - generic [ref=e262]:
+            - generic [ref=e263]: Deck public
+            - heading "test" [level=3] [ref=e264]
+            - text: hehehe
+          - img [ref=e266]
+        - paragraph [ref=e268]: hehehe
+        - generic [ref=e270]:
+          - img [ref=e271]
+          - text: 3 thẻ
+    - link "Mở tài khoản để khám phá toàn bộ thư viện →" [ref=e275] [cursor=pointer]:
+      - /url: http://127.0.0.1:8000/register
+  - generic [ref=e277]:
+    - heading "Sẵn sàng chuyển từ ghi chú rời rạc sang một hệ thống ôn tập rõ ràng?" [level=2] [ref=e278]
+    - paragraph [ref=e279]: Tạo tài khoản, xây deck đầu tiên và bắt đầu một nhịp học có cấu trúc trong vài phút.
+    - link "Tạo tài khoản ngay" [ref=e280] [cursor=pointer]:
+      - /url: http://127.0.0.1:8000/register
+      - img [ref=e281]
+      - text: Tạo tài khoản ngay
+  - contentinfo [ref=e283]:
+    - generic [ref=e284]:
+      - generic [ref=e285]:
+        - generic [ref=e286]:
+          - generic [ref=e288]:
+            - img [ref=e290]
+            - generic [ref=e293]: Flashcard Hub
+          - paragraph [ref=e294]: Nền tảng flashcard cho học viên cần một workflow học tập bền vững và cho quản trị viên cần một bề mặt điều hành gọn, rõ, đáng tin cậy.
+          - link "Bắt đầu miễn phí" [ref=e296] [cursor=pointer]:
+            - /url: http://127.0.0.1:8000/register
+            - img [ref=e297]
+        - generic [ref=e299]:
+          - heading "Điều hướng" [level=4] [ref=e300]
+          - list [ref=e301]:
+            - listitem [ref=e302]:
+              - link "Trang chủ" [ref=e303] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000
+            - listitem [ref=e304]:
+              - link "Tính năng" [ref=e305] [cursor=pointer]:
+                - /url: "#features"
+            - listitem [ref=e306]:
+              - link "Học thử" [ref=e307] [cursor=pointer]:
+                - /url: "#demo"
+            - listitem [ref=e308]:
+              - link "Đăng ký" [ref=e309] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/register
+            - listitem [ref=e310]:
+              - link "Client login" [ref=e311] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/login/client
+        - generic [ref=e312]:
+          - heading "Cổng truy cập" [level=4] [ref=e313]
+          - list [ref=e314]:
+            - listitem [ref=e315]:
+              - link "Client portal" [ref=e316] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/login/client
+            - listitem [ref=e317]:
+              - link "Admin login ↗" [ref=e318] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/login/admin
+      - generic [ref=e319]:
+        - paragraph [ref=e320]: © 2026 Flashcard Learning Hub. Structured study experience on Laravel.
+        - paragraph [ref=e321]: Version 1.0.0 · Laravel 11.48.0

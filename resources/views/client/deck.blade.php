@@ -1,29 +1,26 @@
 @extends('layouts.client-app', ['title' => $deck->title])
 
 @section('content')
-    {{-- Hero Info Section --}}
-    @include('components.client.deck-hero', ['deck' => $deck])
+    <section class="client-page-shell deck-detail-shell">
+        @include('components.client.deck-hero', ['deck' => $deck])
 
-    {{-- Action Buttons --}}
-    @include('components.client.deck-actions', [
-        'deck' => $deck,
-        'canManageDeck' => $canManageDeck
-    ])
+        @include('components.client.deck-actions', [
+            'deck' => $deck,
+            'canManageDeck' => $canManageDeck
+        ])
 
-    {{-- Flashcards Preview --}}
-    @include('components.client.flashcards-table', ['deck' => $deck])
+        @include('components.client.flashcards-table', ['deck' => $deck, 'canManage' => $canManageDeck])
 
-    {{-- Reviews Section --}}
-    @include('components.client.reviews-section', [
-        'deck' => $deck,
-        'reviewForm' => $reviewForm
-    ])
+        @include('components.client.reviews-section', [
+            'deck' => $deck,
+            'reviewForm' => $reviewForm
+        ])
+    </section>
 @endsection
 
-@stack('modals')
-    {{-- Include modals for deck management --}}
+@push('modals')
     @include('components.client.modals', ['deck' => $deck, 'categories' => ['Language', 'Science', 'History', 'Math', 'Technology', 'Other']])
-@endstack
+@endpush
 
 @push('scripts')
     <script>

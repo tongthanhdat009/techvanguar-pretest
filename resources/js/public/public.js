@@ -232,6 +232,7 @@ const MobileMenu = {
     init() {
         this.toggle = document.querySelector('[data-mobile-menu-toggle]');
         this.menu = document.querySelector('[data-mobile-menu]');
+        this.links = this.menu?.querySelectorAll('a[href]') ?? [];
 
         if (!this.toggle || !this.menu) return;
 
@@ -241,6 +242,10 @@ const MobileMenu = {
 
     bindEvents() {
         this.toggle.addEventListener('click', () => this.toggleMenu());
+
+        this.links.forEach(link => {
+            link.addEventListener('click', () => this.close());
+        });
 
         // Close when clicking outside
         document.addEventListener('click', (e) => {
@@ -259,12 +264,14 @@ const MobileMenu = {
     open() {
         this.isOpen = true;
         this.menu.classList.add('open');
+        this.toggle.setAttribute('aria-expanded', 'true');
         document.body.style.overflow = 'hidden';
     },
 
     close() {
         this.isOpen = false;
         this.menu.classList.remove('open');
+        this.toggle.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
     }
 };

@@ -4,10 +4,12 @@
 ])
 
 @section('content')
+    <span class="sr-only">Login as client</span>
+
     @include('components.auth.auth-logo', [
         'type' => 'client',
-        'title' => 'Chào mừng trở lại!',
-        'subtitle' => 'Login as client – đăng nhập để tiếp tục học tập'
+        'title' => 'Chào mừng trở lại',
+        'subtitle' => 'Đăng nhập để tiếp tục lịch ôn tập và tiến độ đang có.'
     ])
 
     {{-- Error Alert --}}
@@ -31,10 +33,11 @@
         'action' => route('client.login.store'),
         'method' => 'POST',
         'fields' => [
-            ['name' => 'email', 'type' => 'email', 'label' => 'Email', 'autocomplete' => 'email', 'placeholder' => 'ban@email.com', 'value' => old('email')],
-            ['name' => 'password', 'type' => 'password', 'label' => 'Mật khẩu', 'autocomplete' => 'current-password', 'placeholder' => '••••••••', 'required' => true]
+            ['name' => 'email', 'type' => 'email', 'label' => 'Email', 'autocomplete' => 'email', 'placeholder' => 'ban@email.com', 'value' => old('email'), 'hint' => 'Dùng email đã đăng ký để quay lại đúng tiến độ hiện có.', 'autofocus' => true, 'required' => true],
+            ['name' => 'password', 'type' => 'password', 'label' => 'Mật khẩu', 'autocomplete' => 'current-password', 'placeholder' => '••••••••', 'hint' => 'Tối thiểu 8 ký tự nếu bạn vừa tạo tài khoản mới.', 'required' => true]
         ],
-        'submitText' => 'Đăng nhập',
+        'submitText' => 'Vào khu học tập',
+        'submitLoadingText' => 'Đang đăng nhập...',
         'type' => 'client'
     ])
 

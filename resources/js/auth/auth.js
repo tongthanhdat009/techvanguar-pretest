@@ -39,7 +39,7 @@ const AuthForm = {
         // Add loading state
         submitBtn.disabled = true;
         submitBtn.dataset.originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Processing...';
+        submitBtn.textContent = submitBtn.dataset.loadingText || 'Dang xu ly...';
         submitBtn.classList.add('opacity-75');
 
         // Form will submit normally, this just adds visual feedback
@@ -115,19 +115,19 @@ const FormValidation = {
                 case 'required':
                     if (!input.value.trim()) {
                         isValid = false;
-                        error = 'This field is required';
+                        error = 'Truong nay la bat buoc';
                     }
                     break;
                 case 'email':
                     if (input.value && !this.isValidEmail(input.value)) {
                         isValid = false;
-                        error = 'Please enter a valid email';
+                        error = 'Vui long nhap email hop le';
                     }
                     break;
                 case 'min':
                     if (input.value.length < parseInt(ruleValue)) {
                         isValid = false;
-                        error = `Minimum ${ruleValue} characters required`;
+                        error = `Can toi thieu ${ruleValue} ky tu`;
                     }
                     break;
             }
@@ -153,7 +153,7 @@ const FormValidation = {
             input.classList.remove('border-green-400');
 
             const errorEl = document.createElement('p');
-            errorEl.className = 'error-message mt-1 text-xs text-red-500';
+            errorEl.className = 'error-message auth-live-error';
             errorEl.textContent = error;
             input.parentElement.appendChild(errorEl);
         } else {

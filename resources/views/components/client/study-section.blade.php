@@ -8,7 +8,10 @@
 ])
 
 <section class="study-section">
-    <h2 class="section-title">{{ $title }}</h2>
+    <div class="study-section-header">
+        <h2 class="section-title">{{ $title }}</h2>
+        <span class="study-section-count">{{ $decks->count() }} decks</span>
+    </div>
     @include('components.client.deck-grid', [
         'decks' => $decks,
         'emptyMessage' => $emptyMessage,

@@ -7,13 +7,13 @@
 
 <p class="auth-links {{ $type }}">
     @if(isset($prompt))
-        {{ $prompt }}
+        {!! $prompt !!}
     @else
         @if($type === 'register')
             Đã có tài khoản?
             <a href="{{ route($loginRoute) }}">Đăng nhập</a>
         @else
-            Chưa có tài khoản?
+            Chưa có tài khoản học viên?
             <a href="{{ route($registerRoute) }}">Đăng ký miễn phí</a>
         @endif
     @endif

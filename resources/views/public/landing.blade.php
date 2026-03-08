@@ -4,32 +4,28 @@
 ])
 
 @section('content')
-    {{-- Hero Section --}}
     @include('components.public.public-hero')
 
-    {{-- Features Section --}}
     @include('components.public.public-features')
 
-    {{-- Demo Section --}}
     @include('components.public.public-demo')
 
-    {{-- Public Decks Section --}}
     @if($publicDecks->isNotEmpty())
-    <section class="public-decks-section">
+    <section id="community-decks" class="public-decks-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Bộ thẻ nổi bật từ cộng đồng</h2>
-                <p class="section-subtitle">Khám phá các bộ thẻ công khai được tạo bởi cộng đồng học viên.</p>
+                <span class="section-kicker">Thư viện cộng đồng</span>
+                <h2 class="section-title">Một vài deck đang được xuất bản công khai.</h2>
+                <p class="section-subtitle">Mỗi deck là một điểm bắt đầu tốt: có cấu trúc, có nội dung và sẵn sàng để sao chép vào thư viện học tập cá nhân.</p>
             </div>
             <div class="deck-grid">
                 @foreach($publicDecks as $deck)
                 <div class="deck-card">
                     <div class="deck-card-header">
                         <div class="flex-1 min-w-0">
-                            <h3 class="deck-card-title">{{ $deck->title }}</h3>
-                            @if($deck->category)
-                            <span class="deck-card-category">{{ $deck->category }}</span>
-                            @endif
+                            <span class="deck-card-eyebrow">Deck public</span>
+                            <h3 class="deck-card-title">{{ \Illuminate\Support\Str::limit($deck->title, 42) }}</h3>
+                            <span class="deck-card-category">{{ $deck->category ? \Illuminate\Support\Str::limit($deck->category, 28) : 'Cong dong' }}</span>
                         </div>
                         <div class="deck-card-icon">
                             <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -37,9 +33,7 @@
                             </svg>
                         </div>
                     </div>
-                    @if($deck->description)
-                    <p class="deck-card-description">{{ $deck->description }}</p>
-                    @endif
+                    <p class="deck-card-description">{{ $deck->description ? \Illuminate\Support\Str::limit(trim($deck->description), 110) : 'Một deck công khai sẵn sàng để bạn dùng làm điểm bắt đầu cho phiên học tiếp theo.' }}</p>
                     <div class="deck-card-footer">
                         <span class="deck-card-stats">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -58,12 +52,36 @@
                 @endforeach
             </div>
             <div class="view-all-cta">
-                <a href="{{ route('register') }}">Xem tất cả bộ thẻ sau khi đăng ký →</a>
+                <a href="{{ route('register') }}">Mở tài khoản để khám phá toàn bộ thư viện →</a>
             </div>
         </div>
     </section>
     @endif
 
-    {{-- Final CTA --}}
+    @if($featuredReviews->isNotEmpty())
+    <section class="public-reviews-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-kicker">Từ người dùng</span>
+                <h2 class="section-title">Tín hiệu từ hoạt động thực tế trên nền tảng.</h2>
+                <p class="section-subtitle">Review mới nhất giúp landing page bớt cảm giác giả lập và phản ánh hệ sinh thái đang có người dùng thật.</p>
+            </div>
+
+            <div class="public-reviews-grid">
+                @foreach($featuredReviews as $review)
+                    <article class="public-review-card">
+                        <div class="public-review-rating">{{ str_repeat('★', (int) $review->rating) }}<span>{{ $review->rating }}/5</span></div>
+                        <p class="public-review-copy">{{ $review->comment ?: 'Người dùng đã để lại đánh giá tích cực cho bộ thẻ này.' }}</p>
+                        <div class="public-review-meta">
+                            <strong>{{ $review->user?->name ?? 'Người dùng ẩn danh' }}</strong>
+                            <span>{{ $review->deck?->title ?? 'Deck cộng đồng' }}</span>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
     @include('components.public.public-final-cta')
 @endsection

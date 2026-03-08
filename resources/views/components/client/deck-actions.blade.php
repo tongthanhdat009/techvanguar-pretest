@@ -5,32 +5,31 @@
 
 @if($deck)
     <div class="deck-actions">
-        {{-- Study Now Button (Always visible) --}}
         <a href="{{ route('client.decks.study', $deck) }}"
            class="deck-actions__btn deck-actions__btn--primary">
-            Học ngay
+            Ôn deck này
         </a>
 
-        {{-- Owner-only Actions --}}
+        <a href="{{ route('client.my-decks') }}" class="deck-actions__btn deck-actions__btn--ghost">
+            Quay lại thư viện
+        </a>
+
         @if($canManageDeck)
             <div class="deck-actions__owner">
-                {{-- Edit Deck --}}
                 <button type="button"
                         class="deck-actions__btn deck-actions__btn--secondary"
                         data-deck-edit
                         data-deck-id="{{ $deck->id }}">
-                    Chỉnh sửa
+                    Chỉnh sửa deck
                 </button>
 
-                {{-- Add Flashcard --}}
                 <button type="button"
                         class="deck-actions__btn deck-actions__btn--secondary"
                         data-deck-add-card
                         data-deck-id="{{ $deck->id }}">
-                    Thêm thẻ mới
+                    Thêm flashcard
                 </button>
 
-                {{-- Delete Deck (with confirmation) --}}
                 <form method="POST"
                       action="{{ route('client.decks.destroy', $deck) }}"
                       class="inline">
@@ -40,7 +39,7 @@
                             class="deck-actions__btn deck-actions__btn--danger"
                             data-deck-delete
                             data-confirm-message="Xóa bộ thẻ này và tất cả các thẻ bên trong?">
-                        Xóa bộ thẻ
+                        Xóa deck
                     </button>
                 </form>
             </div>

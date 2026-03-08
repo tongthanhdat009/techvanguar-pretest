@@ -207,7 +207,7 @@ class ClientPortalController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Progress saved!',
+                'message' => 'Đã lưu tiến độ học.',
                 'flashcard_id' => $flashcard->id,
                 'deck_id' => $deck->id,
                 'back_url' => $backUrl,
@@ -225,7 +225,7 @@ class ClientPortalController extends Controller
                         'mode' => $mode,
                         'card' => $nextCard,
                     ])
-                    ->with('status', 'Study progress updated.');
+                    ->with('status', 'Đã cập nhật tiến độ ôn tập.');
             }
 
             return redirect()
@@ -233,10 +233,10 @@ class ClientPortalController extends Controller
                     'mode' => $mode,
                     'card' => $nextCard,
                 ])
-                ->with('status', 'Study progress updated.');
+                ->with('status', 'Đã cập nhật tiến độ ôn tập.');
         }
 
-        return back()->with('status', 'Study progress updated.');
+        return back()->with('status', 'Đã cập nhật tiến độ ôn tập.');
     }
 
     public function storeDeck(ClientDeckRequest $request): RedirectResponse
@@ -257,7 +257,7 @@ class ClientPortalController extends Controller
             ]);
         }
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck created with '.count($request->cards()).' card(s).');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Đã tạo deck mới với '.count($request->cards()).' flashcard.');
     }
 
     public function updateDeck(ClientDeckRequest $request, Deck $deck): RedirectResponse
@@ -268,7 +268,7 @@ class ClientPortalController extends Controller
 
         $deck->update($request->validatedPayload());
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck updated.');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Đã cập nhật deck.');
     }
 
     public function destroyDeck(Request $request, Deck $deck): RedirectResponse
@@ -279,7 +279,7 @@ class ClientPortalController extends Controller
 
         $deck->delete();
 
-        return redirect()->route('client.dashboard')->with('status', 'Deck removed.');
+        return redirect()->route('client.dashboard')->with('status', 'Đã xóa deck.');
     }
 
     public function storeFlashcard(ClientFlashcardRequest $request, Deck $deck): RedirectResponse
@@ -290,7 +290,7 @@ class ClientPortalController extends Controller
 
         $deck->flashcards()->create($request->validated());
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Flashcard added.');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Đã thêm flashcard mới.');
     }
 
     public function updateFlashcard(ClientFlashcardRequest $request, Flashcard $flashcard): RedirectResponse
@@ -302,7 +302,7 @@ class ClientPortalController extends Controller
 
         $flashcard->update($request->validated());
 
-        return redirect()->route('client.decks.show', $flashcard->deck)->with('status', 'Flashcard updated.');
+        return redirect()->route('client.decks.show', $flashcard->deck)->with('status', 'Đã cập nhật flashcard.');
     }
 
     public function destroyFlashcard(Request $request, Flashcard $flashcard): RedirectResponse
@@ -315,7 +315,7 @@ class ClientPortalController extends Controller
 
         $flashcard->delete();
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Flashcard deleted.');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Đã xóa flashcard.');
     }
 
     public function copyDeck(Request $request, Deck $deck, DeckCopyService $deckCopy, DeckAccess $deckAccess): RedirectResponse
@@ -327,7 +327,7 @@ class ClientPortalController extends Controller
 
         $copy = $deckCopy->copyToUser($deck, $user);
 
-        return redirect()->route('client.decks.show', $copy)->with('status', 'Deck copied to your library.');
+        return redirect()->route('client.decks.show', $copy)->with('status', 'Đã sao chép deck vào thư viện cá nhân.');
     }
 
     public function storeReview(Request $request, Deck $deck, DeckAccess $deckAccess): RedirectResponse
@@ -347,7 +347,7 @@ class ClientPortalController extends Controller
             $validated
         );
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Review saved.');
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Đã lưu đánh giá của bạn.');
     }
 
     public function profile(Request $request, StudyScheduler $scheduler): View
@@ -380,7 +380,7 @@ class ClientPortalController extends Controller
 
         $user->update($request->validated());
 
-        return redirect()->route('client.profile')->with('status', 'Profile updated.');
+        return redirect()->route('client.profile')->with('status', 'Đã cập nhật hồ sơ.');
     }
 
     public function importDeck(ClientDeckImportRequest $request, CsvImportService $csvImport): RedirectResponse
@@ -403,7 +403,7 @@ class ClientPortalController extends Controller
 
         return redirect()
             ->route('client.decks.show', $deck)
-            ->with('status', "Deck imported from CSV. {$importedCount} flashcard(s) added.");
+            ->with('status', "Đã nhập deck từ CSV và thêm {$importedCount} flashcard.");
     }
 
     public function exportDeck(Request $request, Deck $deck, CsvExportService $csvExport): StreamedResponse
@@ -460,7 +460,7 @@ class ClientPortalController extends Controller
             ->count();
 
         return [
-            'today_label' => now()->format('D, M j'),
+            'today_label' => ucfirst(now()->locale('vi')->translatedFormat('D, d/m')),
             'due_today' => $scheduler->dueTodayCount($user),
             'completed_today' => $completedTodayCount,
             'level' => $user->levelProgress(),
@@ -485,9 +485,9 @@ class ClientPortalController extends Controller
                 : false;
 
             return [
-                'label' => $date->format('D'),
+                'label' => ucfirst($date->locale('vi')->translatedFormat('D')),
                 'day' => $date->format('d'),
-                'full' => $date->format('M d'),
+                'full' => ucfirst($date->locale('vi')->translatedFormat('d/m')),
                 'is_active' => $isActive,
                 'is_today' => $date->isToday(),
             ];
@@ -497,13 +497,13 @@ class ClientPortalController extends Controller
     private function buildMasterySummary(int $masteredCount, int $trackedCards): array
     {
         $milestones = [
-            10 => 'Momentum',
-            25 => 'Scholar',
-            50 => 'Archivist',
-            100 => 'Grand Archive',
+            10 => 'Đà học',
+            25 => 'Học chắc',
+            50 => 'Ghi nhớ sâu',
+            100 => 'Kho tri thức',
         ];
 
-        $tier = 'First Spark';
+        $tier = 'Khởi động';
 
         foreach ($milestones as $threshold => $label) {
             if ($masteredCount >= $threshold) {
@@ -517,16 +517,16 @@ class ClientPortalController extends Controller
             : min(100, (int) round(($masteredCount / $trackedCards) * 100));
 
         $message = match (true) {
-            $masteredCount >= 100 => 'Your review base is turning into a reference library. Keep the cadence and protect the streak.',
-            $masteredCount >= 50 => 'This is no longer casual practice. You are building durable recall across multiple decks.',
-            $masteredCount >= 25 => 'A strong mastery core is forming. Push a few more cards each day to turn it into a moat.',
-            $masteredCount >= 10 => 'You have real momentum now. Keep stacking clean reviews before the queue grows again.',
-            default => 'Every mastered card reduces future friction. Start with the easiest wins and compound from there.',
+            $masteredCount >= 100 => 'Bạn đã biến việc ôn tập thành một hệ thống thật sự bền. Giữ nhịp đều và bảo vệ streak hiện tại.',
+            $masteredCount >= 50 => 'Việc học đã vượt qua mức thử nghiệm. Bạn đang xây trí nhớ dài hạn trên nhiều deck cùng lúc.',
+            $masteredCount >= 25 => 'Một lõi ghi nhớ chắc đang hình thành. Chỉ cần thêm vài phiên ngắn mỗi ngày để tăng độ bền.',
+            $masteredCount >= 10 => 'Bạn đã có đà học rõ ràng. Tiếp tục giữ các lượt review sạch trước khi hàng chờ dày lên.',
+            default => 'Mỗi thẻ được mastery sẽ làm những phiên sau nhẹ hơn. Hãy bắt đầu từ các lượt ôn dễ thắng nhất.',
         };
 
         $nextMilestone = $nextThreshold
-            ? ($nextThreshold - $masteredCount).' cards to '.$milestones[$nextThreshold]
-            : 'Top mastery tier unlocked';
+            ? 'Còn '.($nextThreshold - $masteredCount).' thẻ để đạt '.$milestones[$nextThreshold]
+            : 'Đã mở khóa mốc mastery cao nhất';
 
         return [
             'count' => $masteredCount,

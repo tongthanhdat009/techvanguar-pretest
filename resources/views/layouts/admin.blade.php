@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ $title ?? 'Admin Portal' }} – Flashcard Learning Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/css/admin/admin.css'])
+    @stack('styles')
 </head>
-<body class="bg-slate-900 min-h-screen font-sans antialiased">
+<body class="admin-shell">
 
     {{-- Admin Sidebar --}}
     @if (isset($sidebar) && $sidebar !== false)
@@ -33,12 +37,18 @@
                     </svg>
                 </button>
             @endif
-            <span class="text-white font-semibold text-sm">{{ $title ?? 'Admin Portal' }}</span>
+            <div class="admin-topnav-title-group">
+                <span class="admin-topnav-eyebrow">Operations</span>
+                <span class="admin-topnav-title">{{ $title ?? 'Admin Portal' }}</span>
+            </div>
             <div class="flex items-center gap-3 ml-auto">
-                <span class="text-slate-400 text-sm hidden sm:block">{{ auth('admin')->user()?->name }}</span>
+                <div class="admin-topnav-user hidden sm:flex">
+                    <span class="admin-topnav-user-label">Signed in as</span>
+                    <span class="admin-topnav-user-name">{{ auth('admin')->user()?->name }}</span>
+                </div>
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit" class="text-slate-400 hover:text-white text-sm transition-colors">Logout</button>
+                    <button type="submit" class="admin-topnav-logout">Logout</button>
                 </form>
             </div>
         </header>

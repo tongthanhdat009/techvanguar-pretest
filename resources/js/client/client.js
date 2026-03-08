@@ -25,7 +25,7 @@ const Toast = {
         toast.innerHTML = `
             <span class="toast-icon">${this.getIcon(type)}</span>
             <span class="toast-message">${message}</span>
-            <button class="toast-close" aria-label="Close">&times;</button>
+            <button class="toast-close" aria-label="Đóng thông báo">&times;</button>
         `;
 
         this.container.appendChild(toast);
@@ -141,7 +141,7 @@ const ClientNav = {
     logout(e) {
         e.preventDefault();
         const form = e.target.closest('form');
-        if (form && confirm('Are you sure you want to logout?')) {
+        if (form && confirm('Bạn có chắc muốn đăng xuất?')) {
             form.submit();
         }
     }
@@ -190,12 +190,7 @@ const StudyRoom = {
         this.isFlipped = false;
         this.isSubmitting = false;
 
-        // Get cards data from embedded data or parse JSON
-        if (window.studyRoomData) {
-            this.cards = window.studyRoomData.cards || [];
-        } else {
-            this.cards = JSON.parse(this.studyRoom.dataset.cards || '[]');
-        }
+        this.cards = JSON.parse(this.studyRoom.dataset.cards || '[]');
 
         this.initFlipCard();
         this.initControlButtons();
@@ -305,7 +300,7 @@ const StudyRoom = {
         submitBtn?.addEventListener('click', () => {
             const answer = input?.value.trim();
             if (!answer) {
-                Toast.warning('Please enter your answer');
+                Toast.warning('Vui lòng nhập đáp án trước khi kiểm tra');
                 return;
             }
             this.submitTypedAnswer(answer);
@@ -342,7 +337,7 @@ const StudyRoom = {
             }, 300);
         } catch (error) {
             console.error('Error submitting result:', error);
-            Toast.error('Failed to save progress');
+            Toast.error('Không thể lưu tiến độ học');
         } finally {
             this.setSubmittingState(false);
         }
@@ -350,10 +345,10 @@ const StudyRoom = {
 
     showRatingFeedback(result) {
         const feedbackMap = {
-            'again': { message: 'Again!', color: '#ef4444' },
-            'hard': { message: 'Hard', color: '#f59e0b' },
-            'good': { message: 'Good!', color: '#3b82f6' },
-            'easy': { message: 'Easy!', color: '#10b981' }
+            'again': { message: 'Ôn lại', color: '#ef4444' },
+            'hard': { message: 'Khó', color: '#f59e0b' },
+            'good': { message: 'Ổn', color: '#3b82f6' },
+            'easy': { message: 'Dễ', color: '#10b981' }
         };
 
         const feedback = feedbackMap[result] || { message: 'Rated!', color: '#6b7280' };
@@ -406,9 +401,13 @@ const StudyRoom = {
 
         // Update progress bar
         const progressFill = this.studyRoom.querySelector('.progress-fill');
+        const progressMeter = this.studyRoom.querySelector('.study-progress-meter');
         const currentNum = this.studyRoom.querySelector('.current-num');
         if (progressFill) {
             progressFill.style.width = `${((this.currentIndex + 1) / this.totalCards) * 100}%`;
+        }
+        if (progressMeter) {
+            progressMeter.value = ((this.currentIndex + 1) / this.totalCards) * 100;
         }
         if (currentNum) {
             currentNum.textContent = this.currentIndex + 1;
@@ -600,9 +599,9 @@ const StudyRoom = {
     showCompletionMessage() {
         const studyRoom = this.studyRoom;
         const message = this.deckId
-            ? `You've saved progress for all ${this.totalCards} cards in this deck.`
-            : `You've reviewed all ${this.totalCards} cards in this session.`;
-        const backLabel = this.deckId ? 'Back to Deck Details' : 'Back to Dashboard';
+            ? `Bạn đã lưu tiến độ cho toàn bộ ${this.totalCards} thẻ trong deck này.`
+            : `Bạn đã hoàn thành ${this.totalCards} thẻ trong phiên ôn tập này.`;
+        const backLabel = this.deckId ? 'Quay lại chi tiết deck' : 'Quay lại dashboard';
         
         // Haptic Feedback (if supported) & Sound
         if (navigator.vibrate) {
@@ -616,10 +615,10 @@ const StudyRoom = {
         studyRoom.innerHTML = `
             <div class="study-complete">
                 <div class="complete-icon">🎉</div>
-                <h2>Study Session Complete!</h2>
+                <h2>Hoàn thành phiên ôn tập</h2>
                 <p>${message}</p>
                 <div class="complete-actions">
-                    <a href="${this.restartUrl}" class="btn btn-primary">Study Again</a>
+                    <a href="${this.restartUrl}" class="btn btn-primary">Ôn lại lần nữa</a>
                     <a href="${this.backUrl}" class="btn btn-secondary">${backLabel}</a>
                 </div>
             </div>
@@ -710,7 +709,7 @@ const StudyRoom = {
                 }, 300);
             } catch (error) {
                 console.error('Error submitting result:', error);
-                Toast.error('Failed to save progress');
+                Toast.error('Không thể lưu tiến độ học');
             } finally {
                 this.setSubmittingState(false);
             }
@@ -726,7 +725,7 @@ const StudyRoom = {
         const isCorrect = answer.toLowerCase() === correctAnswer;
 
         // Show feedback
-        const feedback = isCorrect ? 'Correct!' : `Incorrect. The answer was: ${correctAnswer}`;
+        const feedback = isCorrect ? 'Chính xác' : `Chưa đúng. Đáp án là: ${correctAnswer}`;
         Toast[isCorrect ? 'success' : 'error'](feedback);
 
         // Submit result and move to next card
@@ -739,7 +738,7 @@ const StudyRoom = {
                 }, 300);
             } catch (error) {
                 console.error('Error submitting result:', error);
-                Toast.error('Failed to save progress');
+                Toast.error('Không thể lưu tiến độ học');
             } finally {
                 this.setSubmittingState(false);
             }
@@ -788,7 +787,7 @@ const StudyRoom = {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            throw new Error(data.message || 'Failed to save progress');
+            throw new Error(data.message || 'Không thể lưu tiến độ học');
         }
 
         if (data.back_url) {
@@ -925,7 +924,7 @@ const DeckDetail = {
         const deleteBtns = document.querySelectorAll('[data-deck-delete]');
         deleteBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const message = btn.dataset.confirmMessage || 'Delete this deck?';
+                const message = btn.dataset.confirmMessage || 'Bạn có chắc muốn xóa deck này?';
                 if (!confirm(message)) {
                     e.preventDefault();
                 }
