@@ -84,6 +84,45 @@ class ClientPortalController extends Controller
         ]);
     }
 
+    public function myDecks(Request $request): View
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $ownedDecks = $user->decks()
+            ->withCount('flashcards')
+            ->withAvg('reviews', 'rating')
+            ->latest()
+            ->paginate(12);
+
+        return view('client.my-decks', [
+            'ownedDecks' => $ownedDecks,
+        ]);
+    }
+
+    public function community(Request $request): View
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $communityDecks = Deck::query()
+            ->active()
+            ->public()
+            ->where(function (Builder $query) use ($user) {
+                $query->whereNull('user_id')
+                    ->orWhere('user_id', '!=', $user->id);
+            })
+            ->withCount('flashcards')
+            ->withAvg('reviews', 'rating')
+            ->with('owner')
+            ->latest()
+            ->paginate(12);
+
+        return view('client.community', [
+            'communityDecks' => $communityDecks,
+        ]);
+    }
+
     public function createDeck(): View
     {
         return view('client.create-deck');

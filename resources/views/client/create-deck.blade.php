@@ -94,39 +94,67 @@
 @push('styles')
 <style>
 .create-deck-page {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
 .page-header {
-    text-align: center;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
     margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
 }
 
 .page-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #111827;
+    color: white;
     margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
 }
 
 .page-subtitle {
-    color: #6b7280;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 1rem;
+    position: relative;
+    z-index: 1;
 }
 
 .create-deck-form {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 }
 
 .form-section {
     margin-bottom: 2rem;
     padding-bottom: 2rem;
     border-bottom: 1px solid #e5e7eb;
+    position: relative;
 }
 
 .form-section:last-of-type {
@@ -136,31 +164,43 @@
 }
 
 .form-section-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #111827;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(180deg, #4f46e5, #7c3aed);
+    border-radius: 2px;
 }
 
 .form-section-desc {
     color: #6b7280;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     margin-bottom: 1.5rem;
+    margin-left: 1rem;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
 }
 
 .form-label {
     display: block;
-    font-weight: 500;
+    font-weight: 600;
     color: #374151;
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
@@ -168,37 +208,61 @@
 
 .form-input {
     width: 100%;
-    padding: 0.625rem 0.75rem;
+    padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
     font-family: inherit;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    background: #f9fafb;
 }
 
 .form-input:focus {
     outline: none;
     border-color: #4f46e5;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    background: white;
+}
+
+.form-input:hover {
+    border-color: #9ca3af;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
 }
 
 .form-error {
     display: block;
     color: #ef4444;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.form-error::before {
+    content: '⚠';
 }
 
 .form-hint {
     display: block;
     color: #9ca3af;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
 }
 
 select.form-input {
     background: white;
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
 }
 
 .form-actions {
@@ -215,43 +279,84 @@ select.form-input {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.625rem;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-secondary {
     background: white;
-    border: 1px solid #e5e7eb;
-    color: #374151;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
 }
 
 .btn-secondary:hover {
-    background: #f9fafb;
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
 }
 
 .btn-primary {
-    background: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .btn-primary:hover {
-    background: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
 }
 
 .btn-lg {
-    padding: 0.75rem 1.5rem;
+    padding: 0.875rem 2rem;
     font-size: 1rem;
 }
 
+.btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Card slide out animation */
+@keyframes cardSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
 @media (max-width: 640px) {
+    .create-deck-page {
+        padding: 0;
+    }
+
+    .page-header {
+        border-radius: 1rem 1rem 0 0;
+        padding: 2rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .create-deck-form {
+        border-radius: 0 0 1rem 1rem;
+        padding: 1.5rem;
+    }
+
     .form-row {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .form-actions {
@@ -261,6 +366,10 @@ select.form-input {
     .btn {
         width: 100%;
         justify-content: center;
+    }
+
+    .form-section-title {
+        font-size: 1.125rem;
     }
 }
 </style>

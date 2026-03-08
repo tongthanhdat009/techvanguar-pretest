@@ -218,18 +218,20 @@
 .modal {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    z-index: 500;
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.2s;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .modal.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .modal-backdrop {
@@ -246,6 +248,7 @@
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
+    padding: 1rem;
 }
 
 .modal-dialog.modal-lg {
@@ -256,18 +259,14 @@
     background: white;
     border-radius: 0.75rem;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-    animation: modalSlideIn 0.3s ease;
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+.modal.active .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
 }
 
 .modal-header {

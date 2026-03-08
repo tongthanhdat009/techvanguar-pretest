@@ -4,7 +4,7 @@
 
 /* ── Flip Card ─────────────────────────────────────────────────────────────── */
 .flip-card {
-    perspective: 1000px;
+    perspective: 1200px;
     cursor: pointer;
 }
 
@@ -12,12 +12,17 @@
     position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.55s cubic-bezier(.4, 0, .2, 1);
+    transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
 }
 
+.flip-card:hover .flip-card-inner:not(.flipped) {
+    transform: rotateX(5deg) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
 .flip-card.flipped .flip-card-inner {
-    transform: rotateY(180deg);
+    transform: rotateY(180deg) scale(1);
 }
 
 .flip-card-front,
@@ -30,8 +35,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     padding: 2rem 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .flip-card-back {
@@ -39,8 +45,16 @@
 }
 
 /* ── Gradient Hero Background ───────────────────────────────────────────────── */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 .hero-gradient {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+    background: linear-gradient(135deg, #4f46e5, #7c3aed, #a855f7, #ec4899, #4f46e5);
+    background-size: 300% 300%;
+    animation: gradientAnimation 12s ease infinite;
 }
 
 /* ── Smooth Scroll ──────────────────────────────────────────────────────────── */
@@ -50,26 +64,43 @@ html {
 
 /* ── Pulse Glow Animation on CTA ─────────────────────────────────────────────── */
 @keyframes pulse-glow {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(168, 85, 247, .55);
+    0% {
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, .7), 0 0 15px rgba(79, 70, 229, 0.5);
     }
     50% {
-        box-shadow: 0 0 0 14px rgba(168, 85, 247, 0);
+        box-shadow: 0 0 0 15px rgba(168, 85, 247, 0), 0 0 30px rgba(79, 70, 229, 0.8);
+        transform: translateY(-2px);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0), 0 0 15px rgba(79, 70, 229, 0.5);
+        transform: translateY(0);
     }
 }
 
 .btn-cta {
-    animation: pulse-glow 2.4s ease-in-out infinite;
+    animation: pulse-glow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    transition: all 0.3s;
+}
+
+.btn-cta:hover {
+    animation: none;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.4), 0 10px 10px -5px rgba(168, 85, 247, 0.2);
 }
 
 /* ── Feature Card Hover ─────────────────────────────────────────────────────── */
 .feature-card {
-    transition: transform .25s ease, box-shadow .25s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    border-radius: 1.5rem;
+    backdrop-filter: blur(10px);
 }
 
 .feature-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(79, 70, 229, .15);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.25), 0 0 0 1px rgba(79, 70, 229, 0.05);
+    border-color: rgba(79, 70, 229, 0.2);
 }
 
 /* ── Sticky Navbar ──────────────────────────────────────────────────────────── */
@@ -102,26 +133,36 @@ html {
     overflow: hidden;
 }
 
+@keyframes blob-float {
+    0% { transform: translateY(0) scale(1); }
+    33% { transform: translateY(-30px) scale(1.1); }
+    66% { transform: translateY(20px) scale(0.9); }
+    100% { transform: translateY(0) scale(1); }
+}
+
 .hero-section .blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(3rem);
+    filter: blur(4rem);
     pointer-events: none;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+    animation: blob-float 10s infinite alternate;
 }
 
 .hero-section .blob-top {
     top: -6rem;
     right: -6rem;
-    width: 24rem;
-    height: 24rem;
+    width: 26rem;
+    height: 26rem;
+    animation-delay: 0s;
 }
 
 .hero-section .blob-bottom {
     bottom: -4rem;
     left: -4rem;
-    width: 18rem;
-    height: 18rem;
+    width: 20rem;
+    height: 20rem;
+    animation-delay: -5s;
 }
 
 .hero-section .content {
@@ -492,10 +533,35 @@ html {
 
 .public-decks-section .deck-card {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 1rem;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    border-radius: 1.25rem;
     padding: 1.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.public-decks-section .deck-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #ec4899);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.public-decks-section .deck-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(79, 70, 229, 0.04);
+    border-color: rgba(79, 70, 229, 0.2);
+}
+
+.public-decks-section .deck-card:hover::before {
+    opacity: 1;
 }
 
 .public-decks-section .deck-card-header {

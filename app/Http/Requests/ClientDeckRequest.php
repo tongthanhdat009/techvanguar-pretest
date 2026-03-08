@@ -18,8 +18,17 @@ class ClientDeckRequest extends FormRequest
 
     public function rules(): array
     {
+        $deck = $this->route('deck'); // For update, may be null
+
         return [
-            'title' => ['required', 'string', 'max:255'],
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('decks', 'title')
+                    ->where('user_id', auth()->id())
+                    ->ignore($deck?->id),
+            ],
             'description' => ['nullable', 'string'],
             'visibility' => ['required', Rule::in([Deck::VISIBILITY_PRIVATE, Deck::VISIBILITY_PUBLIC])],
             'category' => ['nullable', 'string', 'max:255'],

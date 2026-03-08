@@ -1,4 +1,4 @@
-{{-- Public Hero Section Component --}}
+﻿{{-- Public Hero Section Component --}}
 <section class="hero-section hero-gradient">
     {{-- Decorative blobs --}}
     <div class="blob blob-top"></div>
@@ -13,7 +13,7 @@
         {{-- Headline --}}
         <h1 class="headline">
             Ghi nhớ mọi thứ <br class="hidden sm:block" />
-            dễ dàng hơn với <span class="text-yellow-300">Flashcard</span>
+            dễ dàng hơn với <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-200 to-indigo-300 animate-pulse">Flashcard</span>
         </h1>
 
         {{-- Sub-headline --}}

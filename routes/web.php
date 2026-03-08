@@ -31,6 +31,8 @@ Route::middleware('auth:client')
     ->name('client.')
     ->group(function () {
         Route::get('/', [ClientPortalController::class, 'index'])->name('dashboard');
+        Route::get('/my-decks', [ClientPortalController::class, 'myDecks'])->name('my-decks');
+        Route::get('/community', [ClientPortalController::class, 'community'])->name('community');
         Route::get('/decks/create', [ClientPortalController::class, 'createDeck'])->name('decks.create');
         Route::get('/decks/{deck}', [ClientPortalController::class, 'showDeck'])->name('decks.show');
         Route::post('/decks', [ClientPortalController::class, 'storeDeck'])->name('decks.store');

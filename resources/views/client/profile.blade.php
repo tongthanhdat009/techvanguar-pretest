@@ -196,7 +196,7 @@
         </div>
 
         @if($totalDecks > 5)
-            <a href="{{ route('client.dashboard') }}#my-decks" class="view-all-link">
+            <a href="{{ route('client.my-decks') }}" class="view-all-link">
                 View all decks →
             </a>
         @endif

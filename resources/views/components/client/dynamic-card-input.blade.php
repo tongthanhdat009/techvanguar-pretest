@@ -77,14 +77,24 @@
 .card-inputs-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
 }
 
 .card-input-row {
     display: flex;
     gap: 1rem;
-    animation: cardSlideIn 0.2s ease;
+    padding: 1.25rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    animation: cardSlideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
+}
+
+.card-input-row:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
 }
 
 @keyframes cardSlideIn {
@@ -103,9 +113,9 @@
     align-items: flex-start;
     padding-top: 1.75rem;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.125rem;
     color: #9ca3af;
-    min-width: 32px;
+    min-width: 40px;
     text-align: center;
 }
 
@@ -113,7 +123,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.875rem;
 }
 
 .card-input-field {
@@ -124,7 +134,7 @@
 
 .card-input-row-optional {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.875rem;
 }
 
 .card-input-field-half {
@@ -135,29 +145,31 @@
 }
 
 .card-input-label {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.8125rem;
-    color: #6b7280;
+    color: #4b5563;
 }
 
 .card-input-textarea,
 .card-input-input {
     width: 100%;
-    padding: 0.625rem 0.75rem;
+    padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
     font-family: inherit;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    background: white;
 }
 
 .card-input-textarea {
     resize: vertical;
-    min-height: 60px;
+    min-height: 70px;
+    line-height: 1.5;
 }
 
 .card-input-input {
-    height: 42px;
+    height: 44px;
 }
 
 .card-input-textarea:focus,
@@ -165,6 +177,11 @@
     outline: none;
     border-color: #4f46e5;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.card-input-textarea:hover,
+.card-input-input:hover {
+    border-color: #9ca3af;
 }
 
 .card-input-options {
@@ -177,54 +194,67 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background: #fef2f2;
     border: 1px solid #fecaca;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     color: #dc2626;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
 .card-input-remove:hover {
     background: #fee2e2;
     border-color: #fca5a5;
+    transform: scale(1.05);
+}
+
+.card-input-remove:active {
+    transform: scale(0.95);
 }
 
 .card-input-remove svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
 }
 
 .card-input-actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    background: #f9fafb;
-    border: 1px dashed #d1d5db;
-    border-radius: 0.5rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+    border: 1px solid #dbeafe;
+    border-radius: 0.75rem;
 }
 
 .card-input-add {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    padding: 0.75rem 1.25rem;
     background: white;
     border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
+    border-radius: 0.625rem;
     color: #374151;
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card-input-add:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
+.card-input-add:hover:not(:disabled) {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.card-input-add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .card-input-add svg {
@@ -233,19 +263,24 @@
 }
 
 .card-count-info {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
 }
 
 .card-count-info [data-card-count] {
-    font-weight: 600;
+    font-weight: 700;
     color: #4f46e5;
+    font-size: 1rem;
 }
 
 @media (max-width: 640px) {
     .card-input-row {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        padding: 1rem;
     }
 
     .card-input-number {
@@ -265,6 +300,17 @@
 
     .card-input-field-half {
         width: 100%;
+    }
+
+    .card-input-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    .card-input-add {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>

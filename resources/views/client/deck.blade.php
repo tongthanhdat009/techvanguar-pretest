@@ -123,12 +123,9 @@
         };
 
         // Initialize on DOM ready
+        // Note: DeckDetail.init() is called by client.js to avoid double initialization
         document.addEventListener('DOMContentLoaded', () => {
             Modals.init();
-
-            if (typeof DeckDetail !== 'undefined') {
-                DeckDetail.init();
-            }
         });
     </script>
 @endpush

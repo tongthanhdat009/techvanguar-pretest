@@ -34,12 +34,36 @@
 }
 
 .progress-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    opacity: 0.8;
+}
+
+.progress-card:nth-child(1)::after { background: #4f46e5; }
+.progress-card:nth-child(2)::after { background: #eab308; }
+.progress-card:nth-child(3)::after { background: #16a34a; }
+.progress-card:nth-child(4)::after { background: #f97316; }
+
+.progress-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .progress-card .value {
@@ -79,16 +103,22 @@
 
 .deck-card {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    padding: 1.25rem;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
     text-decoration: none;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .deck-card:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(79, 70, 229, 0.04);
+    border-color: rgba(79, 70, 229, 0.3);
 }
 
 .deck-card .title {
@@ -673,14 +703,22 @@
     gap: 0.375rem;
     font-size: 0.875rem;
     font-weight: 600;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .stat-icon {
-    font-size: 1rem;
+    font-size: 0.875rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 .stat-value {
-    font-size: 1rem;
+    font-size: 0.875rem;
+    line-height: 1;
 }
 
 .sidebar-copyright {
@@ -798,7 +836,10 @@
 }
 
 .reminder-icon {
-    font-size: 1.125rem;
+    font-size: 0.9375rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* Level Badge */
@@ -820,7 +861,10 @@
 }
 
 .level-icon {
-    font-size: 1rem;
+    font-size: 0.9375rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 .level-number {
@@ -914,7 +958,10 @@
 }
 
 .streak-icon {
-    font-size: 1.125rem;
+    font-size: 0.9375rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 .streak-count {
@@ -1961,4 +2008,307 @@
     .toast {
         padding: 0.875rem 1rem;
     }
+}
+
+/*  Gamified Progress Bar  */
+.progress-bar-container {
+    background: #eef2ff;
+    border-radius: 999px;
+    height: 0.75rem;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5, #ec4899, #4f46e5);
+    background-size: 200% 100%;
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: progress-slide 3s linear infinite;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0) 25%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 75%
+    );
+    background-size: 200% 200%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes progress-slide {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Study mode glowing active state */
+.study-mode-selector .mode-btn.active {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4), inset 0 2px 4px rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────────
+   PAGE HEADER & DECK LAYOUT
+   ─────────────────────────────────────────────────────────────────────────────── */
+
+.page-header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.5);
+}
+
+.header-content {
+    flex: 1;
+    min-width: 200px;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-description {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.decks-container {
+    max-width: 100%;
+}
+
+/* Deck Grid */
+.deck-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+    .deck-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .header-content {
+        text-align: center;
+    }
+}
+
+/* Deck Card */
+.deck-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.deck-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #4f46e5, #7c3aed);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.deck-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.3);
+    border-color: #4f46e5;
+}
+
+.deck-card:hover::before {
+    opacity: 1;
+}
+
+.deck-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.deck-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.deck-description {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.deck-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.deck-cards-count,
+.deck-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.deck-cards-count svg,
+.deck-rating svg {
+    width: 16px;
+    height: 16px;
+}
+
+.deck-rating {
+    color: #fbbf24;
+}
+
+.deck-author {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.deck-author svg {
+    width: 16px;
+    height: 16px;
+}
+
+.deck-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.tag {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.deck-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.deck-badge.public {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.deck-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 2rem;
+}
+
+.pagination :where(a, span) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination a {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background: #f9fafb;
+    border-color: #4f46e5;
+    color: #4f46e5;
+}
+
+.pagination .active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: white;
+}
+
+.pagination .disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }

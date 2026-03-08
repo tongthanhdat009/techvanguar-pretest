@@ -799,8 +799,7 @@ const DeckDetail = {
         this.initRatingSelector();
         this.initCharCounter();
         this.initDeleteConfirmation();
-        this.initEditModal();
-        this.initAddCardModal();
+        // Modal implementations are handled in deck.blade.php
     },
 
     initRatingSelector() {
@@ -869,25 +868,8 @@ const DeckDetail = {
         });
     },
 
-    initEditModal() {
-        const editBtns = document.querySelectorAll('[data-deck-edit]');
-        editBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // TODO: Implement edit modal
-                alert('Edit modal to be implemented');
-            });
-        });
-    },
-
-    initAddCardModal() {
-        const addCardBtns = document.querySelectorAll('[data-deck-add-card]');
-        addCardBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // TODO: Implement add card modal
-                alert('Add card modal to be implemented');
-            });
-        });
-    }
+    // Modal implementations are handled in deck.blade.php to avoid conflicts
+    // The Modals object in deck.blade.php handles editDeck, addFlashcard, and editFlashcard modals
 };
 
 // ───────────────────────────────────────────────────────────────────────────────

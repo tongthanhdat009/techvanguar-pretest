@@ -2,14 +2,23 @@
 
 @section('content')
     {{-- Dashboard Header --}}
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Welcome back, {{ auth()->user()->name }}!</h1>
-        <a href="{{ route('client.decks.create') }}" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Create Deck
-        </a>
+    <div class="dashboard-header bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+        {{-- Decorative blob --}}
+        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10 blur-2xl animate-pulse"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold mb-1">
+                    Welcome back, <span class="text-yellow-300">{{ auth()->user()->name }}</span>! 👋
+                </h1>
+                <p class="text-indigo-100 text-sm md:text-base">Ready to continue your learning journey today?</p>
+            </div>
+            <a href="{{ route('client.decks.create') }}" class="btn btn-primary bg-white text-indigo-600 hover:bg-indigo-50 shadow-md transform hover:-translate-y-1 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Create Deck
+            </a>
+        </div>
     </div>
 
     {{-- Progress summary --}}
