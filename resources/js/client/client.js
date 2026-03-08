@@ -129,6 +129,106 @@ const ProgressSummary = {
 };
 
 // ───────────────────────────────────────────────────────────────────────────────
+// Deck Detail
+// ───────────────────────────────────────────────────────────────────────────────
+
+const DeckDetail = {
+    init() {
+        this.initRatingSelector();
+        this.initCharCounter();
+        this.initDeleteConfirmation();
+        this.initEditModal();
+        this.initAddCardModal();
+    },
+
+    initRatingSelector() {
+        const ratingContainers = document.querySelectorAll('[data-rating-selector]');
+        ratingContainers.forEach(container => {
+            const stars = container.querySelectorAll('[data-rating-value]');
+            const input = container.querySelector('[data-rating-input]');
+
+            if (!stars.length || !input) return;
+
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const value = parseInt(star.dataset.ratingValue);
+                    input.value = value;
+                    this.updateStars(stars, value);
+                });
+
+                star.addEventListener('mouseenter', () => {
+                    const value = parseInt(star.dataset.ratingValue);
+                    this.updateStars(stars, value);
+                });
+
+                star.addEventListener('mouseleave', () => {
+                    const currentValue = parseInt(input.value) || 0;
+                    this.updateStars(stars, currentValue);
+                });
+            });
+        });
+    },
+
+    updateStars(stars, value) {
+        stars.forEach(star => {
+            const starValue = parseInt(star.dataset.ratingValue);
+            if (starValue <= value) {
+                star.classList.add('review-form__star--active');
+            } else {
+                star.classList.remove('review-form__star--active');
+            }
+        });
+    },
+
+    initCharCounter() {
+        const textareas = document.querySelectorAll('.review-form__textarea');
+        textareas.forEach(textarea => {
+            const counter = textarea.parentElement.querySelector('[data-char-count]');
+            if (!counter) return;
+
+            // Initialize count
+            counter.textContent = textarea.value.length;
+
+            textarea.addEventListener('input', () => {
+                counter.textContent = textarea.value.length;
+            });
+        });
+    },
+
+    initDeleteConfirmation() {
+        const deleteBtns = document.querySelectorAll('[data-deck-delete]');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const message = btn.dataset.confirmMessage || 'Delete this deck?';
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    },
+
+    initEditModal() {
+        const editBtns = document.querySelectorAll('[data-deck-edit]');
+        editBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // TODO: Implement edit modal
+                alert('Edit modal to be implemented');
+            });
+        });
+    },
+
+    initAddCardModal() {
+        const addCardBtns = document.querySelectorAll('[data-deck-add-card]');
+        addCardBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // TODO: Implement add card modal
+                alert('Add card modal to be implemented');
+            });
+        });
+    }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
 // Initialize
 // ───────────────────────────────────────────────────────────────────────────────
 
@@ -137,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     DeckCards.init();
     StudySession.init();
     ProgressSummary.init();
+    DeckDetail.init();
 
     // Logout confirmation
     const logoutBtns = document.querySelectorAll('[data-logout]');

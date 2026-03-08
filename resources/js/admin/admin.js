@@ -12,6 +12,7 @@ const AdminSidebar = {
         this.sidebar = document.getElementById('admin-sidebar');
         if (!this.sidebar) return;
 
+        this.overlay = document.querySelector('[data-admin-sidebar-overlay]');
         this.isOpen = this.sidebar.getAttribute('admin-sidebar-open') === 'true';
         this.bindEvents();
     },
@@ -23,8 +24,14 @@ const AdminSidebar = {
             toggleBtn.addEventListener('click', () => this.toggle());
         }
 
-        // Close sidebar when clicking outside
+        // Close on overlay click (mobile)
+        if (this.overlay) {
+            this.overlay.addEventListener('click', () => this.close());
+        }
+
+        // Close sidebar when clicking outside (desktop fallback)
         document.addEventListener('click', (e) => {
+            if (window.innerWidth >= 1024) return; // skip on desktop
             if (this.isOpen &&
                 !this.sidebar.contains(e.target) &&
                 !e.target.closest('[data-admin-sidebar-toggle]')) {
@@ -40,11 +47,13 @@ const AdminSidebar = {
     open() {
         this.isOpen = true;
         this.sidebar.setAttribute('admin-sidebar-open', 'true');
+        if (this.overlay) this.overlay.classList.remove('hidden');
     },
 
     close() {
         this.isOpen = false;
         this.sidebar.setAttribute('admin-sidebar-open', 'false');
+        if (this.overlay) this.overlay.classList.add('hidden');
     }
 };
 

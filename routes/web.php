@@ -59,11 +59,13 @@ Route::middleware('auth:admin')
         Route::post('/users', [AdminDashboardController::class, 'storeUser'])->name('users.store');
         Route::put('/users/{user}', [AdminDashboardController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
+        Route::patch('/users/{user}/role', [AdminDashboardController::class, 'toggleUserRole'])->name('users.toggle-role');
         Route::get('/decks', [AdminDashboardController::class, 'decks'])->name('decks');
         Route::get('/reviews', [AdminDashboardController::class, 'reviews'])->name('reviews');
         Route::delete('/reviews/{review}', [AdminDashboardController::class, 'destroyReview'])->name('reviews.destroy');
         Route::post('/decks', [AdminDashboardController::class, 'storeDeck'])->name('decks.store');
         Route::put('/decks/{deck}', [AdminDashboardController::class, 'updateDeck'])->name('decks.update');
+        Route::patch('/decks/{deck}/toggle', [AdminDashboardController::class, 'toggleDeckStatus'])->name('decks.toggle');
         Route::delete('/decks/{deck}', [AdminDashboardController::class, 'destroyDeck'])->name('decks.destroy');
         Route::post('/decks/{deck}/flashcards', [AdminDashboardController::class, 'storeFlashcard'])->name('decks.flashcards.store');
         Route::put('/flashcards/{flashcard}', [AdminDashboardController::class, 'updateFlashcard'])->name('flashcards.update');

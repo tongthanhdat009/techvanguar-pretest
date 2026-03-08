@@ -187,4 +187,23 @@ class AdminDashboardController extends Controller
         return back()->with('status', 'Review removed.');
     }
 
+    public function toggleDeckStatus(Deck $deck): RedirectResponse
+    {
+        $deck->update(['is_active' => ! $deck->is_active]);
+
+        $label = $deck->is_active ? 'activated' : 'deactivated';
+
+        return back()->with('status', "Deck \"{$deck->title}\" {$label}.");
+    }
+
+    public function toggleUserRole(Request $request, User $user): RedirectResponse
+    {
+        abort_if($request->user()?->is($user), 422, 'You cannot change your own role.');
+
+        $newRole = $user->isAdmin() ? User::ROLE_CLIENT : User::ROLE_ADMIN;
+        $user->update(['role' => $newRole]);
+
+        return back()->with('status', "User \"{$user->name}\" role changed to {$newRole}.");
+    }
+
 }

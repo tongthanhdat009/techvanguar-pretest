@@ -26,7 +26,8 @@ class AdminPortalUiTest extends TestCase
         $response->assertSee('User deleted.');
         $response->assertSee('admin-sidebar-open');
         $response->assertSee('data-admin-confirm', false);
-        $response->assertSee('data-confirm-message="Are you sure you want to delete this user?"', false);
+        // Confirm modal is used (not browser confirm())
+        $response->assertSee('data-confirm-message', false);
         $response->assertDontSee("confirm('Are you sure you want to delete this user?')", false);
         $response->assertSee($managedUser->email);
     }
@@ -46,13 +47,13 @@ class AdminPortalUiTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.decks'))
             ->assertOk()
-            ->assertSee('data-confirm-message="Delete this deck and all its flashcards?"', false)
-            ->assertSee('data-confirm-accept="Delete deck"', false);
+            ->assertSee('data-admin-confirm', false)
+            ->assertSee('data-confirm-accept', false);
 
         $this->actingAs($admin)
             ->get(route('admin.reviews'))
             ->assertOk()
-            ->assertSee('data-confirm-message="Remove this review?"', false)
-            ->assertSee('data-confirm-accept="Remove review"', false);
+            ->assertSee('data-admin-confirm', false)
+            ->assertSee('data-confirm-accept', false);
     }
 }

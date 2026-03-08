@@ -54,17 +54,14 @@ echo Starting Development Services...
 echo ========================================
 echo.
 
-echo [1/4] Starting Laravel Server...
+echo [1/3] Starting Laravel Server...
 start "Laravel Server" cmd /k "cd /d "%SCRIPT_DIR%" && php artisan serve"
 
-echo [2/4] Starting Vite Dev Server...
+echo [2/3] Starting Vite Dev Server...
 start "Vite Dev Server" cmd /k "cd /d "%SCRIPT_DIR%" && npm run dev"
 
-echo [3/4] Starting Queue Worker...
-start "Queue Worker" cmd /k "cd /d "%SCRIPT_DIR%" && php artisan queue:listen"
-
-echo [4/4] Starting Log Watcher (Pail)...
-start "Log Watcher" cmd /k "cd /d "%SCRIPT_DIR%" && php artisan pail"
+echo [3/3] Starting Queue Worker...
+start "Queue Worker" cmd /k "cd /d "%SCRIPT_DIR%" && php artisan queue:listen --tries=1"
 
 echo.
 echo ========================================
@@ -75,7 +72,9 @@ echo Services running in separate windows:
 echo   - Laravel Server:  http://localhost:8000
 echo   - Vite Dev Server: http://localhost:5173
 echo   - Queue Worker:    Processing background jobs
-echo   - Log Watcher:     Monitoring logs
+echo.
+echo NOTE: Pail (Log Watcher) is not available on Windows.
+echo       View logs manually: storage/logs/laravel.log
 echo.
 echo Close this window to keep services running.
 echo Press any key to stop all services...
@@ -86,5 +85,4 @@ echo Stopping all services...
 taskkill /FI "WINDOWTITLE eq Laravel Server*" /T /F >nul 2>nul
 taskkill /FI "WINDOWTITLE eq Vite Dev Server*" /T /F >nul 2>nul
 taskkill /FI "WINDOWTITLE eq Queue Worker*" /T /F >nul 2>nul
-taskkill /FI "WINDOWTITLE eq Log Watcher*" /T /F >nul 2>nul
 echo All services stopped.

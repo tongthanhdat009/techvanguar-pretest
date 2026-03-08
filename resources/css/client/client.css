@@ -116,3 +116,401 @@
     color: #111827;
     margin-bottom: 1rem;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────────
+   DECK DETAIL PAGE
+   ─────────────────────────────────────────────────────────────────────────────── */
+
+/* Deck Hero */
+.deck-hero {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.deck-hero__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.deck-hero__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.deck-hero__badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.deck-hero__badge--public {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.deck-hero__badge--private {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.deck-hero__description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.deck-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.deck-hero__category {
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.deck-hero__author {
+    color: #4b5563;
+}
+
+.deck-hero__stats {
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.deck-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.deck-hero__tag {
+    padding: 0.25rem 0.75rem;
+    background: #ede9fe;
+    color: #6d28d9;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Deck Actions */
+.deck-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    align-items: center;
+}
+
+.deck-actions__btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.deck-actions__btn--primary {
+    background: #4338ca;
+    color: white;
+}
+
+.deck-actions__btn--primary:hover {
+    background: #3730a3;
+}
+
+.deck-actions__btn--secondary {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.deck-actions__btn--secondary:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.deck-actions__btn--danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.deck-actions__btn--danger:hover {
+    background: #fecaca;
+}
+
+.deck-actions__owner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+/* Flashcards Section */
+.flashcards-section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.flashcards-section__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.flashcards-table {
+    overflow-x: auto;
+}
+
+.flashcards-table__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.flashcards-table__table thead {
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.flashcards-table__table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.flashcards-table__row {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.flashcards-table__row:hover {
+    background: #f9fafb;
+}
+
+.flashcards-table__cell {
+    padding: 0.75rem 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Reviews Section */
+.reviews-section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.reviews-section__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reviews-section__avg-rating {
+    padding: 0.25rem 0.75rem;
+    background: #fef3c7;
+    color: #d97706;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.reviews-list__item {
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.reviews-list__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.reviews-list__author {
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.875rem;
+}
+
+.reviews-list__comment {
+    color: #6b7280;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Review Form */
+.review-form {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.review-form__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.review-form__field {
+    margin-bottom: 1rem;
+}
+
+.review-form__label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.review-form__rating {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.review-form__star {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #d1d5db;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.review-form__star:hover {
+    color: #fbbf24;
+}
+
+.review-form__star--active {
+    color: #f59e0b;
+}
+
+.review-form__textarea {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.review-form__textarea:focus {
+    outline: none;
+    border-color: #4338ca;
+    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
+}
+
+.review-form__char-count {
+    display: block;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.review-form__submit {
+    background: #4338ca;
+    color: white;
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.review-form__submit:hover {
+    background: #3730a3;
+}
+
+/* Rating Stars Display */
+.rating-stars {
+    display: flex;
+    gap: 0.125rem;
+}
+
+.rating-stars__star {
+    color: #d1d5db;
+}
+
+.rating-stars__star--filled {
+    color: #f59e0b;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .deck-actions__owner {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .deck-actions__btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .flashcards-table__table th,
+    .flashcards-table__cell {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .reviews-list__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

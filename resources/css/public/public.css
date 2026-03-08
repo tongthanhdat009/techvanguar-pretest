@@ -433,6 +433,7 @@ html {
     font-size: 1rem;
     font-weight: 700;
     color: white;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
     border-radius: 0.75rem;
     text-decoration: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
