@@ -100,11 +100,14 @@ Validation rules are centralized in Form Requests under [app/Http/Requests/](app
 
 ### View Components
 
-Blade components are organized under [resources/views/components/](resources/views/components/):
+Blade components are organized by section under [resources/views/components/](resources/views/components/):
 
-- **Layouts**: `layouts/app.blade.php`, `layouts/admin.blade.php`, `layouts/client.blade.php`
-- **Admin UI**: `admin-toast.blade.php`, `admin-confirm-modal.blade.php`, `admin-breadcrumb.blade.php`
-- **Common**: `stat-card.blade.php`, `empty-state.blade.php`, `footer.blade.php`
+- **Layouts**: `layouts/admin.blade.php`, `layouts/client.blade.php`, `layouts/auth.blade.php`, `layouts/public.blade.php`
+- **Admin Components**: `admin/admin-sidebar.blade.php`, `admin/admin-breadcrumb.blade.php`, `admin/admin-toast.blade.php`, `admin/admin-confirm-modal.blade.php`, `admin/admin-table.blade.php`
+- **Client Components**: `client/client-header.blade.php`, `client/progress-summary.blade.php`, `client/deck-grid.blade.php`, `client/study-section.blade.php`
+- **Auth Components**: `auth/auth-logo.blade.php`, `auth/auth-alert.blade.php`, `auth/auth-form.blade.php`, `auth/auth-links.blade.php`
+- **Public Components**: `public/public-navbar.blade.php`, `public/public-hero.blade.php`, `public/public-features.blade.php`, `public/public-demo.blade.php`, `public/public-footer.blade.php`, `public/public-final-cta.blade.php`
+- **Common Components**: `common/empty-state.blade.php`
 
 ### Models & Relationships
 
@@ -120,7 +123,35 @@ Decks have visibility (`private`/`public`), tags (array cast), and can reference
 
 - **Vite** + **Laravel Vite Plugin** for asset compilation
 - **Tailwind CSS** for styling
-- **Alpine.js** (via global scripts) for interactive components
+- **JavaScript Modules**: Organized by section (admin, client, auth, public) for maintainability
+
+### Frontend Directory Structure
+
+```
+resources/
+├── css/
+│   ├── admin/admin.css      # Admin-specific styles
+│   ├── client/client.css    # Client portal styles
+│   ├── auth/auth.css        # Authentication page styles
+│   └── public/public.css    # Landing page styles
+├── js/
+│   ├── admin/admin.js       # Admin interactions (sidebar, toasts, modals)
+│   ├── client/client.js     # Client portal interactions
+│   ├── auth/auth.js         # Form validation, password toggle
+│   └── public/public.js     # Landing page interactions (flip cards, smooth scroll)
+└── views/
+    ├── layouts/             # Section-specific layouts
+    └── components/          # Organized by section (admin, client, auth, public, common)
+```
+
+### Adding New Pages
+
+When creating new pages, follow these conventions:
+
+1. **Use appropriate layout**: Admin pages use `layouts.admin`, Client pages use `layouts.client`, Auth pages use `layouts.auth`
+2. **Page icon**: Use the icon from [public/assets/icon-logo.svg](public/assets/icon-logo.svg) for branding consistency
+3. **Component organization**: Place reusable components in the appropriate section folder under `resources/views/components/`
+4. **CSS/JS**: Add section-specific styles to `resources/css/{section}/` and scripts to `resources/js/{section}/`
 
 ## Testing
 

@@ -1,28 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Reviews – Admin</title>
-</head>
-<body>
+@extends('layouts.admin', [
+    'title' => 'Manage Reviews',
+    'sidebar' => true,
+    'header' => ['title' => 'Manage Reviews']
+])
 
-{{-- Admin sidebar toggle --}}
-<div admin-sidebar-open="false" id="admin-sidebar">
-    <nav>Admin Panel</nav>
-</div>
-
-{{-- Toast stack for flash messages --}}
-<div data-admin-toast-stack>
-    @if(session('status'))
-        <div class="toast">{{ session('status') }}</div>
-    @endif
-</div>
-
-<main>
-    <h1>Manage Reviews</h1>
-
-    <table>
+@section('content')
+    <table class="admin-table">
         <thead>
             <tr>
                 <th>Deck</th>
@@ -46,7 +29,8 @@
                         <button type="submit"
                             data-admin-confirm
                             data-confirm-message="Remove this review?"
-                            data-confirm-accept="Remove review">
+                            data-confirm-accept="Remove review"
+                            class="btn-admin-delete">
                             Remove
                         </button>
                     </form>
@@ -55,7 +39,4 @@
             @endforeach
         </tbody>
     </table>
-</main>
-
-</body>
-</html>
+@endsection

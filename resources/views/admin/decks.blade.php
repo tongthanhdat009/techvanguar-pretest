@@ -1,28 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Decks – Admin</title>
-</head>
-<body>
+@extends('layouts.admin', [
+    'title' => 'Manage Decks',
+    'sidebar' => true,
+    'header' => ['title' => 'Manage Decks']
+])
 
-{{-- Admin sidebar toggle --}}
-<div admin-sidebar-open="false" id="admin-sidebar">
-    <nav>Admin Panel</nav>
-</div>
-
-{{-- Toast stack for flash messages --}}
-<div data-admin-toast-stack>
-    @if(session('status'))
-        <div class="toast">{{ session('status') }}</div>
-    @endif
-</div>
-
-<main>
-    <h1>Manage Decks</h1>
-
-    <table>
+@section('content')
+    <table class="admin-table">
         <thead>
             <tr>
                 <th>Title</th>
@@ -46,7 +29,8 @@
                         <button type="submit"
                             data-admin-confirm
                             data-confirm-message="Delete this deck and all its flashcards?"
-                            data-confirm-accept="Delete deck">
+                            data-confirm-accept="Delete deck"
+                            class="btn-admin-delete">
                             Delete
                         </button>
                     </form>
@@ -55,7 +39,4 @@
             @endforeach
         </tbody>
     </table>
-</main>
-
-</body>
-</html>
+@endsection
