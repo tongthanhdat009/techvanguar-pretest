@@ -6,9 +6,12 @@
 @section('content')
 
 {{-- Page heading --}}
-<div class="mb-8">
-    <h1 class="text-2xl font-bold text-white">Quản lý bộ thẻ</h1>
-    <p class="text-slate-400 mt-1 text-sm">{{ $decks->count() }} bộ thẻ trong hệ thống</p>
+<div class="mb-8 flex items-center justify-between flex-wrap gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-white">Quản lý bộ thẻ</h1>
+        <p class="text-slate-400 mt-1 text-sm">{{ $decks->count() }} bộ thẻ trong hệ thống</p>
+    </div>
+    <a href="{{ route('admin.decks.create') }}" class="btn-primary">+ Thêm bộ thẻ</a>
 </div>
 
 {{-- Decks Table --}}
@@ -34,7 +37,78 @@
             <p>Chưa có bộ thẻ nào.</p>
         </div>
     @else
-        <div class="overflow-x-auto">
+        {{-- Mobile card view (< sm) --}}
+        <div class="sm:hidden p-4 flex flex-col gap-3">
+            @foreach($decks as $deck)
+            <div class="mobile-data-card {{ !$deck->is_active ? 'opacity-60' : '' }}">
+                {{-- Header: title + category + owner + badge --}}
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="font-medium text-white text-sm">{{ $deck->title }}</p>
+                        @if($deck->category)
+                            <p class="text-xs text-slate-500 mt-0.5">{{ $deck->category }}</p>
+                        @endif
+                        <p class="text-xs text-slate-500 mt-0.5">{{ $deck->owner?->name ?? '—' }}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                        <span class="badge {{ $deck->visibility === 'public' ? 'badge-public' : 'badge-private' }}">
+                            {{ $deck->visibility === 'public' ? 'Công khai' : 'Riêng tư' }}
+                        </span>
+                        <span class="badge {{ $deck->is_active ? 'badge-active' : 'badge-inactive' }}">
+                            {{ $deck->is_active ? 'Bật' : 'Tắt' }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Meta --}}
+                <div class="mobile-data-card-meta">
+                    <span>{{ $deck->flashcards_count }} thẻ</span>
+                    @if($deck->reviews_avg_rating)
+                        <span class="flex items-center gap-0.5">
+                            <svg class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            {{ number_format($deck->reviews_avg_rating, 1) }}
+                        </span>
+                    @endif
+                    <span>{{ $deck->created_at->format('d/m/Y') }}</span>
+                </div>
+
+                {{-- Actions --}}
+                <div class="mobile-data-card-actions">
+                    <a href="{{ route('admin.decks.show', $deck) }}" class="btn-admin-action info">Xem</a>
+                    <a href="{{ route('admin.decks.edit', $deck) }}" class="btn-admin-action warning">Sửa</a>
+
+                    <form method="POST" action="{{ route('admin.decks.toggle', $deck) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit"
+                            class="btn-admin-action {{ $deck->is_active ? 'warning' : 'success' }}"
+                            data-admin-confirm
+                            data-confirm-message="{{ $deck->is_active ? 'Ẩn bộ thẻ &quot;'.$deck->title.'&quot; khỏi hệ thống?' : 'Kích hoạt lại bộ thẻ &quot;'.$deck->title.'&quot;?' }}"
+                            data-confirm-accept="{{ $deck->is_active ? 'Ẩn bộ thẻ' : 'Kích hoạt' }}">
+                            {{ $deck->is_active ? 'Tắt' : 'Bật' }}
+                        </button>
+                    </form>
+
+                    @if(!$deck->is_active)
+                    <form method="POST" action="{{ route('admin.decks.destroy', $deck) }}">
+                        @csrf @method('DELETE')
+                        <button type="submit"
+                            class="btn-admin-action danger"
+                            data-admin-confirm
+                            data-confirm-message="Xóa vĩnh viễn bộ thẻ &quot;{{ $deck->title }}&quot; và toàn bộ flashcard?"
+                            data-confirm-accept="Xóa bộ thẻ">
+                            Xóa
+                        </button>
+                    </form>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Desktop table view (≥ sm) --}}
+        <div class="hidden sm:block overflow-x-auto">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -112,26 +186,32 @@
                         {{-- Created at --}}
                         <td class="text-slate-500 text-xs">{{ $deck->created_at->format('d/m/Y') }}</td>
 
-                        {{-- Delete --}}
+                        {{-- Actions --}}
                         <td>
-                            <form method="POST" action="{{ route('admin.decks.destroy', $deck) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="btn-admin-action danger"
-                                    data-admin-confirm
-                                    data-confirm-message="Xóa vĩnh viễn bộ thẻ &quot;{{ $deck->title }}&quot; và toàn bộ flashcard?"
-                                    data-confirm-accept="Xóa bộ thẻ">
-                                    Xóa
-                                </button>
-                            </form>
+                            <div class="flex items-center gap-1 flex-wrap">
+                                <a href="{{ route('admin.decks.show', $deck) }}" class="btn-admin-action info">Xem</a>
+                                <a href="{{ route('admin.decks.edit', $deck) }}" class="btn-admin-action warning">Sửa</a>
+                                @if(!$deck->is_active)
+                                <form method="POST" action="{{ route('admin.decks.destroy', $deck) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="btn-admin-action danger"
+                                        data-admin-confirm
+                                        data-confirm-message="Xóa vĩnh viễn bộ thẻ &quot;{{ $deck->title }}&quot; và toàn bộ flashcard?"
+                                        data-confirm-accept="Xóa bộ thẻ">
+                                        Xóa
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
                         </td>
 
                     </tr>
                     @endforeach
                 </tbody>
             </table>
-        </div>
+        </div>{{-- end desktop table --}}
     @endif
 </div>
 

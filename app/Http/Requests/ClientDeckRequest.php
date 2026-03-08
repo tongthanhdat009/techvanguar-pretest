@@ -25,6 +25,12 @@ class ClientDeckRequest extends FormRequest
             'category' => ['nullable', 'string', 'max:255'],
             'tags' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
+            'cards' => ['required', 'array', 'min:1', 'max:50'],
+            'cards.*.front' => ['required', 'string'],
+            'cards.*.back' => ['required', 'string'],
+            'cards.*.image_url' => ['nullable', 'url'],
+            'cards.*.audio_url' => ['nullable', 'url'],
+            'cards.*.hint' => ['nullable', 'string'],
         ];
     }
 
@@ -34,5 +40,13 @@ class ClientDeckRequest extends FormRequest
         $validated['tags'] = $this->normalizeTags($validated['tags'] ?? null);
 
         return $validated;
+    }
+
+    /**
+     * Get cards data from request
+     */
+    public function cards(): array
+    {
+        return $this->input('cards', []);
     }
 }

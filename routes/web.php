@@ -30,7 +30,8 @@ Route::middleware('auth:client')
     ->prefix('client')
     ->name('client.')
     ->group(function () {
-        Route::get('/', [ClientPortalController::class, 'index'])->name('portal');
+        Route::get('/', [ClientPortalController::class, 'index'])->name('dashboard');
+        Route::get('/decks/create', [ClientPortalController::class, 'createDeck'])->name('decks.create');
         Route::get('/decks/{deck}', [ClientPortalController::class, 'showDeck'])->name('decks.show');
         Route::post('/decks', [ClientPortalController::class, 'storeDeck'])->name('decks.store');
         Route::put('/decks/{deck}', [ClientPortalController::class, 'updateDeck'])->name('decks.update');
@@ -47,6 +48,7 @@ Route::middleware('auth:client')
         Route::put('/profile', [ClientPortalController::class, 'updateProfile'])->name('profile.update');
         Route::get('/decks/{deck}/export', [ClientPortalController::class, 'exportDeck'])->name('decks.export');
         Route::post('/decks/{deck}/import', [ClientPortalController::class, 'importDeck'])->name('decks.import');
+        Route::match(['get', 'post'], '/logout', [AuthPageController::class, 'logout'])->name('logout');
     });
 
 // Admin Portal
@@ -56,11 +58,17 @@ Route::middleware('auth:admin')
     ->group(function () {
         Route::get('/', [AdminDashboardController::class, 'overview'])->name('overview');
         Route::get('/users', [AdminDashboardController::class, 'users'])->name('users');
+        Route::get('/users/create', [AdminDashboardController::class, 'createUser'])->name('users.create');
         Route::post('/users', [AdminDashboardController::class, 'storeUser'])->name('users.store');
+        Route::get('/users/{user}/edit', [AdminDashboardController::class, 'editUser'])->name('users.edit');
         Route::put('/users/{user}', [AdminDashboardController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
         Route::patch('/users/{user}/role', [AdminDashboardController::class, 'toggleUserRole'])->name('users.toggle-role');
+        Route::patch('/users/{user}/status', [AdminDashboardController::class, 'toggleUserStatus'])->name('users.toggle-status');
         Route::get('/decks', [AdminDashboardController::class, 'decks'])->name('decks');
+        Route::get('/decks/create', [AdminDashboardController::class, 'createDeck'])->name('decks.create');
+        Route::get('/decks/{deck}', [AdminDashboardController::class, 'showDeck'])->name('decks.show');
+        Route::get('/decks/{deck}/edit', [AdminDashboardController::class, 'editDeck'])->name('decks.edit');
         Route::get('/reviews', [AdminDashboardController::class, 'reviews'])->name('reviews');
         Route::delete('/reviews/{review}', [AdminDashboardController::class, 'destroyReview'])->name('reviews.destroy');
         Route::post('/decks', [AdminDashboardController::class, 'storeDeck'])->name('decks.store');

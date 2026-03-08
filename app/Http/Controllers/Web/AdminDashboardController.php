@@ -48,14 +48,49 @@ class AdminDashboardController extends Controller
         ]);
     }
 
+    public function createUser(): View
+    {
+        return view('admin.users.create');
+    }
+
+    public function editUser(User $user): View
+    {
+        return view('admin.users.edit', ['user' => $user]);
+    }
+
     public function decks(): View
     {
         return view('admin.decks', [
             'decks' => Deck::query()
-                ->with(['owner', 'flashcards'])
+                ->with('owner')
+                ->withCount('flashcards')
                 ->withAvg('reviews', 'rating')
                 ->latest()
                 ->get(),
+        ]);
+    }
+
+    public function createDeck(): View
+    {
+        return view('admin.decks.create', [
+            'users' => User::orderBy('name')->get(['id', 'name', 'role']),
+        ]);
+    }
+
+    public function showDeck(Deck $deck): View
+    {
+        $deck->load(['owner', 'flashcards']);
+
+        return view('admin.decks.show', ['deck' => $deck]);
+    }
+
+    public function editDeck(Deck $deck): View
+    {
+        $deck->load(['owner', 'flashcards']);
+
+        return view('admin.decks.edit', [
+            'deck' => $deck,
+            'users' => User::orderBy('name')->get(['id', 'name', 'role']),
         ]);
     }
 
@@ -72,28 +107,30 @@ class AdminDashboardController extends Controller
     public function storeUser(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CLIENT])],
-            'bio' => ['nullable', 'string', 'max:1200'],
+            'role'     => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CLIENT])],
+            'status'   => ['required', Rule::in([User::STATUS_ACTIVE, User::STATUS_INACTIVE])],
+            'bio'      => ['nullable', 'string', 'max:1200'],
         ]);
 
         User::create($validated);
 
-        return back()->with('status', 'User created.');
+        return redirect()->route('admin.users')->with('status', "Tài khoản \"{$validated['name']}\" đã được tạo.");
     }
 
     public function updateUser(Request $request, User $user): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => ['nullable', 'string', 'min:8'],
-            'role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CLIENT])],
-            'bio' => ['nullable', 'string', 'max:1200'],
+            'name'              => ['required', 'string', 'max:255'],
+            'email'             => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password'          => ['nullable', 'string', 'min:8'],
+            'role'              => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CLIENT])],
+            'status'            => ['required', Rule::in([User::STATUS_ACTIVE, User::STATUS_INACTIVE])],
+            'bio'               => ['nullable', 'string', 'max:1200'],
             'experience_points' => ['required', 'integer', 'min:0'],
-            'daily_streak' => ['required', 'integer', 'min:0'],
+            'daily_streak'      => ['required', 'integer', 'min:0'],
         ]);
 
         if (blank($validated['password'] ?? null)) {
@@ -102,7 +139,7 @@ class AdminDashboardController extends Controller
 
         $user->update($validated);
 
-        return back()->with('status', 'User updated.');
+        return redirect()->route('admin.users')->with('status', "Tài khoản \"{$user->name}\" đã được cập nhật.");
     }
 
     public function destroyUser(Request $request, User $user): RedirectResponse
@@ -116,23 +153,25 @@ class AdminDashboardController extends Controller
 
     public function storeDeck(AdminDeckRequest $request): RedirectResponse
     {
-        Deck::create($request->validatedPayload());
+        $deck = Deck::create($request->validatedPayload());
 
-        return back()->with('status', 'Deck created.');
+        return redirect()->route('admin.decks.show', $deck)->with('status', 'Bộ thẻ đã được tạo.');
     }
 
     public function updateDeck(AdminDeckRequest $request, Deck $deck): RedirectResponse
     {
         $deck->update($request->validatedPayload());
 
-        return back()->with('status', 'Deck updated.');
+        return redirect()->route('admin.decks.show', $deck)->with('status', 'Bộ thẻ đã được cập nhật.');
     }
 
     public function destroyDeck(Deck $deck): RedirectResponse
     {
+        abort_if($deck->is_active, 422, 'Hãy vô hiệu hóa bộ thẻ trước khi xóa.');
+
         $deck->delete();
 
-        return back()->with('status', 'Deck deleted.');
+        return redirect()->route('admin.decks')->with('status', "Bộ thẻ \"{$deck->title}\" đã được xóa.");
     }
 
     public function storeFlashcard(AdminFlashcardRequest $request): RedirectResponse
@@ -204,6 +243,18 @@ class AdminDashboardController extends Controller
         $user->update(['role' => $newRole]);
 
         return back()->with('status', "User \"{$user->name}\" role changed to {$newRole}.");
+    }
+
+    public function toggleUserStatus(Request $request, User $user): RedirectResponse
+    {
+        abort_if($request->user()?->is($user), 422, 'You cannot ban your own account.');
+
+        $newStatus = $user->isActive() ? User::STATUS_INACTIVE : User::STATUS_ACTIVE;
+        $user->update(['status' => $newStatus]);
+
+        $label = $newStatus === User::STATUS_ACTIVE ? 'được kích hoạt' : 'bị vô hiệu hóa';
+
+        return back()->with('status', "Tài khoản \"{$user->name}\" đã {$label}.");
     }
 
 }

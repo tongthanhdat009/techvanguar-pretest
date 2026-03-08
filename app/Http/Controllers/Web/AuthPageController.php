@@ -66,7 +66,7 @@ class AuthPageController extends Controller
         Auth::guard('client')->login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('client.portal');
+        return redirect()->route('client.dashboard');
     }
 
     public function clientLogin(Request $request): RedirectResponse
@@ -83,7 +83,7 @@ class AuthPageController extends Controller
         }
 
         $request->session()->regenerate();
-        return redirect()->route('client.portal');
+        return redirect()->route('client.dashboard');
     }
 
     public function adminLogin(Request $request): RedirectResponse

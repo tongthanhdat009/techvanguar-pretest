@@ -21,10 +21,13 @@ class ClientSessionGuard extends SessionGuard
         // Get user from parent (which handles caching)
         $user = parent::user();
 
-        // Validate user is client
+        // Validate user is client and is not banned
         if ($user && method_exists($user, 'isClient') && !$user->isClient()) {
-            // Don't call logout() here as it may cause recursion
-            // Just clear and return null
+            $this->user = null;
+            return null;
+        }
+
+        if ($user && method_exists($user, 'isBanned') && $user->isBanned()) {
             $this->user = null;
             return null;
         }

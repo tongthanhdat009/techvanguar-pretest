@@ -23,6 +23,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'bio' => fake()->sentence(),
             'role' => User::ROLE_CLIENT,
+            'status' => User::STATUS_ACTIVE,
             'experience_points' => fake()->numberBetween(0, 1200),
             'daily_streak' => fake()->numberBetween(0, 14),
             'last_studied_at' => now()->subDays(fake()->numberBetween(0, 3)),

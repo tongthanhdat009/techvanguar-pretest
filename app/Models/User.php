@@ -18,12 +18,17 @@ class User extends Authenticatable implements JWTSubject
 
     public const ROLE_CLIENT = 'client';
 
+    public const STATUS_ACTIVE = 'active';
+
+    public const STATUS_INACTIVE = 'inactive';
+
     protected $fillable = [
         'name',
         'email',
         'password',
         'bio',
         'role',
+        'status',
         'experience_points',
         'daily_streak',
         'last_studied_at',
@@ -78,6 +83,16 @@ class User extends Authenticatable implements JWTSubject
     public function isClient(): bool
     {
         return $this->role === self::ROLE_CLIENT;
+    }
+
+    public function isActive(): bool
+    {
+        return ($this->status ?? self::STATUS_ACTIVE) === self::STATUS_ACTIVE;
+    }
+
+    public function isBanned(): bool
+    {
+        return ! $this->isActive();
     }
 
     public function level(): int

@@ -29,7 +29,7 @@ class EnsureUserRole
         if ($user->role === 'client' && $role === 'admin') {
             return $request->expectsJson()
                 ? response()->json(['message' => 'You are not authorized to access this resource.'], Response::HTTP_FORBIDDEN)
-                : redirect()->route('client.portal')->with('status', 'Clients should use the learning portal.');
+                : redirect()->route('client.dashboard')->with('status', 'Clients should use the learning portal.');
         }
 
         if ($user->role !== $role) {

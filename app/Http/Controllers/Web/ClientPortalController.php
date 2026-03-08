@@ -84,6 +84,11 @@ class ClientPortalController extends Controller
         ]);
     }
 
+    public function createDeck(): View
+    {
+        return view('client.create-deck');
+    }
+
     public function showDeck(Request $request, Deck $deck): View
     {
         /** @var User $user */
@@ -132,13 +137,17 @@ class ClientPortalController extends Controller
         );
     }
 
-    public function updateProgress(RecordStudyProgressRequest $request, Flashcard $flashcard, StudyScheduler $scheduler, DeckAccess $deckAccess): RedirectResponse
+    public function updateProgress(RecordStudyProgressRequest $request, Flashcard $flashcard, StudyScheduler $scheduler, DeckAccess $deckAccess): Response
     {
         /** @var User $user */
         $user = $request->user();
-        $flashcard->load('deck');
 
-        abort_unless($deckAccess->canAccess($user, $flashcard->deck), Response::HTTP_NOT_FOUND);
+        // Load the deck relationship explicitly
+        $deck = Deck::find($flashcard->deck_id);
+
+        // Check if flashcard belongs to a valid deck
+        abort_if(is_null($deck), Response::HTTP_NOT_FOUND, 'Flashcard does not belong to any deck.');
+        abort_unless($deckAccess->canAccess($user, $deck), Response::HTTP_NOT_FOUND);
 
         $validated = $request->validated();
 
@@ -149,15 +158,24 @@ class ClientPortalController extends Controller
             $validated['result'] ?? null
         );
 
+        // Handle AJAX requests - return JSON success response
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress saved!'
+            ]);
+        }
+
+        // Handle non-AJAX requests - redirect as before
         $mode = (string) $request->input('study_mode', '');
 
         if (in_array($mode, ['flip', 'multiple-choice', 'typed'], true)) {
             $nextCard = max(0, (int) $request->input('card_index', 0) + 1);
 
-            if ($request->filled('study_deck_id') && (int) $request->input('study_deck_id') === $flashcard->deck->id) {
+            if ($request->filled('study_deck_id') && (int) $request->input('study_deck_id') === $deck->id) {
                 return redirect()
                     ->route('client.decks.study', [
-                        'deck' => $flashcard->deck,
+                        'deck' => $deck,
                         'mode' => $mode,
                         'card' => $nextCard,
                     ])
@@ -182,7 +200,18 @@ class ClientPortalController extends Controller
 
         $deck = $user->decks()->create($request->validatedPayload());
 
-        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck created.');
+        // Create flashcards from cards array
+        foreach ($request->cards() as $cardData) {
+            $deck->flashcards()->create([
+                'front_content' => $cardData['front'],
+                'back_content' => $cardData['back'],
+                'image_url' => $cardData['image_url'] ?? null,
+                'audio_url' => $cardData['audio_url'] ?? null,
+                'hint' => $cardData['hint'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('client.decks.show', $deck)->with('status', 'Deck created with ' . count($request->cards()) . ' card(s).');
     }
 
     public function updateDeck(ClientDeckRequest $request, Deck $deck): RedirectResponse
@@ -204,7 +233,7 @@ class ClientPortalController extends Controller
 
         $deck->delete();
 
-        return redirect()->route('client.portal')->with('status', 'Deck removed.');
+        return redirect()->route('client.dashboard')->with('status', 'Deck removed.');
     }
 
     public function storeFlashcard(ClientFlashcardRequest $request, Deck $deck): RedirectResponse

@@ -55,7 +55,7 @@ class WebPortalTest extends TestCase
         ]);
 
         $clientLogin
-            ->assertRedirect(route('client.portal'))
+            ->assertRedirect(route('client.dashboard'))
             ->assertCookie('flashcard_learning_hub_client_session');
 
         $clientCookie = $clientLogin->getCookie('flashcard_learning_hub_client_session');

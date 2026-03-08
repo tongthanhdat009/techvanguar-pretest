@@ -11,6 +11,7 @@
         <h1 class="text-2xl font-bold text-white">Quản lý người dùng</h1>
         <p class="text-slate-400 mt-1 text-sm">{{ $users->count() }} tài khoản trong hệ thống</p>
     </div>
+    <a href="{{ route('admin.users.create') }}" class="btn-primary">+ Thêm người dùng</a>
 </div>
 
 {{-- Users Table --}}
@@ -33,13 +34,97 @@
             <p>Chưa có người dùng nào.</p>
         </div>
     @else
-        <div class="overflow-x-auto">
+        {{-- Mobile card view (< sm) --}}
+        <div class="sm:hidden p-4 flex flex-col gap-3">
+            @foreach($users as $user)
+            <div class="mobile-data-card">
+                {{-- Header: avatar + name + email + badges --}}
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                            {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-medium text-white text-sm truncate">{{ $user->name }}</p>
+                            <p class="text-slate-500 text-xs mt-0.5 truncate">{{ $user->email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                        <span class="badge {{ $user->isAdmin() ? 'badge-admin' : 'badge-client' }}">
+                            {{ $user->isAdmin() ? 'Admin' : 'Client' }}
+                        </span>
+                        <span class="badge {{ $user->isActive() ? 'badge-active' : 'badge-inactive' }}">
+                            {{ $user->isActive() ? 'Hoạt động' : 'Bị ban' }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Meta info --}}
+                <div class="mobile-data-card-meta">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        {{ number_format($user->experience_points) }} XP
+                    </span>
+                    <span>🔥 {{ $user->daily_streak }} ngày</span>
+                    <span>{{ $user->created_at->format('d/m/Y') }}</span>
+                </div>
+
+                {{-- Actions --}}
+                @unless(auth('admin')->user()?->is($user))
+                <div class="mobile-data-card-actions">
+                    <a href="{{ route('admin.users.edit', $user) }}" class="btn-admin-action info">Sửa</a>
+
+                    <form method="POST" action="{{ route('admin.users.toggle-role', $user) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit"
+                            class="btn-admin-action {{ $user->isAdmin() ? 'warning' : 'success' }}"
+                            data-admin-confirm
+                            data-confirm-message="Đổi quyền của {{ $user->name }} thành {{ $user->isAdmin() ? 'Client' : 'Admin' }}?"
+                            data-confirm-accept="Xác nhận">
+                            {{ $user->isAdmin() ? '↓ Hạ Client' : '↑ Lên Admin' }}
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit"
+                            class="btn-admin-action {{ $user->isActive() ? 'danger' : 'success' }}"
+                            data-admin-confirm
+                            data-confirm-message="{{ $user->isActive() ? 'Ban tài khoản ' : 'Gỡ ban tài khoản ' }}{{ $user->name }}?"
+                            data-confirm-accept="{{ $user->isActive() ? 'Ban' : 'Gỡ ban' }}">
+                            {{ $user->isActive() ? '🚫 Ban' : '✓ Gỡ ban' }}
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('admin.users.destroy', $user) }}">
+                        @csrf @method('DELETE')
+                        <button type="submit"
+                            class="btn-admin-action danger"
+                            data-admin-confirm
+                            data-confirm-message="Xóa tài khoản {{ $user->name }}? Toàn bộ dữ liệu học tập sẽ bị xóa."
+                            data-confirm-accept="Xóa người dùng">
+                            Xóa
+                        </button>
+                    </form>
+                </div>
+                @else
+                <p class="mt-2 text-slate-600 text-xs italic">Tài khoản của bạn</p>
+                @endunless
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Desktop table view (≥ sm) --}}
+        <div class="hidden sm:block overflow-x-auto">
             <table class="admin-table">
                 <thead>
                     <tr>
                         <th>Người dùng</th>
                         <th>Email</th>
                         <th>Quyền</th>
+                        <th>Trạng thái</th>
                         <th>Kinh nghiệm</th>
                         <th>Chuỗi học</th>
                         <th>Ngày tạo</th>
@@ -69,6 +154,13 @@
                             </span>
                         </td>
 
+                        {{-- Status badge --}}
+                        <td>
+                            <span class="badge {{ $user->isActive() ? 'badge-active' : 'badge-inactive' }}">
+                                {{ $user->isActive() ? 'Hoạt động' : 'Bị ban' }}
+                            </span>
+                        </td>
+
                         {{-- XP --}}
                         <td>
                             <div class="flex items-center gap-1.5">
@@ -93,17 +185,33 @@
                         {{-- Actions --}}
                         <td>
                             <div class="admin-table-actions">
-                                {{-- Toggle Role --}}
                                 @unless(auth('admin')->user()?->is($user))
+                                    {{-- Edit --}}
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn-admin-action info">Sửa</a>
+
+                                    {{-- Toggle Role --}}
                                     <form method="POST" action="{{ route('admin.users.toggle-role', $user) }}">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit"
-                                            class="btn-admin-action {{ $user->isAdmin() ? 'warning' : 'info' }}"
+                                            class="btn-admin-action {{ $user->isAdmin() ? 'warning' : 'success' }}"
                                             data-admin-confirm
                                             data-confirm-message="Đổi quyền của {{ $user->name }} thành {{ $user->isAdmin() ? 'Client' : 'Admin' }}?"
                                             data-confirm-accept="Xác nhận">
                                             {{ $user->isAdmin() ? '↓ Hạ Client' : '↑ Lên Admin' }}
+                                        </button>
+                                    </form>
+
+                                    {{-- Toggle Status (ban/unban) --}}
+                                    <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                            class="btn-admin-action {{ $user->isActive() ? 'danger' : 'success' }}"
+                                            data-admin-confirm
+                                            data-confirm-message="{{ $user->isActive() ? 'Ban tài khoản ' : 'Gỡ ban tài khoản ' }}{{ $user->name }}?"
+                                            data-confirm-accept="{{ $user->isActive() ? 'Ban' : 'Gỡ ban' }}">
+                                            {{ $user->isActive() ? '🚫 Ban' : '✓ Gỡ ban' }}
                                         </button>
                                     </form>
 
@@ -128,7 +236,7 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
+        </div>{{-- end desktop table --}}
     @endif
 </div>
 

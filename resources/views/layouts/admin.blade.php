@@ -44,7 +44,7 @@
         </header>
 
         {{-- Main Content --}}
-        <main class="{{ $mainClass ?? 'p-6' }}">
+        <main class="{{ $mainClass ?? 'p-4 sm:p-6' }}">
             {{-- Breadcrumb --}}
             @if (isset($breadcrumb) && $breadcrumb !== false)
                 @include('components.admin.admin-breadcrumb', $breadcrumb)

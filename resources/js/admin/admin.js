@@ -103,41 +103,49 @@ const AdminConfirm = {
     },
 
     bindEvents() {
-        // Handle elements with data-admin-confirm attribute
+        // Intercept clicks on any element with data-admin-confirm (but never the modal itself)
         document.addEventListener('click', (e) => {
             const trigger = e.target.closest('[data-admin-confirm]');
-            if (trigger) {
-                e.preventDefault();
-                this.show(trigger);
-            }
+            if (!trigger) return;
+            // Ignore clicks that originate inside the modal overlay
+            if (this.modal && this.modal.contains(trigger)) return;
+            e.preventDefault();
+            this.show(trigger);
         });
 
-        // Cancel button
-        const cancelBtn = this.modal?.querySelector('[data-confirm-cancel]');
-        cancelBtn?.addEventListener('click', () => this.hide());
+        // Cancel button (uses stable ID so it never conflicts with trigger attributes)
+        document.getElementById('confirm-modal-cancel')?.addEventListener('click', () => this.hide());
+
+        // Close on backdrop click
+        this.modal?.addEventListener('click', (e) => {
+            if (e.target === this.modal) this.hide();
+        });
     },
 
     show(trigger) {
         const message = trigger.getAttribute('data-confirm-message');
         const acceptText = trigger.getAttribute('data-confirm-accept');
 
-        const messageEl = this.modal.querySelector('[data-confirm-message]');
-        const acceptBtn = this.modal.querySelector('[data-confirm-accept]');
+        const messageEl = document.getElementById('confirm-modal-message');
+        const acceptBtn = document.getElementById('confirm-modal-ok');
 
-        if (messageEl) messageEl.textContent = message;
-        if (acceptBtn) acceptBtn.textContent = acceptText || 'Confirm';
+        if (messageEl) messageEl.textContent = message || 'Bạn có chắc chắn muốn tiếp tục?';
+        if (acceptBtn) acceptBtn.textContent = acceptText || 'Xác nhận';
 
-        // Set up confirm action
-        const confirmBtn = this.modal.querySelector('[data-confirm-ok]');
+        const confirmBtn = document.getElementById('confirm-modal-ok');
         if (confirmBtn) {
-            confirmBtn.onclick = () => {
-                if (trigger.tagName === 'FORM') {
-                    trigger.submit();
-                } else if (trigger.tagName === 'BUTTON' && trigger.type === 'submit') {
-                    trigger.closest('form').submit();
-                }
+            // Clone to remove previous onclick listener
+            const fresh = confirmBtn.cloneNode(true);
+            fresh.textContent = acceptText || 'Xác nhận';
+            confirmBtn.replaceWith(fresh);
+            fresh.addEventListener('click', () => {
+                // Submit the associated form
+                const form = trigger.tagName === 'FORM'
+                    ? trigger
+                    : trigger.closest('form');
+                if (form) form.submit();
                 this.hide();
-            };
+            });
         }
 
         this.modal.setAttribute('open', 'true');
