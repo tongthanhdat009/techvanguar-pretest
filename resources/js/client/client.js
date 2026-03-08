@@ -68,9 +68,16 @@ const Toast = {
 
 const ClientApp = {
     init() {
+        this.desktopMediaQuery = window.matchMedia('(min-width: 1025px)');
+        this.desktopCollapsed = false;
         this.initSidebar();
         this.initTopbar();
         this.initMobileMenu();
+        this.syncSidebarForViewport();
+
+        this.desktopMediaQuery.addEventListener('change', () => {
+            this.syncSidebarForViewport();
+        });
     },
 
     initSidebar() {
@@ -78,9 +85,16 @@ const ClientApp = {
         const mainWrapper = document.querySelector('.client-main-wrapper');
         const toggleBtn = document.querySelector('[data-sidebar-toggle]');
 
+        this.sidebar = sidebar;
+        this.mainWrapper = mainWrapper;
+
         toggleBtn?.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainWrapper?.classList.toggle('collapsed');
+            if (!this.isDesktopViewport()) {
+                return;
+            }
+
+            this.desktopCollapsed = !this.desktopCollapsed;
+            this.applyDesktopSidebarState();
         });
     },
 
@@ -109,22 +123,164 @@ const ClientApp = {
         const layout = document.querySelector('[data-client-app]');
         const toggleBtn = document.querySelector('[data-mobile-menu-toggle]');
         const sidebar = document.querySelector('.client-sidebar');
-        const overlay = document.querySelector('.client-app-layout::before');
+        const overlay = document.querySelector('[data-sidebar-overlay]');
+
+        this.layout = layout;
+        this.overlay = overlay;
 
         toggleBtn?.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            layout?.classList.toggle('sidebar-open');
-            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+            if (this.isDesktopViewport()) {
+                return;
+            }
+
+            const shouldOpen = !sidebar.classList.contains('active');
+            if (shouldOpen) {
+                this.openMobileSidebar();
+                return;
+            }
+
+            this.closeMobileSidebar();
         });
 
-        // Close on overlay click
-        layout?.addEventListener('click', (e) => {
-            if (e.target === layout || e.target.classList.contains('sidebar-overlay')) {
-                sidebar.classList.remove('active');
-                layout.classList.remove('sidebar-open');
-                document.body.style.overflow = '';
+        overlay?.addEventListener('click', () => this.closeMobileSidebar());
+    },
+
+    isDesktopViewport() {
+        return this.desktopMediaQuery.matches;
+    },
+
+    applyDesktopSidebarState() {
+        if (!this.sidebar || !this.mainWrapper || !this.isDesktopViewport()) {
+            return;
+        }
+
+        this.sidebar.classList.toggle('collapsed', this.desktopCollapsed);
+        this.mainWrapper.classList.toggle('collapsed', this.desktopCollapsed);
+    },
+
+    openMobileSidebar() {
+        if (!this.sidebar || !this.layout) {
+            return;
+        }
+
+        this.sidebar.classList.remove('collapsed');
+        this.mainWrapper?.classList.remove('collapsed');
+        this.sidebar.classList.add('active');
+        this.layout.classList.add('sidebar-open');
+        document.body.style.overflow = 'hidden';
+    },
+
+    closeMobileSidebar() {
+        if (!this.sidebar || !this.layout) {
+            return;
+        }
+
+        this.sidebar.classList.remove('active');
+        this.layout.classList.remove('sidebar-open');
+        document.body.style.overflow = '';
+
+        if (this.isDesktopViewport()) {
+            this.applyDesktopSidebarState();
+        }
+    },
+
+    syncSidebarForViewport() {
+        if (!this.sidebar || !this.layout) {
+            return;
+        }
+
+        if (this.isDesktopViewport()) {
+            this.closeMobileSidebar();
+            this.applyDesktopSidebarState();
+            return;
+        }
+
+        this.sidebar.classList.remove('active', 'collapsed');
+        this.mainWrapper?.classList.remove('collapsed');
+        this.layout.classList.remove('sidebar-open');
+        document.body.style.overflow = '';
+    },
+
+    syncDueCount(count) {
+        const reminder = document.querySelector('[data-study-reminder]');
+        const countNode = document.querySelector('[data-due-count]');
+        const labelNode = document.querySelector('[data-due-label]');
+
+        if (!reminder || !countNode || !labelNode || typeof count !== 'number') {
+            return;
+        }
+
+        countNode.textContent = count;
+
+        if (count > 0) {
+            reminder.classList.remove('study-reminder--idle');
+            labelNode.textContent = 'thẻ đến hạn hôm nay';
+        } else {
+            reminder.classList.add('study-reminder--idle');
+            labelNode.textContent = 'Hàng chờ hôm nay đã sạch';
+        }
+    }
+};
+
+const ConfirmDialog = {
+    modal: null,
+    title: null,
+    message: null,
+    submitButton: null,
+    cancelButton: null,
+    pendingAction: null,
+
+    init() {
+        this.modal = document.getElementById('confirmActionModal');
+        if (!this.modal) return;
+
+        this.title = document.getElementById('confirmActionTitle');
+        this.message = document.getElementById('confirmActionMessage');
+        this.submitButton = this.modal.querySelector('[data-confirm-submit]');
+        this.cancelButton = this.modal.querySelector('[data-confirm-cancel]');
+
+        this.submitButton?.addEventListener('click', () => {
+            const action = this.pendingAction;
+            this.close();
+            action?.();
+        });
+
+        this.cancelButton?.addEventListener('click', () => this.close());
+
+        this.modal.querySelectorAll('[data-modal-backdrop], [data-modal-close]').forEach((node) => {
+            node.addEventListener('click', () => this.close());
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.modal?.classList.contains('active')) {
+                this.close();
             }
         });
+    },
+
+    open({ title, message, confirmLabel = 'Xác nhận' }, onConfirm) {
+        if (!this.modal) {
+            if (confirm(message || title || 'Bạn có chắc muốn tiếp tục?')) {
+                onConfirm?.();
+            }
+            return;
+        }
+
+        this.pendingAction = onConfirm;
+        if (this.title) this.title.textContent = title || 'Xác nhận thao tác';
+        if (this.message) this.message.textContent = message || 'Hành động này có thể ảnh hưởng đến dữ liệu hiện tại.';
+        if (this.submitButton) this.submitButton.textContent = confirmLabel;
+
+        this.modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    },
+
+    close() {
+        if (!this.modal) return;
+
+        this.modal.classList.remove('active');
+        document.body.style.overflow = '';
+        this.pendingAction = null;
     }
 };
 
@@ -353,30 +509,26 @@ const StudyRoom = {
 
         const feedback = feedbackMap[result] || { message: 'Rated!', color: '#6b7280' };
 
-        // Show temporary feedback overlay
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: ${feedback.color};
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            z-index: 9999;
-            animation: fadeIn 0.1s ease;
-        `;
-        overlay.textContent = feedback.message;
-        document.body.appendChild(overlay);
+        const existingFeedback = this.studyRoom.querySelector('[data-study-feedback]');
+        existingFeedback?.remove();
+
+        const feedbackChip = document.createElement('div');
+        feedbackChip.className = 'study-feedback-chip';
+        feedbackChip.dataset.studyFeedback = 'true';
+        feedbackChip.dataset.result = result;
+        feedbackChip.style.setProperty('--feedback-color', feedback.color);
+        feedbackChip.textContent = feedback.message;
+
+        this.studyRoom.appendChild(feedbackChip);
+
+        requestAnimationFrame(() => {
+            feedbackChip.classList.add('is-visible');
+        });
 
         setTimeout(() => {
-            overlay.remove();
-        }, 300);
+            feedbackChip.classList.remove('is-visible');
+            setTimeout(() => feedbackChip.remove(), 220);
+        }, 520);
     },
 
     showNextCard() {
@@ -798,6 +950,10 @@ const StudyRoom = {
             this.restartUrl = data.restart_url;
         }
 
+        if (typeof data.due_count === 'number') {
+            ClientApp.syncDueCount(data.due_count);
+        }
+
         return data;
     },
 
@@ -921,13 +1077,19 @@ const DeckDetail = {
     },
 
     initDeleteConfirmation() {
-        const deleteBtns = document.querySelectorAll('[data-deck-delete]');
+        const deleteBtns = document.querySelectorAll('button[type="submit"][data-confirm-message], button[type="submit"][data-confirm]');
         deleteBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const message = btn.dataset.confirmMessage || 'Bạn có chắc muốn xóa deck này?';
-                if (!confirm(message)) {
-                    e.preventDefault();
-                }
+                const form = btn.closest('form');
+                if (!form) return;
+
+                e.preventDefault();
+
+                ConfirmDialog.open({
+                    title: btn.dataset.confirmTitle || 'Xác nhận thao tác',
+                    message: btn.dataset.confirmMessage || btn.dataset.confirm || 'Bạn có chắc muốn tiếp tục?',
+                    confirmLabel: btn.dataset.confirmLabel || 'Xác nhận'
+                }, () => form.submit());
             });
         });
     },
@@ -943,6 +1105,7 @@ const DeckDetail = {
 document.addEventListener('DOMContentLoaded', () => {
     Toast.init();
     ClientApp.init();
+    ConfirmDialog.init();
     ClientNav.init();
     DeckCards.init();
     StudyRoom.init();

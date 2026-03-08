@@ -17,25 +17,31 @@
             </svg>
         </button>
 
-        <div class="search-container">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-            </svg>
-            <input type="text"
-                   class="search-input"
-                     placeholder="Tìm deck hoặc chủ đề..."
-                   id="deckSearch"
-                   autocomplete="off">
+        <div class="topbar-search-panel">
+            <span class="topbar-meta-label">Tìm nhanh trong thư viện học</span>
+            <div class="search-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                <input type="text"
+                       class="search-input"
+                       placeholder="Tìm deck, chủ đề hoặc tag..."
+                       id="deckSearch"
+                       autocomplete="off">
+            </div>
         </div>
     </div>
 
     <div class="topbar-right">
-        @if($dueCount > 0)
-            <a href="{{ route('client.study.all') }}" class="study-reminder">
-                <span class="reminder-icon">📚</span>
-                <span class="reminder-text">{{ $dueCount }} thẻ đến hạn hôm nay</span>
-            </a>
-        @endif
+        <a href="{{ route('client.study.all') }}"
+           class="study-reminder {{ $dueCount > 0 ? '' : 'study-reminder--idle' }}"
+           data-study-reminder>
+            <span class="reminder-icon">📚</span>
+            <span class="reminder-copy">
+                <strong data-due-count>{{ $dueCount }}</strong>
+                <span data-due-label>{{ $dueCount > 0 ? 'thẻ đến hạn hôm nay' : 'Hàng chờ hôm nay đã sạch' }}</span>
+            </span>
+        </a>
 
         <div class="level-badge-container">
             <div class="level-badge">

@@ -20,8 +20,7 @@
                 @for($i = 1; $i <= 5; $i++)
                     <button type="button"
                             class="review-form__star {{ $i <= ($existingReview->rating ?? 0) ? 'review-form__star--active' : '' }}"
-                            data-rating-value="{{ $i }}"
-                            type="button">
+                            data-rating-value="{{ $i }}">
                         ★
                     </button>
                 @endfor

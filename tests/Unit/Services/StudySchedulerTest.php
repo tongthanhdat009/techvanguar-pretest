@@ -110,17 +110,35 @@ class StudySchedulerTest extends TestCase
 
         StudyProgress::factory()->count(2)->create([
             'user_id' => $user->id,
+            'last_reviewed_at' => now()->subDay(),
             'next_review_at' => null,
         ]);
         StudyProgress::factory()->create([
             'user_id' => $user->id,
+            'last_reviewed_at' => now()->subDay(),
             'next_review_at' => now()->subHour(),
         ]);
         StudyProgress::factory()->create([
             'user_id' => $user->id,
+            'last_reviewed_at' => now()->subDay(),
             'next_review_at' => now()->addDay(),
         ]);
 
         $this->assertSame(3, app(StudyScheduler::class)->dueTodayCount($user));
+    }
+
+    public function test_due_today_count_does_not_fall_back_to_upcoming_cards_when_nothing_is_due(): void
+    {
+        $this->travelTo(now()->setDate(2026, 3, 8)->setTime(13, 0));
+
+        $user = User::factory()->create();
+
+        StudyProgress::factory()->count(2)->create([
+            'user_id' => $user->id,
+            'last_reviewed_at' => now(),
+            'next_review_at' => now()->addDays(5),
+        ]);
+
+        $this->assertSame(0, app(StudyScheduler::class)->dueTodayCount($user));
     }
 }

@@ -95,6 +95,14 @@ class StudySessionService
         return $flashcards->filter(function (Flashcard $flashcard) {
             $progress = $flashcard->studyProgress->first();
 
+            if (! $progress) {
+                return true;
+            }
+
+            if ($progress->last_reviewed_at && $progress->last_reviewed_at->gte(now()->startOfDay())) {
+                return false;
+            }
+
             return ! $progress
                 || ! $progress->next_review_at
                 || $progress->next_review_at->lte(now());
@@ -106,15 +114,13 @@ class StudySessionService
      */
     private function prioritizeFlashcards(Collection $dueFlashcards, Collection $allFlashcards, int $limit): Collection
     {
-        $source = $dueFlashcards->isNotEmpty() ? $dueFlashcards : $allFlashcards;
-
-        return $source->take($limit)->values();
+        return $dueFlashcards->take($limit)->values();
     }
 
     /**
      * Build a pool of answers for multiple-choice questions.
      *
-     * @return \Illuminate\SupportCollection
+    * @return \Illuminate\Support\Collection<int, string>
      */
     private function buildAnswerPool(User $user, ?Deck $deck, int $poolSize): Collection
     {

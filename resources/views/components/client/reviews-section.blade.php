@@ -1,6 +1,7 @@
 @props([
     'deck' => null,
-    'reviewForm' => null
+    'reviewForm' => null,
+    'canReview' => true
 ])
 
 <div class="reviews-section">
@@ -13,11 +14,17 @@
         @endif
     </h2>
 
-    {{-- Review Form (for logged-in users) --}}
-    @include('components.client.review-form', [
-        'deck' => $deck,
-        'existingReview' => $reviewForm
-    ])
+    @if($canReview)
+        @include('components.client.review-form', [
+            'deck' => $deck,
+            'existingReview' => $reviewForm
+        ])
+    @else
+        <div class="review-form review-form--locked">
+            <h3 class="review-form__title">Bạn đang xem deck của chính mình</h3>
+            <p class="review-form__locked-copy">Phần đánh giá chỉ mở cho người học khác. Bạn vẫn có thể xem toàn bộ nhận xét để cải thiện chất lượng nội dung của deck này.</p>
+        </div>
+    @endif
 
     {{-- Reviews List --}}
     @if($deck->reviews->isEmpty())

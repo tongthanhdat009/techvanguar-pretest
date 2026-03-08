@@ -40,16 +40,8 @@ class StudyScheduler
 
     public function dueTodayCount(User $user): int
     {
-        return $user->studyProgress()
-            ->where(function ($query) {
-                $query->whereNull('next_review_at')
-                    ->orWhere('next_review_at', '<=', now());
-            })
-            ->where(function ($query) {
-                // Exclude cards already reviewed today
-                $query->whereNull('last_reviewed_at')
-                    ->orWhere('last_reviewed_at', '<', now()->startOfDay());
-            })
+        return app(StudySessionService::class)
+            ->getStudyCandidates($user, null, PHP_INT_MAX)
             ->count();
     }
 

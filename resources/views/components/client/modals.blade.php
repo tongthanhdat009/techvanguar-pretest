@@ -20,7 +20,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Chỉnh sửa deck</h3>
+                <div class="modal-heading">
+                    <span class="modal-kicker">Quản lý deck</span>
+                    <h3 class="modal-title">Chỉnh sửa deck</h3>
+                    <p class="modal-description">Điều chỉnh mô tả, danh mục, mức chia sẻ và các tag để deck hiển thị rõ ràng hơn với người học.</p>
+                </div>
                 <button type="button" class="modal-close" data-modal-close aria-label="Đóng modal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -101,7 +105,11 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Thêm flashcard</h3>
+                <div class="modal-heading">
+                    <span class="modal-kicker">Mở rộng nội dung</span>
+                    <h3 class="modal-title">Thêm flashcard</h3>
+                    <p class="modal-description">Mỗi flashcard nên chỉ chứa một ý chính để quá trình tự nhớ lại vẫn nhanh, chính xác và dễ đo tiến độ.</p>
+                </div>
                 <button type="button" class="modal-close" data-modal-close aria-label="Đóng modal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -170,7 +178,11 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Chỉnh sửa flashcard</h3>
+                <div class="modal-heading">
+                    <span class="modal-kicker">Tinh chỉnh nội dung</span>
+                    <h3 class="modal-title">Chỉnh sửa flashcard</h3>
+                    <p class="modal-description">Cập nhật lại mặt trước, mặt sau hoặc gợi ý để thẻ rõ nghĩa hơn và ít gây nhầm lẫn hơn khi ôn tập.</p>
+                </div>
                 <button type="button" class="modal-close" data-modal-close aria-label="Đóng modal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -218,6 +230,26 @@
                 <button type="submit" form="editFlashcardForm" class="btn btn-primary" data-edit-flashcard-submit>
                     Lưu thay đổi
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-confirm" id="confirmActionModal" data-modal="confirm-action" tabindex="-1" aria-hidden="true">
+    <div class="modal-backdrop" data-modal-backdrop></div>
+    <div class="modal-dialog">
+        <div class="modal-content modal-confirm__content">
+            <div class="modal-header modal-confirm__header">
+                <div class="modal-confirm__badge">!</div>
+                <div class="modal-heading">
+                    <span class="modal-kicker">Xác nhận thao tác</span>
+                    <h3 class="modal-title" id="confirmActionTitle">Bạn có chắc muốn tiếp tục?</h3>
+                    <p class="modal-description" id="confirmActionMessage">Hành động này có thể ảnh hưởng đến dữ liệu hiện tại.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-confirm-cancel>Giữ lại</button>
+                <button type="button" class="btn btn-danger" data-confirm-submit>Xác nhận xóa</button>
             </div>
         </div>
     </div>

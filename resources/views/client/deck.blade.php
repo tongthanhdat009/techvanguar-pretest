@@ -13,7 +13,8 @@
 
         @include('components.client.reviews-section', [
             'deck' => $deck,
-            'reviewForm' => $reviewForm
+            'reviewForm' => $reviewForm,
+            'canReview' => ! $canManageDeck
         ])
     </section>
 @endsection

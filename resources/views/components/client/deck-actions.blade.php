@@ -38,7 +38,9 @@
                     <button type="submit"
                             class="deck-actions__btn deck-actions__btn--danger"
                             data-deck-delete
-                            data-confirm-message="Xóa bộ thẻ này và tất cả các thẻ bên trong?">
+                            data-confirm-title="Xóa deck này?"
+                            data-confirm-message="Hành động này sẽ xóa toàn bộ flashcard, tiến độ học và đánh giá liên quan trong deck này."
+                            data-confirm-label="Xóa deck">
                         Xóa deck
                     </button>
                 </form>

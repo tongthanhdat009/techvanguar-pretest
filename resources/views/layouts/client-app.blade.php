@@ -18,6 +18,8 @@
         {{-- Sidebar --}}
         @include('components.client.client-sidebar')
 
+        <div class="client-sidebar-overlay" data-sidebar-overlay aria-hidden="true"></div>
+
         {{-- Main Content Area --}}
         <div class="client-main-wrapper">
 

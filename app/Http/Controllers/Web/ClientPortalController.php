@@ -210,6 +210,7 @@ class ClientPortalController extends Controller
                 'message' => 'Đã lưu tiến độ học.',
                 'flashcard_id' => $flashcard->id,
                 'deck_id' => $deck->id,
+                'due_count' => $scheduler->dueTodayCount($user),
                 'back_url' => $backUrl,
                 'restart_url' => $restartUrl,
             ]);
@@ -336,6 +337,7 @@ class ClientPortalController extends Controller
         $user = $request->user();
 
         abort_unless($deckAccess->canCloneOrReview($deck), Response::HTTP_NOT_FOUND);
+        abort_if((int) $deck->user_id === (int) $user->id, Response::HTTP_FORBIDDEN, 'Bạn không thể tự đánh giá deck của chính mình.');
 
         $validated = $request->validate([
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
