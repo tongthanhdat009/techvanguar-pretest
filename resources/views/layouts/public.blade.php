@@ -15,7 +15,7 @@
     @include('components.public.public-navbar')
 
     {{-- Main Content --}}
-    {{ $slot ?? '' }}
+    @yield('content')
 
     {{-- Footer --}}
     @include('components.public.public-footer')

@@ -37,7 +37,7 @@
         @endif
 
         {{-- Content --}}
-        {{ $slot ?? '' }}
+        @yield('content')
     </main>
 
     {{-- Scripts --}}

@@ -14,7 +14,7 @@
 
         {{-- Content --}}
         <div class="content">
-            {{ $slot ?? '' }}
+            @yield('content')
         </div>
 
         {{-- Back to Home --}}
