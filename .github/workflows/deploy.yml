@@ -85,7 +85,6 @@ jobs:
 
     env:
       APP_NAME: flashcard-learning-hub
-      APP_PORT: '8000'
 
     steps:
       - name: Download release artifact
@@ -108,13 +107,21 @@ jobs:
             mkdir -p "$BASE_DIR/shared/bootstrap/cache"
 
             if [ ! -f "$BASE_DIR/shared/.env" ]; then
-              echo "Missing shared env file at $BASE_DIR/shared/.env"
+              echo "❌ Missing shared env file at $BASE_DIR/shared/.env"
+              echo "Please create it first:"
+              echo "  sudo nano $BASE_DIR/shared/.env"
               exit 1
             fi
 
-            if ! command -v pm2 >/dev/null 2>&1; then
-              sudo npm install -g pm2
+            # Ensure PHP-FPM is installed
+            if ! dpkg -l | grep -q php.*-fpm; then
+              echo "❌ PHP-FPM is not installed. Please install it first:"
+              echo "  sudo apt install php8.2-fpm -y"
+              exit 1
             fi
+
+            echo "✓ Remote directories prepared"
+            echo "✓ PHP-FPM is installed"
 
       - name: Upload release archive
         uses: burnett01/rsync-deployments@v8
@@ -127,6 +134,44 @@ jobs:
           remote_key: ${{ secrets.VPS_SSH_KEY }}
           remote_port: ${{ secrets.VPS_PORT || 22 }}
 
+      - name: Deploy Nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -eu
+            APP_NAME="${{ env.APP_NAME }}"
+            BASE_DIR="${{ secrets.VPS_APP_DIR }}"
+            RELEASE_DIR="$BASE_DIR/releases/${{ github.sha }}"
+            NGINX_SOURCE="$RELEASE_DIR/.github/workflows/nginx/flashcard-learning-hub.conf"
+            NGINX_TARGET="/etc/nginx/sites-available/$APP_NAME"
+            NGINX_ENABLED="/etc/nginx/sites-enabled/$APP_NAME"
+
+            # Deploy Nginx config if it exists
+            if [ -f "$NGINX_SOURCE" ]; then
+              echo "📋 Deploying Nginx configuration..."
+              sudo cp "$NGINX_SOURCE" "$NGINX_TARGET"
+
+              # Create symlink to sites-enabled if not exists
+              if [ ! -L "$NGINX_ENABLED" ]; then
+                sudo ln -sf "$NGINX_TARGET" "$NGINX_ENABLED"
+                echo "✓ Created symlink: $NGINX_ENABLED"
+              fi
+
+              # Verify Nginx config
+              if sudo nginx -t; then
+                echo "✓ Nginx config is valid"
+              else
+                echo "❌ Nginx config test failed"
+                exit 1
+              fi
+            else
+              echo "⚠️  Warning: Nginx config not found at $NGINX_SOURCE"
+            fi
+
       - name: Deploy release on VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -138,66 +183,138 @@ jobs:
             set -eu
 
             APP_NAME="${{ env.APP_NAME }}"
-            APP_PORT="${{ env.APP_PORT }}"
             BASE_DIR="${{ secrets.VPS_APP_DIR }}"
             RELEASE_DIR="$BASE_DIR/releases/${{ github.sha }}"
             CURRENT_DIR="$BASE_DIR/current"
             SHARED_DIR="$BASE_DIR/shared"
-            PM2_SERVICE_NAME="pm2-${USER}"
-            PM2_BIN="$(command -v pm2)"
-            LEGACY_SYSTEMD_SERVICE="${APP_NAME}.service"
+
+            # Detect PHP version
+            PHP_VERSION=$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')
+            PHP_FPM_SERVICE="php${PHP_VERSION}-fpm"
+            PHP_FPM_SOCKET="/var/run/php/php${PHP_VERSION}-fpm.sock"
+
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "📦 Deploying: $APP_NAME"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "PHP Version: $PHP_VERSION"
+            echo "PHP-FPM Service: $PHP_FPM_SERVICE"
+            echo "Release Directory: $RELEASE_DIR"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
             cd "$RELEASE_DIR"
             tar -xzf release.tar.gz
             rm -f release.tar.gz
 
+            # Setup symlinks to shared directories
             rm -rf storage bootstrap/cache
             ln -sfn "$SHARED_DIR/storage" "$RELEASE_DIR/storage"
             ln -sfn "$SHARED_DIR/bootstrap/cache" "$RELEASE_DIR/bootstrap/cache"
             ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
+            echo "✓ Symlinks created"
 
+            # Install dependencies
+            echo "📚 Installing Composer dependencies..."
             composer install --no-dev --optimize-autoloader --no-interaction
 
+            # Run Laravel commands
+            echo "🔧 Running Laravel optimizations..."
             php artisan storage:link || true
             php artisan migrate --force
             php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            echo "✓ Laravel optimizations completed"
 
+            # Update current symlink
             ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
             cd "$CURRENT_DIR"
+            echo "✓ Current symlink updated"
 
-            pm2 delete "$APP_NAME" || true
-            pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env
-            pm2 save --force
+            # Set proper permissions
+            echo "🔐 Setting permissions..."
+            sudo chown -R www-data:www-data storage bootstrap/cache || true
+            sudo chmod -R 775 storage bootstrap/cache || true
+            echo "✓ Permissions set"
 
-            sudo systemctl stop "$LEGACY_SYSTEMD_SERVICE" || true
-            sudo systemctl disable "$LEGACY_SYSTEMD_SERVICE" || true
-            sudo rm -f "/etc/systemd/system/$LEGACY_SYSTEMD_SERVICE"
+            # Restart PHP-FPM to clear opcache
+            echo "🔄 Restarting PHP-FPM..."
+            sudo systemctl restart "$PHP_FPM_SERVICE"
+            echo "✓ PHP-FPM restarted"
 
-            sudo env PATH="$PATH" "$PM2_BIN" unstartup systemd -u "$USER" --hp "$HOME" || true
-            sudo systemctl stop "$PM2_SERVICE_NAME" || true
-            sudo systemctl disable "$PM2_SERVICE_NAME" || true
-            sudo rm -f "/etc/systemd/system/$PM2_SERVICE_NAME.service"
-            sudo systemctl daemon-reload
-
-            sudo env PATH="$PATH" "$PM2_BIN" startup systemd -u "$USER" --hp "$HOME"
-            pm2 save --force
-
-            sudo systemctl daemon-reload
-            sudo systemctl enable "$PM2_SERVICE_NAME"
-            sudo systemctl restart "$PM2_SERVICE_NAME"
-
-            if ! pm2 describe "$APP_NAME" >/dev/null 2>&1; then
-              echo "PM2 process was not created"
-              exit 1
-            fi
-
+            # Reload Nginx
+            echo "🔄 Reloading Nginx..."
             sudo nginx -t
             sudo systemctl reload nginx
+            echo "✓ Nginx reloaded"
 
+            # Setup/Restart queue worker with supervisor
+            if ! command -v supervisor >/dev/null 2>&1; then
+              echo "📦 Installing supervisor..."
+              sudo apt install supervisor -y
+            fi
+
+            # Create supervisor config for queue worker
+            echo "📋 Setting up queue worker..."
+            cat <<EOF | sudo tee /etc/supervisor/conf.d/${APP_NAME}-queue.conf > /dev/null
+            [program:${APP_NAME}-queue]
+            process_name=%(program_name)s_%(process_num)02d
+            command=php ${CURRENT_DIR}/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+            autostart=true
+            autorestart=true
+            user=www-data
+            redirect_stderr=true
+            stdout_logfile=${CURRENT_DIR}/storage/logs/queue.log
+            stopwaitsecs=3600
+            EOF
+
+            # Update supervisor and restart queue
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            sudo supervisorctl restart "${APP_NAME}-queue:*" || true
+            echo "✓ Queue worker restarted"
+
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "✅ Deployment completed successfully!"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "✓ PHP-FPM restarted: $PHP_FPM_SERVICE"
+            echo "✓ Nginx reloaded"
+            echo "✓ Queue worker restarted"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+            # Cleanup old releases (keep 5 most recent)
             cd "$BASE_DIR/releases"
             ls -1dt */ | tail -n +6 | xargs -r rm -rf
+            echo "🧹 Cleaned up old releases"
 
-  
+      - name: Health check
+        run: |
+          echo "⏳ Waiting for application to be ready..."
+          sleep 5
+
+          # Health check endpoint
+          MAX_ATTEMPTS=10
+          ATTEMPT=0
+          APP_URL="https://flashcard.jadt-airline.io.vn"
+
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" || echo "000")
+
+            if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ]; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "✅ Application is healthy! (HTTP $HTTP_CODE)"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "🌐 URL: $APP_URL"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              exit 0
+            fi
+
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS: HTTP $HTTP_CODE - Retrying in 5s..."
+            sleep 5
+          done
+
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "❌ Health check failed after $MAX_ATTEMPTS attempts"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          exit 1
