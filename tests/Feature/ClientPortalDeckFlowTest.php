@@ -41,6 +41,39 @@ class ClientPortalDeckFlowTest extends TestCase
         $this->assertSame(2, $copy->flashcards()->count());
     }
 
+    public function test_copying_same_public_deck_reuses_existing_copy(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $deck = Deck::factory()->create([
+            'visibility' => Deck::VISIBILITY_PUBLIC,
+            'is_active' => true,
+        ]);
+
+        Flashcard::factory()->count(2)->create([
+            'deck_id' => $deck->id,
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('client.decks.copy', $deck));
+
+        $firstCopy = Deck::query()
+            ->where('user_id', $user->id)
+            ->where('source_deck_id', $deck->id)
+            ->first();
+
+        $this->assertNotNull($firstCopy);
+
+        $this->actingAs($user)
+            ->post(route('client.decks.copy', $deck), ['redirect_to' => 'study'])
+            ->assertRedirect(route('client.decks.study', $firstCopy));
+
+        $this->assertSame(1, Deck::query()
+            ->where('user_id', $user->id)
+            ->where('source_deck_id', $deck->id)
+            ->count());
+    }
+
     public function test_client_cannot_copy_private_deck(): void
     {
         /** @var User $user */
@@ -66,6 +99,40 @@ class ClientPortalDeckFlowTest extends TestCase
             ->get(route('client.decks.study', $deck))
             ->assertOk()
             ->assertSee('data-total-cards="13"', false);
+    }
+
+    public function test_client_can_update_owned_deck_without_resubmitting_cards_or_is_active(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $deck = Deck::factory()->privateOwned($user)->create([
+            'title' => 'Original Title',
+            'description' => 'Original description',
+            'visibility' => Deck::VISIBILITY_PRIVATE,
+            'category' => 'Science',
+            'tags' => ['alpha'],
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('client.decks.update', $deck), [
+                'title' => 'Updated Deck Title',
+                'description' => 'Updated description',
+                'visibility' => Deck::VISIBILITY_PUBLIC,
+                'category' => 'Technology',
+                'tags' => 'beta, gamma',
+            ])
+            ->assertRedirect(route('client.decks.show', $deck))
+            ->assertSessionHasNoErrors();
+
+        $deck->refresh();
+
+        $this->assertSame('Updated Deck Title', $deck->title);
+        $this->assertSame('Updated description', $deck->description);
+        $this->assertSame(Deck::VISIBILITY_PUBLIC, $deck->visibility);
+        $this->assertSame('Technology', $deck->category);
+        $this->assertSame(['beta', 'gamma'], $deck->tags);
+        $this->assertTrue($deck->is_active);
     }
 
     public function test_client_can_save_study_progress_via_ajax_for_a_deck_session(): void

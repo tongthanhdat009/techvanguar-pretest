@@ -19,6 +19,7 @@ class ClientDeckRequest extends FormRequest
     public function rules(): array
     {
         $deck = $this->route('deck'); // For update, may be null
+        $isUpdate = $deck !== null && in_array($this->method(), ['PUT', 'PATCH'], true);
 
         return [
             'title' => [
@@ -26,15 +27,15 @@ class ClientDeckRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('decks', 'title')
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', $this->user()?->id)
                     ->ignore($deck?->id),
             ],
             'description' => ['nullable', 'string'],
             'visibility' => ['required', Rule::in([Deck::VISIBILITY_PRIVATE, Deck::VISIBILITY_PUBLIC])],
             'category' => ['nullable', 'string', 'max:255'],
             'tags' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
-            'cards' => ['required', 'array', 'min:1', 'max:50'],
+            'is_active' => $isUpdate ? ['sometimes', 'boolean'] : ['required', 'boolean'],
+            'cards' => $isUpdate ? ['sometimes', 'array', 'min:1', 'max:50'] : ['required', 'array', 'min:1', 'max:50'],
             'cards.*.front' => ['required', 'string'],
             'cards.*.back' => ['required', 'string'],
             'cards.*.image_url' => ['nullable', 'url'],

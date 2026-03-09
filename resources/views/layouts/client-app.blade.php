@@ -49,6 +49,18 @@
 
     {{-- Toasts Container --}}
     <div class="toasts-container" data-toasts-container></div>
+    @if(session('status'))
+        <div data-flash-toast
+             data-flash-toast-type="success"
+             data-flash-toast-message="{{ session('status') }}"
+             hidden></div>
+    @endif
+    @if($errors->any())
+        <div data-flash-toast
+             data-flash-toast-type="error"
+             data-flash-toast-message="{{ $errors->first() }}"
+             hidden></div>
+    @endif
 
     {{-- Modals Container --}}
     <div class="modals-container" data-modals-container>

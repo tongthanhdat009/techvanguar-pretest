@@ -319,7 +319,7 @@ class ClientPortalController extends Controller
         return redirect()->route('client.decks.show', $deck)->with('status', 'Đã xóa flashcard.');
     }
 
-    public function copyDeck(Request $request, Deck $deck, DeckCopyService $deckCopy, DeckAccess $deckAccess): RedirectResponse
+    public function copyDeck(Request $request, Deck $deck, DeckCopyService $deckCopy, DeckAccess $deckAccess): JsonResponse|RedirectResponse
     {
         /** @var User $user */
         $user = $request->user();
@@ -328,7 +328,24 @@ class ClientPortalController extends Controller
 
         $copy = $deckCopy->copyToUser($deck, $user);
 
-        return redirect()->route('client.decks.show', $copy)->with('status', 'Đã sao chép deck vào thư viện cá nhân.');
+        $redirectTarget = $request->string('redirect_to')->toString() === 'study'
+            ? route('client.decks.study', $copy)
+            : route('client.decks.show', $copy);
+
+        $message = $request->string('redirect_to')->toString() === 'study'
+            ? 'Deck đã được lưu vào thư viện của bạn. Bạn đang học trên bản sao riêng tư này.'
+            : 'Deck đã được lưu vào thư viện của bạn. Bạn có thể chỉnh sửa và ôn tập trong thư viện cá nhân.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'deck_id' => $copy->id,
+                'redirect_url' => $redirectTarget,
+            ]);
+        }
+
+        return redirect($redirectTarget)->with('status', $message);
     }
 
     public function storeReview(Request $request, Deck $deck, DeckAccess $deckAccess): RedirectResponse

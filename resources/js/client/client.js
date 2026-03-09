@@ -62,6 +62,24 @@ const Toast = {
     info(message) { this.show(message, 'info'); }
 };
 
+const FlashToast = {
+    init() {
+        const flashToasts = document.querySelectorAll('[data-flash-toast]');
+        if (!flashToasts.length) return;
+
+        flashToasts.forEach((node) => {
+            const message = node.dataset.flashToastMessage;
+            const type = node.dataset.flashToastType || 'info';
+
+            if (!message) {
+                return;
+            }
+
+            Toast.show(message, type);
+        });
+    }
+};
+
 // ───────────────────────────────────────────────────────────────────────────────
 // Client App Layout (Sidebar + Topbar)
 // ───────────────────────────────────────────────────────────────────────────────
@@ -1104,6 +1122,7 @@ const DeckDetail = {
 
 document.addEventListener('DOMContentLoaded', () => {
     Toast.init();
+    FlashToast.init();
     ClientApp.init();
     ConfirmDialog.init();
     ClientNav.init();

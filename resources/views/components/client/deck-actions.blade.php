@@ -5,10 +5,23 @@
 
 @if($deck)
     <div class="deck-actions">
-        <a href="{{ route('client.decks.study', $deck) }}"
-           class="deck-actions__btn deck-actions__btn--primary">
-            Ôn deck này
-        </a>
+        @if($canManageDeck)
+            <a href="{{ route('client.decks.study', $deck) }}"
+               class="deck-actions__btn deck-actions__btn--primary">
+                Ôn deck này
+            </a>
+        @else
+            <form method="POST"
+                  action="{{ route('client.decks.copy', $deck) }}"
+                  class="inline">
+                @csrf
+                <input type="hidden" name="redirect_to" value="study">
+                <button type="submit"
+                        class="deck-actions__btn deck-actions__btn--primary">
+                    Ôn deck này
+                </button>
+            </form>
+        @endif
 
         <a href="{{ route('client.my-decks') }}" class="deck-actions__btn deck-actions__btn--ghost">
             Quay lại thư viện

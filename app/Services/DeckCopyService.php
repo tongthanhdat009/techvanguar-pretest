@@ -20,6 +20,14 @@ class DeckCopyService
     {
         abort_unless($this->canCopy($deck), 403, 'This deck cannot be copied.');
 
+        $existingCopy = $user->decks()
+            ->where('source_deck_id', $deck->id)
+            ->first();
+
+        if ($existingCopy) {
+            return $existingCopy;
+        }
+
         $copy = $user->decks()->create([
             'title' => $this->generateCopyTitle($deck->title),
             'description' => $deck->description,
