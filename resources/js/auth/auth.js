@@ -150,19 +150,19 @@ const FormValidation = {
                 case 'required':
                     if (!input.value.trim()) {
                         isValid = false;
-                        error = 'Truong nay la bat buoc';
+                        error = 'Trường này là bắt buộc';
                     }
                     break;
                 case 'email':
                     if (input.value && !this.isValidEmail(input.value)) {
                         isValid = false;
-                        error = 'Vui long nhap email hop le';
+                        error = 'Vui lòng nhập email hợp lệ';
                     }
                     break;
                 case 'min':
                     if (input.value.length < parseInt(ruleValue)) {
                         isValid = false;
-                        error = `Can toi thieu ${ruleValue} ky tu`;
+                        error = `Cần tối thiểu ${ruleValue} ký tự`;
                     }
                     break;
             }
