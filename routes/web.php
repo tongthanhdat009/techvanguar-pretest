@@ -14,6 +14,10 @@ Route::middleware('guest:client')->group(function () {
     Route::post('/register', [AuthPageController::class, 'register'])->name('register.store');
     Route::get('/login/client', [AuthPageController::class, 'showClientLogin'])->name('client.login');
     Route::post('/login/client', [AuthPageController::class, 'clientLogin'])->name('client.login.store');
+    Route::get('/forgot-password', [AuthPageController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password/send-otp', [AuthPageController::class, 'sendOtp'])->name('password.send-otp');
+    Route::post('/forgot-password/verify-otp', [AuthPageController::class, 'verifyOtp'])->name('password.verify-otp');
+    Route::post('/forgot-password/reset', [AuthPageController::class, 'resetPassword'])->name('password.reset');
 });
 
 Route::middleware('guest:admin')->group(function () {

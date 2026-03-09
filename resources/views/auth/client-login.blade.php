@@ -43,4 +43,9 @@
 
     {{-- Auth Links --}}
     @include('components.auth.auth-links', ['type' => 'client'])
+
+    {{-- Forgot Password Link --}}
+    <p class="auth-links client">
+        <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
+    </p>
 @endsection
