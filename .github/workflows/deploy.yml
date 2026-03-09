@@ -110,7 +110,7 @@ jobs:
             set -eu
             BASE_DIR="${{ secrets.VPS_APP_DIR }}"
             mkdir -p "$BASE_DIR/releases" "$BASE_DIR/shared/storage/app" "$BASE_DIR/shared/storage/framework/cache" "$BASE_DIR/shared/storage/framework/sessions" "$BASE_DIR/shared/storage/framework/views" "$BASE_DIR/shared/storage/logs"
-            mkdir -p "$BASE_DIR/shared/bootstrap/cache"
+            mkdir -p "$BASE_DIR/shared/bootstrap/cache" "$BASE_DIR/shared/vendor"
 
             if [ ! -f "$BASE_DIR/shared/.env" ]; then
               echo "❌ Missing shared env file at $BASE_DIR/shared/.env"
@@ -211,16 +211,31 @@ jobs:
             tar -xzf release.tar.gz
             rm -f release.tar.gz
 
-            # Setup symlinks to shared directories
-            rm -rf storage bootstrap/cache
+            # Setup symlinks to shared directories (except vendor - handle after composer)
+            rm -rf storage bootstrap/cache vendor
             ln -sfn "$SHARED_DIR/storage" "$RELEASE_DIR/storage"
             ln -sfn "$SHARED_DIR/bootstrap/cache" "$RELEASE_DIR/bootstrap/cache"
             ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
             echo "✓ Symlinks created"
 
-            # Install dependencies
-            echo "📚 Installing Composer dependencies..."
-            composer install --no-dev --optimize-autoloader --no-interaction
+            # Check if composer.lock has changed (only install if changed)
+            COMPOSER_LOCK_SHA256=$(sha256sum "$RELEASE_DIR/composer.lock" | cut -d' ' -f1)
+            COMPOSER_LOCK_CACHE="$SHARED_DIR/.composer_lock_sha256"
+
+            if [ "$COMPOSER_LOCK_SHA256" != "$(cat "$COMPOSER_LOCK_CACHE" 2>/dev/null)" ]; then
+              echo "📚 composer.lock changed, installing dependencies..."
+              cd "$RELEASE_DIR"
+              composer install --no-dev --optimize-autoloader --no-interaction
+              # Move vendor to shared folder
+              mv "$RELEASE_DIR/vendor" "$SHARED_DIR/vendor"
+              # Create symlink back to release
+              ln -s "$SHARED_DIR/vendor" "$RELEASE_DIR/vendor"
+              echo "$COMPOSER_LOCK_SHA256" > "$COMPOSER_LOCK_CACHE"
+              echo "✓ Dependencies installed and cached"
+            else
+              echo "⏭️  composer.lock unchanged, using cached vendor"
+              ln -s "$SHARED_DIR/vendor" "$RELEASE_DIR/vendor"
+            fi
 
             # Run Laravel commands
             echo "🔧 Running Laravel optimizations..."
