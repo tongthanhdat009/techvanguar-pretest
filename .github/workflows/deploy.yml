@@ -300,10 +300,10 @@ jobs:
           echo "⏳ Waiting for application to be ready..."
           sleep 5
 
-          # Health check endpoint
+          # Health check endpoint (use HTTP for now, change to HTTPS after SSL is setup)
           MAX_ATTEMPTS=10
           ATTEMPT=0
-          APP_URL="https://flashcard.jadt-airline.io.vn"
+          APP_URL="http://flashcard.jadt-airline.io.vn"
 
           while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" || echo "000")
