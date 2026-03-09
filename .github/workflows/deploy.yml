@@ -61,7 +61,9 @@ jobs:
 
       - name: Package release bundle
         run: |
-          tar \
+          # Create a temp directory and copy files there to avoid "file changed" error
+          mkdir -p /tmp/release-build
+          rsync -av \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='vendor' \
@@ -70,7 +72,13 @@ jobs:
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
-            -czf release.tar.gz .
+            /tmp/release-build/
+
+          cd /tmp/release-build
+          tar -czf release.tar.gz .
+          mv release.tar.gz $GITHUB_WORKSPACE/
+          cd $GITHUB_WORKSPACE
+          rm -rf /tmp/release-build
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
