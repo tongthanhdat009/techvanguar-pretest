@@ -1,4 +1,29 @@
-﻿{{-- Public Hero Section Component --}}
+﻿{{-- Announcement Marquee Banner --}}
+<div class="hero-marquee">
+    <div class="marquee-content">
+        <span class="marquee-item">🎉 Đăng ký ngay để nhận 50 XP khởi động!</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">📚 Hàng trăm deck công khai miễn phí</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">🔥 Duy trì streak để nhận thưởng hàng ngày</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">🧠 Học thông minh với Spaced Repetition</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">✨ Tạo flashcard không giới hạn</span>
+    </div>
+    <div class="marquee-content" aria-hidden="true">
+        <span class="marquee-item">🎉 Đăng ký ngay để nhận 50 XP khởi động!</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">📚 Hàng trăm deck công khai miễn phí</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">🔥 Duy trì streak để nhận thưởng hàng ngày</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">🧠 Học thông minh với Spaced Repetition</span>
+        <span class="marquee-separator">•</span>
+        <span class="marquee-item">✨ Tạo flashcard không giới hạn</span>
+    </div>
+</div>
+{{-- Public Hero Section Component --}}
 <section class="hero-section hero-gradient">
     <div class="blob blob-top"></div>
     <div class="blob blob-bottom"></div>
@@ -26,9 +51,8 @@
             </div>
 
             <div class="hero-proof-list">
-                <span>✓ Spaced repetition</span>
-                <span>✓ Deck cộng đồng</span>
-                <span>✓ Theo dõi tiến độ</span>
+                <span><span class="stat-number">{{ number_format($userCount ?? 0) }}</span> người dùng</span>
+                <span><span class="stat-number">{{ number_format($deckCount ?? 0) }}</span> deck công khai</span>
             </div>
         </div>
 

@@ -19,9 +19,15 @@ const FlipCards = {
     bindEvents() {
         // Click to flip
         this.cards.forEach(card => {
-            card.addEventListener('click', () => {
+            // Use mousedown/touchstart for more responsive flip on mobile/desktop
+            const flipCard = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 card.classList.toggle('flipped');
-            });
+            };
+
+            card.addEventListener('click', flipCard);
+            card.addEventListener('touchstart', flipCard, { passive: false });
 
             // Keyboard accessibility
             card.setAttribute('tabindex', '0');

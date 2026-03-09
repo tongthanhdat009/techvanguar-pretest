@@ -2,17 +2,27 @@
 <div admin-sidebar-open="{{ $isOpen ?? 'false' }}" id="admin-sidebar" class="admin-sidebar">
     <div class="flex flex-col h-full">
         <div class="p-6 border-b border-slate-700">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
+            <a href="{{ route('admin.overview') }}" class="flex items-center gap-3">
+                <span class="w-10 h-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full">
+                        <defs>
+                            <linearGradient id="adminLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#22D3EE" />
+                                <stop offset="100%" stop-color="#F97316" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="10" y="10" width="100" height="100" rx="22" fill="#FFF7ED" />
+                        <rect x="31" y="21" width="58" height="78" rx="8" fill="#FFFFFF" stroke="url(#adminLogoGradient)" stroke-width="4" />
+                        <line x1="41" y1="38" x2="79" y2="38" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="41" y1="52" x2="67" y2="52" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M66 58 L48 75 L58 75 L53 93 L73 69 L63 69 Z" fill="url(#adminLogoGradient)" />
                     </svg>
-                </div>
+                </span>
                 <div>
                     <span class="text-lg font-bold text-white">Admin Console</span>
                     <span class="text-xs text-slate-400 block">Flashcard operations</span>
                 </div>
-            </div>
+            </a>
         </div>
 
         <nav class="flex-1 p-4 space-y-1">
@@ -45,6 +55,7 @@
             </a>
         </nav>
 
+        {{-- Back to landing --}}
         <div class="p-4 border-t border-slate-700">
             <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

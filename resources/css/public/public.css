@@ -277,6 +277,49 @@ a {
     animation-delay: -5s;
 }
 
+/* Hero Marquee Announcement Banner */
+@keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.hero-marquee {
+    position: relative;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    display: flex;
+}
+
+.marquee-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    white-space: nowrap;
+    padding: 0.75rem 0;
+    animation: marquee-scroll 30s linear infinite;
+}
+
+.hero-marquee:hover .marquee-content {
+    animation-play-state: paused;
+}
+
+.marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.marquee-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+}
+
 .hero-content {
     position: relative;
     z-index: 1;
@@ -356,11 +399,19 @@ a {
 .hero-proof-list span {
     display: inline-flex;
     align-items: center;
+    gap: 0.4rem;
     padding: 0.68rem 0.92rem;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.12);
     color: white;
     font-size: 0.92rem;
+}
+
+.hero-proof-list .stat-number {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #fef08a;
+    text-shadow: 0 0 12px rgba(254, 240, 138, 0.5);
 }
 
 .hero-panel {
@@ -724,6 +775,16 @@ a {
 .flip-card {
     perspective: 1200px;
     cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.flip-card,
+.flip-card-inner,
+.flip-card-front,
+.flip-card-back {
+    pointer-events: auto;
 }
 
 .flip-card-inner {
@@ -734,7 +795,7 @@ a {
     transform-style: preserve-3d;
 }
 
-.flip-card:hover .flip-card-inner:not(.flipped) {
+.flip-card:not(.flipped):hover .flip-card-inner {
     transform: rotateY(-6deg) translateY(-3px);
 }
 
@@ -967,7 +1028,7 @@ a {
 
 .final-cta-section .description {
     max-width: 40rem;
-    margin: 0 auto 1.8rem;
+    margin: 0;
     color: rgba(255, 255, 255, 0.88);
 }
 

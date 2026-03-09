@@ -8,13 +8,21 @@
 // ───────────────────────────────────────────────────────────────────────────────
 
 const AdminSidebar = {
+    STORAGE_KEY: 'admin_sidebar_open',
+
     init() {
         this.sidebar = document.getElementById('admin-sidebar');
+        this.mainWrapper = document.getElementById('admin-main-wrapper');
         if (!this.sidebar) return;
 
         this.overlay = document.querySelector('[data-admin-sidebar-overlay]');
-        this.isOpen = this.sidebar.getAttribute('admin-sidebar-open') === 'true';
+
+        // Read state from localStorage, default to true if not set
+        const storedState = localStorage.getItem(this.STORAGE_KEY);
+        this.isOpen = storedState === null ? true : storedState === 'true';
+
         this.bindEvents();
+        this.updateUI();
     },
 
     bindEvents() {
@@ -24,18 +32,35 @@ const AdminSidebar = {
             toggleBtn.addEventListener('click', () => this.toggle());
         }
 
-        // Close on overlay click (mobile)
+        // Close on overlay click
         if (this.overlay) {
             this.overlay.addEventListener('click', () => this.close());
         }
 
-        // Close sidebar when clicking outside (desktop fallback)
+        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', (e) => {
-            if (window.innerWidth >= 1024) return; // skip on desktop
+            // Only apply this behavior on mobile
+            if (window.innerWidth >= 1024) return;
+
             if (this.isOpen &&
                 !this.sidebar.contains(e.target) &&
                 !e.target.closest('[data-admin-sidebar-toggle]')) {
                 this.close();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                // On desktop, show overlay when sidebar is closed
+                if (this.overlay && this.isOpen) {
+                    this.overlay.classList.add('hidden');
+                }
+            } else {
+                // On mobile, always hide overlay initially
+                if (this.overlay && !this.isOpen) {
+                    this.overlay.classList.add('hidden');
+                }
             }
         });
     },
@@ -46,14 +71,41 @@ const AdminSidebar = {
 
     open() {
         this.isOpen = true;
-        this.sidebar.setAttribute('admin-sidebar-open', 'true');
-        if (this.overlay) this.overlay.classList.remove('hidden');
+        this.saveState();
+        this.updateUI();
     },
 
     close() {
         this.isOpen = false;
-        this.sidebar.setAttribute('admin-sidebar-open', 'false');
-        if (this.overlay) this.overlay.classList.add('hidden');
+        this.saveState();
+        this.updateUI();
+    },
+
+    saveState() {
+        localStorage.setItem(this.STORAGE_KEY, this.isOpen ? 'true' : 'false');
+    },
+
+    updateUI() {
+        // Update sidebar attribute
+        this.sidebar.setAttribute('admin-sidebar-open', this.isOpen ? 'true' : 'false');
+
+        // Update main wrapper margin
+        if (this.mainWrapper) {
+            if (this.isOpen && window.innerWidth >= 1024) {
+                this.mainWrapper.classList.add('sidebar-open');
+            } else {
+                this.mainWrapper.classList.remove('sidebar-open');
+            }
+        }
+
+        // Update overlay visibility
+        if (this.overlay) {
+            if (this.isOpen && window.innerWidth < 1024) {
+                this.overlay.classList.remove('hidden');
+            } else {
+                this.overlay.classList.add('hidden');
+            }
+        }
     }
 };
 
@@ -157,6 +209,94 @@ const AdminConfirm = {
 };
 
 // ───────────────────────────────────────────────────────────────────────────────
+// Theme Toggle
+// ───────────────────────────────────────────────────────────────────────────────
+
+const ThemeToggle = {
+    STORAGE_KEY: 'theme',
+
+    init() {
+        // Check for saved theme preference or default to 'dark'
+        const savedTheme = localStorage.getItem(this.STORAGE_KEY);
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        this.darkMode = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+
+        this.applyTheme();
+
+        // Make functions globally available for Alpine.js
+        window.toggleTheme = () => this.toggle();
+        window.setTheme = (mode) => this.setTheme(mode);
+        window.darkMode = this.darkMode;
+        window.theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    },
+
+    toggle() {
+        this.darkMode = !this.darkMode;
+        window.darkMode = this.darkMode;
+        this.applyTheme();
+        this.saveTheme();
+    },
+
+    setTheme(mode) {
+        this.darkMode = mode === 'dark';
+        window.darkMode = this.darkMode;
+        window.theme = mode;
+        this.applyTheme();
+        this.saveTheme();
+    },
+
+    applyTheme() {
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    },
+
+    saveTheme() {
+        localStorage.setItem(this.STORAGE_KEY, this.darkMode ? 'dark' : 'light');
+    }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Language Manager
+// ───────────────────────────────────────────────────────────────────────────────
+
+const LanguageManager = {
+    STORAGE_KEY: 'language',
+    DEFAULT_LANG: 'vi',
+
+    init() {
+        // Get saved language or default to Vietnamese
+        const savedLang = localStorage.getItem(this.STORAGE_KEY) || this.DEFAULT_LANG;
+        this.currentLang = savedLang;
+
+        // Make functions globally available for Alpine.js
+        window.setLanguage = (lang) => this.setLanguage(lang);
+        window.language = this.currentLang;
+    },
+
+    setLanguage(lang) {
+        this.currentLang = lang;
+        window.language = lang;
+        localStorage.setItem(this.STORAGE_KEY, lang);
+
+        // Optionally reload page to apply language changes
+        // window.location.reload();
+
+        // Show toast notification
+        const langNames = { vi: 'Tiếng Việt', en: 'English' };
+        if (window.AdminToast) {
+            AdminToast.success(`Ngôn ngữ đã được thay đổi sang ${langNames[lang]}`);
+        }
+    },
+
+    getLanguage() {
+        return this.currentLang;
+    }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
 // Initialize
 // ───────────────────────────────────────────────────────────────────────────────
 
@@ -164,6 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
     AdminSidebar.init();
     AdminToast.init();
     AdminConfirm.init();
+    ThemeToggle.init();
+    LanguageManager.init();
 
     // Show flash messages as toasts
     const flashMessage = document.querySelector('[data-flash-message]');

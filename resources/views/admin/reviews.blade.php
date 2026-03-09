@@ -3,13 +3,94 @@
     'sidebar' => true,
 ])
 
+@php
+use Illuminate\Support\Str;
+@endphp
+
 @section('content')
 
 {{-- Page heading --}}
-<div class="mb-8">
+<div class="mb-6">
     <h1 class="text-2xl font-bold text-white">Quản lý đánh giá</h1>
     <p class="text-slate-400 mt-1 text-sm">{{ $reviews->total() }} đánh giá trong hệ thống</p>
 </div>
+
+{{-- Search & Filter Bar --}}
+<form method="GET" action="{{ route('admin.reviews') }}" class="admin-filter-bar">
+    <div class="admin-filter-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Tìm kiếm theo nội dung, bộ thẻ, ngườii dùng...">
+    </div>
+
+    <div class="admin-filter-group">
+        <select name="rating" class="admin-filter-select">
+            <option value="">Tất cả sao</option>
+            <option value="5" {{ ($filters['rating'] ?? '') === '5' ? 'selected' : '' }}>⭐⭐⭐⭐⭐ (5 sao)</option>
+            <option value="4" {{ ($filters['rating'] ?? '') === '4' ? 'selected' : '' }}>⭐⭐⭐⭐ (4 sao)</option>
+            <option value="3" {{ ($filters['rating'] ?? '') === '3' ? 'selected' : '' }}>⭐⭐⭐ (3 sao)</option>
+            <option value="2" {{ ($filters['rating'] ?? '') === '2' ? 'selected' : '' }}>⭐⭐ (2 sao)</option>
+            <option value="1" {{ ($filters['rating'] ?? '') === '1' ? 'selected' : '' }}>⭐ (1 sao)</option>
+        </select>
+
+        <select name="deck_id" class="admin-filter-select">
+            <option value="">Tất cả bộ thẻ</option>
+            @foreach($decks as $deck)
+                <option value="{{ $deck->id }}" {{ ($filters['deck_id'] ?? '') == $deck->id ? 'selected' : '' }}>
+                    {{ Str::limit($deck->title, 40) }}
+                </option>
+            @endforeach
+        </select>
+
+        <select name="per_page" class="admin-filter-select" onchange="this.form.submit()">
+            <option value="5" {{ ($filters['per_page'] ?? 5) == 5 ? 'selected' : '' }}>5 / trang</option>
+            <option value="10" {{ ($filters['per_page'] ?? 5) == 10 ? 'selected' : '' }}>10 / trang</option>
+            <option value="20" {{ ($filters['per_page'] ?? 5) == 20 ? 'selected' : '' }}>20 / trang</option>
+            <option value="50" {{ ($filters['per_page'] ?? 5) == 50 ? 'selected' : '' }}>50 / trang</option>
+        </select>
+
+        <button type="submit" class="admin-filter-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Lọc
+        </button>
+
+        @if(!empty($filters['search']) || !empty($filters['rating']) || !empty($filters['deck_id']))
+        <a href="{{ route('admin.reviews') }}" class="admin-filter-clear">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Xóa bộ lọc
+        </a>
+        @endif
+    </div>
+</form>
+
+{{-- Active filter badges --}}
+@if(!empty($filters['search']) || !empty($filters['rating']) || !empty($filters['deck_id']))
+<div class="admin-filter-badges">
+    @if(!empty($filters['search']))
+    <span class="admin-filter-badge">
+        Tìm: "{{ $filters['search'] }}"
+    </span>
+    @endif
+    @if(!empty($filters['rating']))
+    <span class="admin-filter-badge">
+        {{ $filters['rating'] }} sao
+    </span>
+    @endif
+    @if(!empty($filters['deck_id']))
+        @php $deck = $decks->firstWhere('id', $filters['deck_id']); @endphp
+        @if($deck)
+        <span class="admin-filter-badge">
+            Bộ thẻ: {{ Str::limit($deck->title, 30) }}
+        </span>
+        @endif
+    @endif
+</div>
+@endif
 
 {{-- Reviews Table --}}
 <div class="admin-card">
@@ -20,7 +101,9 @@
             </svg>
             Danh sách đánh giá
         </span>
+        @if($reviews->lastPage() > 1)
         <span class="text-slate-400 text-xs">Trang {{ $reviews->currentPage() }} / {{ $reviews->lastPage() }}</span>
+        @endif
     </div>
 
     @if($reviews->isEmpty())
@@ -163,33 +246,53 @@
         </div>{{-- end desktop table --}}
 
         {{-- Pagination --}}
-        @if($reviews->hasPages())
-            <div class="px-4 sm:px-6 py-4 border-t border-slate-700/50 flex items-center justify-between flex-wrap gap-3">
-                <span class="text-slate-500 text-sm">
-                    Hiển thị {{ $reviews->firstItem() }}–{{ $reviews->lastItem() }} / {{ $reviews->total() }}
-                </span>
-                <div class="flex items-center gap-1">
-                    @if($reviews->onFirstPage())
-                        <span class="px-3 py-1.5 rounded-lg text-slate-600 text-sm cursor-not-allowed">&larr;</span>
-                    @else
-                        <a href="{{ $reviews->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white text-sm transition-colors">&larr;</a>
-                    @endif
+        @if ($reviews->hasPages())
+        <nav class="admin-pagination" aria-label="Pagination">
+            <span class="admin-pagination-info">
+                Hiển thị {{ $reviews->firstItem() }}-{{ $reviews->lastItem() }} của {{ $reviews->total() }} kết quả
+            </span>
 
-                    @foreach($reviews->getUrlRange(max(1, $reviews->currentPage()-2), min($reviews->lastPage(), $reviews->currentPage()+2)) as $page => $url)
-                        @if($page == $reviews->currentPage())
-                            <span class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-medium">{{ $page }}</span>
-                        @else
-                            <a href="{{ $url }}" class="px-3 py-1.5 rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white text-sm transition-colors">{{ $page }}</a>
-                        @endif
-                    @endforeach
+            {{-- Previous page link --}}
+            @if ($reviews->onFirstPage())
+            <span class="disabled">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            @else
+            <a href="{{ $reviews->previousPageUrl() }}" aria-label="Previous page">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            @endif
 
-                    @if($reviews->hasMorePages())
-                        <a href="{{ $reviews->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white text-sm transition-colors">&rarr;</a>
-                    @else
-                        <span class="px-3 py-1.5 rounded-lg text-slate-600 text-sm cursor-not-allowed">&rarr;</span>
-                    @endif
-                </div>
-            </div>
+            {{-- Pagination links --}}
+            @foreach ($reviews->getUrlRange(1, $reviews->lastPage()) as $page => $url)
+            @if ($page == $reviews->currentPage())
+            <span class="active">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $reviews->lastPage() || ($page >= $reviews->currentPage() - 2 && $page <= $reviews->currentPage() + 2))
+            <a href="{{ $url }}">{{ $page }}</a>
+            @elseif ($page == $reviews->currentPage() - 3 || $page == $reviews->currentPage() + 3)
+            <span>...</span>
+            @endif
+            @endforeach
+
+            {{-- Next page link --}}
+            @if ($reviews->hasMorePages())
+            <a href="{{ $reviews->nextPageUrl() }}" aria-label="Next page">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            @else
+            <span class="disabled">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            @endif
+        </nav>
         @endif
     @endif
 </div>

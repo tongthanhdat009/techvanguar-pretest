@@ -27,10 +27,6 @@ Route::middleware('guest:admin')->group(function () {
     Route::post('/login/admin', [AuthPageController::class, 'adminLogin'])->name('admin.login.store');
 });
 
-// Logout
-Route::match(['get', 'post'], '/logout', [AuthPageController::class, 'logout'])->name('logout');
-Route::match(['get', 'post'], '/admin/logout', [AuthPageController::class, 'logout'])->name('admin.logout');
-
 // Client Portal
 Route::middleware('auth:client')
     ->prefix('client')
@@ -56,7 +52,9 @@ Route::middleware('auth:client')
         Route::put('/profile', [ClientPortalController::class, 'updateProfile'])->name('profile.update');
         Route::get('/decks/{deck}/export', [ClientPortalController::class, 'exportDeck'])->name('decks.export');
         Route::post('/decks/{deck}/import', [ClientPortalController::class, 'importDeck'])->name('decks.import');
-        Route::match(['get', 'post'], '/logout', [AuthPageController::class, 'logout'])->name('logout');
+        Route::post('/logout', [AuthPageController::class, 'logout'])
+            ->defaults('guard', 'client')
+            ->name('logout');
     });
 
 // Admin Portal
@@ -88,4 +86,14 @@ Route::middleware('auth:admin')
         Route::delete('/flashcards/{flashcard}', [AdminDashboardController::class, 'destroyFlashcard'])->name('flashcards.destroy');
         Route::get('/decks/{deck}/export', [AdminDashboardController::class, 'exportDeck'])->name('decks.export');
         Route::post('/decks/{deck}/import', [AdminDashboardController::class, 'importDeck'])->name('decks.import');
+
+        // Profile, Account, Settings
+        Route::get('/profile', [AdminDashboardController::class, 'profile'])->name('profile');
+        Route::put('/profile', [AdminDashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::get('/account', [AdminDashboardController::class, 'account'])->name('account');
+        Route::put('/account/password', [AdminDashboardController::class, 'updatePassword'])->name('account.password');
+        Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('settings');
+        Route::post('/logout', [AuthPageController::class, 'logout'])
+            ->defaults('guard', 'admin')
+            ->name('logout');
     });

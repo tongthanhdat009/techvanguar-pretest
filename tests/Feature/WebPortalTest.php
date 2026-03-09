@@ -88,15 +88,41 @@ class WebPortalTest extends TestCase
         $response->assertSee('Gợi ý từ cộng đồng');
     }
 
-    public function test_client_logout_accepts_get_requests_and_redirects_to_login(): void
+    public function test_client_logout_redirects_to_client_login(): void
     {
         /** @var User $client */
         $client = User::factory()->create();
 
-        $response = $this->actingAs($client, 'client')->get('/logout');
+        $response = $this->actingAs($client, 'client')->post('/client/logout');
 
         $response->assertRedirect(route('client.login'));
         $this->assertGuest('client');
+    }
+
+    public function test_admin_portal_renders_admin_logout_route(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        $response = $this->actingAs($admin, 'admin')->get('/admin');
+
+        $response->assertOk();
+        $response->assertSee(route('admin.logout'), false);
+    }
+
+    public function test_admin_logout_redirects_to_admin_login(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        $response = $this->actingAs($admin, 'admin')->post('/admin/logout');
+
+        $response->assertRedirect(route('admin.login'));
+        $this->assertGuest('admin');
     }
 
     public function test_new_client_dashboard_does_not_show_due_cards_from_public_decks(): void

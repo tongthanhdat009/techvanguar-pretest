@@ -6,13 +6,91 @@
 @section('content')
 
 {{-- Page heading --}}
-<div class="mb-8 flex items-center justify-between flex-wrap gap-4">
+<div class="mb-6 flex items-center justify-between flex-wrap gap-4">
     <div>
         <h1 class="text-2xl font-bold text-white">Quản lý bộ thẻ</h1>
-        <p class="text-slate-400 mt-1 text-sm">{{ $decks->count() }} bộ thẻ trong hệ thống</p>
+        <p class="text-slate-400 mt-1 text-sm">{{ $decks->total() }} bộ thẻ trong hệ thống</p>
     </div>
     <a href="{{ route('admin.decks.create') }}" class="btn-primary">+ Thêm bộ thẻ</a>
 </div>
+
+{{-- Search & Filter Bar --}}
+<form method="GET" action="{{ route('admin.decks') }}" class="admin-filter-bar">
+    <div class="admin-filter-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Tìm kiếm theo tên, mô tả...">
+    </div>
+
+    <div class="admin-filter-group">
+        <select name="visibility" class="admin-filter-select">
+            <option value="">Tất cả chế độ</option>
+            <option value="public" {{ ($filters['visibility'] ?? '') === 'public' ? 'selected' : '' }}>Công khai</option>
+            <option value="private" {{ ($filters['visibility'] ?? '') === 'private' ? 'selected' : '' }}>Riêng tư</option>
+        </select>
+
+        <select name="is_active" class="admin-filter-select">
+            <option value="">Tất cả trạng thái</option>
+            <option value="1" {{ ($filters['is_active'] ?? '') === '1' ? 'selected' : '' }}>Đang hoạt động</option>
+            <option value="0" {{ ($filters['is_active'] ?? '') === '0' ? 'selected' : '' }}>Đã tắt</option>
+        </select>
+
+        <select name="owner_id" class="admin-filter-select">
+            <option value="">Tất cả chủ sở hữu</option>
+            @foreach($users as $user)
+                <option value="{{ $user->id }}" {{ ($filters['owner_id'] ?? '') == $user->id ? 'selected' : '' }}>
+                    {{ $user->name }} ({{ $user->role === 'admin' ? 'Admin' : 'Client' }})
+                </option>
+            @endforeach
+        </select>
+
+        <select name="per_page" class="admin-filter-select" onchange="this.form.submit()">
+            <option value="5" {{ ($filters['per_page'] ?? 5) == 5 ? 'selected' : '' }}>5 / trang</option>
+            <option value="10" {{ ($filters['per_page'] ?? 5) == 10 ? 'selected' : '' }}>10 / trang</option>
+            <option value="20" {{ ($filters['per_page'] ?? 5) == 20 ? 'selected' : '' }}>20 / trang</option>
+            <option value="50" {{ ($filters['per_page'] ?? 5) == 50 ? 'selected' : '' }}>50 / trang</option>
+        </select>
+
+        @if(!empty($filters['search']) || !empty($filters['visibility']) || !empty($filters['is_active']) || !empty($filters['owner_id']))
+        <a href="{{ route('admin.decks') }}" class="admin-filter-clear">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Xóa bộ lọc
+        </a>
+        @endif
+    </div>
+</form>
+
+{{-- Active filter badges --}}
+@if(!empty($filters['search']) || !empty($filters['visibility']) || !empty($filters['is_active']) || !empty($filters['owner_id']))
+<div class="admin-filter-badges">
+    @if(!empty($filters['search']))
+    <span class="admin-filter-badge">
+        Tìm: "{{ $filters['search'] }}"
+    </span>
+    @endif
+    @if(!empty($filters['visibility']))
+    <span class="admin-filter-badge">
+        Chế độ: {{ $filters['visibility'] === 'public' ? 'Công khai' : 'Riêng tư' }}
+    </span>
+    @endif
+    @if(!empty($filters['is_active']))
+    <span class="admin-filter-badge">
+        Trạng thái: {{ $filters['is_active'] === '1' ? 'Đang hoạt động' : 'Đã tắt' }}
+    </span>
+    @endif
+    @if(!empty($filters['owner_id']))
+        @php $owner = $users->firstWhere('id', $filters['owner_id']); @endphp
+        @if($owner)
+        <span class="admin-filter-badge">
+            Chủ sở hữu: {{ $owner->name }}
+        </span>
+        @endif
+    @endif
+</div>
+@endif
 
 {{-- Decks Table --}}
 <div class="admin-card">
@@ -212,6 +290,56 @@
                 </tbody>
             </table>
         </div>{{-- end desktop table --}}
+
+        {{-- Pagination --}}
+        @if ($decks->hasPages())
+        <nav class="admin-pagination" aria-label="Pagination">
+            <span class="admin-pagination-info">
+                Hiển thị {{ $decks->firstItem() }}-{{ $decks->lastItem() }} của {{ $decks->total() }} kết quả
+            </span>
+
+            {{-- Previous page link --}}
+            @if ($decks->onFirstPage())
+            <span class="disabled">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            @else
+            <a href="{{ $decks->previousPageUrl() }}" aria-label="Previous page">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            @endif
+
+            {{-- Pagination links --}}
+            @foreach ($decks->getUrlRange(1, $decks->lastPage()) as $page => $url)
+            @if ($page == $decks->currentPage())
+            <span class="active">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $decks->lastPage() || ($page >= $decks->currentPage() - 2 && $page <= $decks->currentPage() + 2))
+            <a href="{{ $url }}">{{ $page }}</a>
+            @elseif ($page == $decks->currentPage() - 3 || $page == $decks->currentPage() + 3)
+            <span>...</span>
+            @endif
+            @endforeach
+
+            {{-- Next page link --}}
+            @if ($decks->hasMorePages())
+            <a href="{{ $decks->nextPageUrl() }}" aria-label="Next page">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            @else
+            <span class="disabled">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            @endif
+        </nav>
+        @endif
     @endif
 </div>
 

@@ -42,14 +42,13 @@
                     <a href="{{ auth()->user()->role === 'admin' ? route('admin.overview') : route('client.dashboard') }}" class="public-btn public-btn-primary">
                         Dashboard
                     </a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                    <form method="POST" action="{{ auth()->user()->role === 'admin' ? route('admin.logout') : route('client.logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="public-btn public-btn-ghost">Đăng xuất</button>
                     </form>
                 </div>
             @else
                 <div class="public-nav-actions desktop-only">
-                    <a href="{{ route('admin.login') }}" class="public-btn public-btn-ghost public-btn-ghost-muted">Admin</a>
                     <a href="{{ route('client.login') }}" class="public-btn public-btn-ghost">Đăng nhập</a>
                     <a href="{{ route('register') }}" class="public-btn public-btn-primary">Dùng miễn phí</a>
                 </div>
@@ -89,7 +88,7 @@
                         <a href="{{ auth()->user()->role === 'admin' ? route('admin.overview') : route('client.dashboard') }}" class="public-btn public-btn-primary">
                             Dashboard
                         </a>
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ auth()->user()->role === 'admin' ? route('admin.logout') : route('client.logout') }}">
                             @csrf
                             <button type="submit" class="public-btn public-btn-ghost">Đăng xuất</button>
                         </form>
@@ -97,7 +96,6 @@
                 @else
                     <div class="public-mobile-actions">
                         <a href="{{ route('client.login') }}" class="public-btn public-btn-ghost">Đăng nhập</a>
-                        <a href="{{ route('admin.login') }}" class="public-btn public-btn-ghost public-btn-ghost-muted">Admin</a>
                         <a href="{{ route('register') }}" class="public-btn public-btn-primary">Dùng miễn phí</a>
                     </div>
                 @endauth

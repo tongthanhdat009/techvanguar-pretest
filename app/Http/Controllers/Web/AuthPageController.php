@@ -23,6 +23,9 @@ class AuthPageController extends Controller
 {
     public function landing(): View
     {
+        $userCount = User::query()->where('role', User::ROLE_CLIENT)->count();
+        $deckCount = Deck::query()->public()->count();
+
         return view('public.landing', [
             'publicDecks' => Deck::query()
                 ->active()
@@ -38,6 +41,8 @@ class AuthPageController extends Controller
                 ->take(3)
                 ->get(),
             'currentUser' => Auth::user(),
+            'userCount' => $userCount,
+            'deckCount' => $deckCount,
         ]);
     }
 
@@ -143,9 +148,20 @@ class AuthPageController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        // Check if user exists and is banned before attempting authentication
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->isBanned()) {
+            return back()
+                ->withErrors([
+                    'login' => 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
+                ])
+                ->onlyInput('email');
+        }
+
         if (!Auth::guard('client')->attempt($credentials)) {
             return back()->withErrors([
-                'login' => 'The provided credentials are incorrect.',
+                'login' => 'Email hoặc mật khẩu không chính xác.',
             ])->onlyInput('email');
         }
 
@@ -160,9 +176,20 @@ class AuthPageController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        // Check if user exists and is banned before attempting authentication
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->isBanned()) {
+            return back()
+                ->withErrors([
+                    'login' => 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
+                ])
+                ->onlyInput('email');
+        }
+
         if (!Auth::guard('admin')->attempt($credentials)) {
             return back()->withErrors([
-                'login' => 'The provided credentials are incorrect.',
+                'login' => 'Email hoặc mật khẩu không chính xác.',
             ])->onlyInput('email');
         }
 
@@ -172,8 +199,9 @@ class AuthPageController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
-        // Determine which guard to logout from based on route name
-        $guard = $request->route()->named('admin.*') ? 'admin' : 'client';
+        $guard = $request->route('guard');
+
+        abort_unless(in_array($guard, ['admin', 'client'], true), 404);
 
         Auth::guard($guard)->logout();
 

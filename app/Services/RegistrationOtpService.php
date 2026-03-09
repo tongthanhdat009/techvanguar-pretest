@@ -20,7 +20,19 @@ class RegistrationOtpService
 
     public function sendOtp(string $name, string $email): array
     {
-        if (User::query()->where('email', $email)->exists()) {
+        $existingUser = User::query()->where('email', $email)->first();
+
+        if ($existingUser) {
+            // Check if user is banned
+            if ($existingUser->isBanned()) {
+                return [
+                    'success' => false,
+                    'code' => 'account_banned',
+                    'message' => 'Tài khoản liên kết với email này đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là sai lầm.',
+                ];
+            }
+
+            // User exists but is active
             return [
                 'success' => false,
                 'code' => 'email_exists',
