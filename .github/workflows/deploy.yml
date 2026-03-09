@@ -126,8 +126,17 @@ jobs:
               exit 1
             fi
 
+            # Ensure Composer is installed
+            if ! command -v composer >/dev/null 2>&1; then
+              echo "📦 Installing Composer..."
+              php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+              php composer-setup.php --quiet --install-dir=/usr/local/bin --filename=composer
+              php -r "unlink('composer-setup.php');"
+            fi
+
             echo "✓ Remote directories prepared"
             echo "✓ PHP-FPM is installed"
+            echo "✓ Composer is installed"
 
       - name: Upload release archive
         uses: burnett01/rsync-deployments@v8
