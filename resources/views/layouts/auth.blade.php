@@ -15,38 +15,23 @@
 
     @php
         $authType = $type ?? 'client';
+        $typingTexts = $authType === 'admin'
+            ? '["Đăng nhập admin.", "Vào khu vực quản trị."]'
+            : '["Quay lại nhịp học.", "Tiếp tục học tập.", "Đúng tiến độ của bạn."]';
         $showcase = $authType === 'admin'
             ? [
                 'badge' => 'Admin access',
-                'title' => 'Bảng điều khiển quản trị rõ ràng, an toàn và tập trung.',
-                'copy' => 'Theo dõi hoạt động người dùng, chất lượng nội dung và sức khỏe nền tảng trong một không gian làm việc gọn gàng.',
-                'pills' => ['User oversight', 'Deck moderation', 'System visibility'],
-                'cards' => [
-                    ['label' => 'Control', 'body' => 'Điều phối người dùng, deck và review trong cùng một luồng quản trị.'],
-                    ['label' => 'Visibility', 'body' => 'Nắm nhanh các chỉ số hệ thống và vùng cần can thiệp.'],
-                ],
-                'timeline' => [
-                    'Đăng nhập bằng guard admin riêng biệt.',
-                    'Kiểm tra nội dung, review và trạng thái người dùng.',
-                    'Giữ hệ thống sạch, rõ và nhất quán.',
-                ],
+                'title' => '<span class="typing-text" data-typing=\'' . $typingTexts . '\'></span>',
+                'copy' => 'Truy cập nhanh phần kiểm duyệt, người dùng và nội dung.',
                 'panelKicker' => 'Admin portal',
+                'panelCopy' => 'Đăng nhập để tiếp tục quản trị hệ thống.',
             ]
             : [
                 'badge' => 'Client access',
-                'title' => 'Biến việc ôn tập mỗi ngày thành một hệ thống học tập bền vững.',
-                'copy' => 'Tạo deck nhanh, theo dõi streak, nhận lịch ôn tập thông minh và giữ nhịp học đều đặn trên mọi thiết bị.',
-                'pills' => ['Spaced repetition', 'Public decks', 'Daily rhythm'],
-                'cards' => [
-                    ['label' => 'Focus', 'body' => 'Ưu tiên đúng thẻ cần học thay vì ôn tập dàn trải.'],
-                    ['label' => 'Rhythm', 'body' => 'Duy trì streak, XP và tiến độ ghi nhớ bằng các nhịp học ngắn.'],
-                ],
-                'timeline' => [
-                    'Tạo tài khoản học viên trong vài bước ngắn.',
-                    'Bắt đầu từ deck riêng hoặc sao chép deck công khai.',
-                    'Ôn theo lịch thay vì học theo cảm hứng.',
-                ],
+                'title' => '<span class="typing-text" data-typing=\'' . $typingTexts . '\'></span>',
+                'copy' => 'Mở lại deck, lịch ôn tập và tiến độ đang có chỉ trong vài giây.',
                 'panelKicker' => 'Learning portal',
+                'panelCopy' => 'Đăng nhập hoặc tạo tài khoản để tiếp tục học.',
             ];
     @endphp
 
@@ -56,32 +41,18 @@
                 <div class="auth-showcase-badge">{{ $showcase['badge'] }}</div>
                 <span class="auth-showcase-brand">Flashcard Learning Hub</span>
             </div>
-            <h2 class="auth-showcase-title">{{ $showcase['title'] }}</h2>
+
+            <div class="auth-floating-logo">
+                <img src="{{ asset('assets/icon-logo.svg') }}" alt="Flashcard Learning Hub" class="floating-logo">
+                <div class="floating-particles">
+                    <span class="particle particle-1"></span>
+                    <span class="particle particle-2"></span>
+                    <span class="particle particle-3"></span>
+                </div>
+            </div>
+
+            <h2 class="auth-showcase-title">{!! $showcase['title'] !!}</h2>
             <p class="auth-showcase-copy">{{ $showcase['copy'] }}</p>
-
-            <div class="auth-showcase-pills" aria-label="Điểm nhấn">
-                @foreach($showcase['pills'] as $pill)
-                    <span>{{ $pill }}</span>
-                @endforeach
-            </div>
-
-            <div class="auth-showcase-grid">
-                @foreach($showcase['cards'] as $card)
-                    <div class="auth-showcase-card">
-                        <span class="auth-showcase-metric">{{ $card['label'] }}</span>
-                        <p>{{ $card['body'] }}</p>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="auth-showcase-timeline" aria-label="Quy trình">
-                @foreach($showcase['timeline'] as $index => $item)
-                    <div class="auth-showcase-step">
-                        <span>{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                        <p>{{ $item }}</p>
-                    </div>
-                @endforeach
-            </div>
 
             <div class="auth-showcase-footer">
                 <a href="{{ route('home') }}">Trang chủ</a>
@@ -96,7 +67,7 @@
             <div class="auth-panel-shell {{ $type ?? 'client' }}">
                 <div class="auth-panel-heading">
                     <span class="auth-panel-kicker">{{ $showcase['panelKicker'] }}</span>
-                    <p class="auth-panel-copy">Đăng nhập hoặc tạo tài khoản để tiếp tục trong cùng một không gian học tập được tổ chức rõ ràng.</p>
+                    <p class="auth-panel-copy">{{ $showcase['panelCopy'] }}</p>
                 </div>
 
                 <div class="auth-box {{ $type ?? 'client' }}">

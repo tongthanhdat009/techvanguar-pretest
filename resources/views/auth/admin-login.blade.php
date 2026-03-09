@@ -8,8 +8,8 @@
 
     @include('components.auth.auth-logo', [
         'type' => 'admin',
-        'title' => 'Đăng nhập quản trị',
-        'subtitle' => 'Chỉ dành cho quản trị viên hệ thống.'
+        'title' => 'Đăng nhập admin',
+        'subtitle' => 'Truy cập khu vực quản trị.'
     ])
 
     {{-- Error Alert --}}
@@ -25,10 +25,10 @@
         'action' => route('admin.login.store'),
         'method' => 'POST',
         'fields' => [
-            ['name' => 'email', 'type' => 'email', 'label' => 'Email', 'autocomplete' => 'email', 'placeholder' => 'admin@example.com', 'hint' => 'Đăng nhập bằng tài khoản có quyền quản trị hệ thống.', 'autofocus' => true, 'required' => true],
-            ['name' => 'password', 'type' => 'password', 'label' => 'Mật khẩu', 'autocomplete' => 'current-password', 'placeholder' => '••••••••', 'hint' => 'Guard admin dùng session riêng với client portal.', 'required' => true]
+            ['name' => 'email', 'type' => 'email', 'label' => 'Email', 'autocomplete' => 'email', 'placeholder' => 'admin@example.com', 'autofocus' => true, 'required' => true],
+            ['name' => 'password', 'type' => 'password', 'label' => 'Mật khẩu', 'autocomplete' => 'current-password', 'placeholder' => '••••••••', 'required' => true]
         ],
-        'submitText' => 'Vào Admin Portal',
+        'submitText' => 'Đăng nhập',
         'submitLoadingText' => 'Đang xác thực...',
         'type' => 'admin'
     ])

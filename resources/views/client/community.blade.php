@@ -13,6 +13,92 @@
             </div>
         </div>
 
+        {{-- Search & Filter Section --}}
+        <div class="community-search-section">
+            <form method="GET" action="{{ route('client.community') }}" class="community-search-form">
+                <div class="community-search-main">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                        <input type="text" name="search" value="{{ $filters['search'] }}"
+                               placeholder="Tìm kiếm theo tên hoặc mô tả..."
+                               class="community-search-input">
+                        @if($filters['search'])
+                            <a href="{{ route('client.community') }}" class="search-clear">✕</a>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="community-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Danh mục</label>
+                        <select name="category" class="filter-select">
+                            <option value="">Tất cả</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category }}" {{ $filters['category'] === $category ? 'selected' : '' }}>
+                                    {{ $category }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Tags</label>
+                        <select name="tag" class="filter-select">
+                            <option value="">Tất cả</option>
+                            @foreach($allTags as $tag)
+                                <option value="{{ $tag }}" {{ $filters['tag'] === $tag ? 'selected' : '' }}>
+                                    {{ $tag }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Sắp xếp</label>
+                        <select name="sort" class="filter-select">
+                            <option value="latest" {{ $filters['sort'] === 'latest' ? 'selected' : '' }}>Mới nhất</option>
+                            <option value="oldest" {{ $filters['sort'] === 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
+                            <option value="rating" {{ $filters['sort'] === 'rating' ? 'selected' : '' }}>Đánh giá cao</option>
+                            <option value="cards" {{ $filters['sort'] === 'cards' ? 'selected' : '' }}>Nhiều thẻ nhất</option>
+                            <option value="popular" {{ $filters['sort'] === 'popular' ? 'selected' : '' }}>Phổ biến nhất</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="filter-apply-btn">Áp dụng</button>
+                    @if($filters['search'] || $filters['category'] || $filters['tag'] || $filters['sort'] !== 'latest')
+                        <a href="{{ route('client.community') }}" class="filter-reset-btn">Xóa bộ lọc</a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+        {{-- Active Filters Display --}}
+        @if($filters['search'] || $filters['category'] || $filters['tag'])
+            <div class="active-filters">
+                <span class="active-filters-label">Đang lọc:</span>
+                @if($filters['search'])
+                    <span class="active-filter-tag">
+                        🔍 "{{ $filters['search'] }}"
+                        <a href="{{ request()->fullUrlWithQuery(['search' => null, 'page' => null]) }}" class="filter-remove">×</a>
+                    </span>
+                @endif
+                @if($filters['category'])
+                    <span class="active-filter-tag">
+                        📁 {{ $filters['category'] }}
+                        <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="filter-remove">×</a>
+                    </span>
+                @endif
+                @if($filters['tag'])
+                    <span class="active-filter-tag">
+                        🏷️ {{ $filters['tag'] }}
+                        <a href="{{ request()->fullUrlWithQuery(['tag' => null, 'page' => null]) }}" class="filter-remove">×</a>
+                    </span>
+                @endif
+            </div>
+        @endif
+
         <div class="client-page-highlights">
             <div class="client-page-highlight">
                 <strong>{{ $communityDecks->total() }}</strong>

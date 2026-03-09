@@ -30,7 +30,7 @@
 
     @if($title)
         <h1 class="auth-title {{ $type === 'admin' ? 'admin' : 'client' }}">
-            {{ $title }}
+            {!! $title !!}
         </h1>
     @endif
 

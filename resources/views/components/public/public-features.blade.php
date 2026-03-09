@@ -79,6 +79,30 @@
                 <p class="feature-card-copy">Cả landing, dashboard học viên và khu vực admin đều dùng cùng một ngôn ngữ hình ảnh nhất quán và chuyên nghiệp.</p>
                 <span class="feature-card-tag">Clear operations</span>
             </div>
+
+            {{-- Feature 7 --}}
+            <div class="feature-card">
+                <div class="feature-card-icon icon-teal">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M3.75 5.25h16.5M3.75 12h16.5m-16.5 6.75h10.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="feature-card-title">Luồng học có thứ tự</h3>
+                <p class="feature-card-copy">Từ dashboard, hàng chờ đến study session đều giữ cùng một logic ưu tiên để người học biết bước tiếp theo là gì.</p>
+                <span class="feature-card-tag">Structured flow</span>
+            </div>
+
+            {{-- Feature 8 --}}
+            <div class="feature-card">
+                <div class="feature-card-icon icon-blue">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M7.5 3.75h6.75A2.25 2.25 0 0 1 16.5 6v12a2.25 2.25 0 0 1-2.25 2.25H7.5A2.25 2.25 0 0 1 5.25 18V6A2.25 2.25 0 0 1 7.5 3.75ZM9 17.25h3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="feature-card-title">Sẵn sàng trên nhiều thiết bị</h3>
+                <p class="feature-card-copy">Landing page, portal học viên và khu vực thao tác đều được bố trí để dùng ổn trên màn hình lớn lẫn thiết bị di động.</p>
+                <span class="feature-card-tag">Responsive workspace</span>
+            </div>
         </div>
     </div>
 </section>

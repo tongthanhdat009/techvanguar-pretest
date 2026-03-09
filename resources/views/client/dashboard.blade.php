@@ -63,6 +63,73 @@
     </section>
 
     @include('components.client.progress-summary', ['summary' => $progressSummary])
+    {{-- Study Activity Chart --}}
+    <section class="dashboard-grid" style="margin-bottom: 1rem;">
+            {{-- Stats Card --}}
+        <article class="dashboard-card" style="margin-bottom: 1rem;">
+            <div class="dashboard-card-header">
+                <div>
+                    <span class="dashboard-card-kicker">📊 Phiên hôm nay</span>
+                    <h2>thống kê học tập</h2>
+                </div>
+            </div>
+            <div class="session-stats-grid">
+                <div class="session-stat-item session-stat-correct">
+                    <div class="session-stat-value">{{ $dashboardSummary['session_stats']['correct'] }}</div>
+                    <div class="session-stat-label">Chính xác</div>
+                </div>
+                <div class="session-stat-item session-stat-learning">
+                    <div class="session-stat-value">{{ $dashboardSummary['session_stats']['learning'] }}</div>
+                    <div class="session-stat-label">Đang học</div>
+                </div>
+                <div class="session-stat-item session-stat-new">
+                    <div class="session-stat-value">{{ $dashboardSummary['session_stats']['new'] }}</div>
+                    <div class="session-stat-label">Mới</div>
+                </div>
+                <div class="session-stat-item session-stat-accuracy">
+                    <div class="session-stat-value">{{ $dashboardSummary['session_stats']['accuracy'] }}%</div>
+                    <div class="session-stat-label">Độ chính xác</div>
+                </div>
+            </div>
+            @if($dashboardSummary['session_stats']['total'] > 0)
+                <div class="session-progress">
+                    <progress class="session-accuracy-bar" max="100" value="{{ $dashboardSummary['session_stats']['accuracy'] }}"></progress>
+                    <p class="session-progress-text">Đã hoàn thành {{ $dashboardSummary['session_stats']['total'] }} thẻ hôm nay</p>
+                </div>
+            @else
+                <p class="dashboard-empty" style="margin: 0;">Chưa có hoạt động học tập hôm nay.</p>
+            @endif
+        </article>
+
+        <article class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-header">
+                <div>
+                    <span class="dashboard-card-kicker">📈 Hoạt động học tập</span>
+                    <h2>{{ $dashboardSummary['study_chart']['total'] }} thẻ trong 7 ngày qua</h2>
+                </div>
+            </div>
+            <div class="study-chart-container">
+                <div class="study-chart-bars">
+                    @foreach($dashboardSummary['study_chart']['data'] as $item)
+                        <div class="study-bar-wrapper">
+                            <div class="study-bar-container">
+                                @if($item['count'] > 0)
+                                    <div class="study-bar {{ $item['is_today'] ? 'today' : '' }}"
+                                         style="height: {{ ($item['count'] / $dashboardSummary['study_chart']['max']) * 100 }}%">
+                                        <span class="study-bar-value">{{ $item['count'] }}</span>
+                                    </div>
+                                @else
+                                    <div class="study-bar study-bar-empty {{ $item['is_today'] ? 'today' : '' }}"></div>
+                                @endif
+                            </div>
+                            <span class="study-bar-label {{ $item['is_today'] ? 'today' : '' }}">{{ $item['label'] }}</span>
+                            <span class="study-bar-date">{{ $item['date'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </article>
+    </section>
 
     <section class="dashboard-grid">
         <article class="dashboard-card dashboard-card-wide">

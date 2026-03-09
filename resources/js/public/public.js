@@ -277,6 +277,64 @@ const MobileMenu = {
 };
 
 // ───────────────────────────────────────────────────────────────────────────────
+// Typing Animation
+// ───────────────────────────────────────────────────────────────────────────────
+
+const TypingAnimation = {
+    init() {
+        this.elements = document.querySelectorAll('[data-typing]');
+        if (this.elements.length === 0) return;
+
+        this.elements.forEach(el => this.type(el));
+    },
+
+    type(element) {
+        const texts = JSON.parse(element.dataset.typing || '[]');
+        if (!texts.length) return;
+
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 80;
+        let deletingSpeed = 40;
+        let pauseDuration = 1500;
+        let pauseBetweenTexts = 500;
+
+        const type = () => {
+            const currentText = texts[textIndex];
+
+            if (isDeleting) {
+                element.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = deletingSpeed;
+            } else {
+                element.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 80 + Math.random() * 40; // Random typing speed
+            }
+
+            if (!isDeleting && charIndex === currentText.length) {
+                // Finished typing current text
+                isDeleting = true;
+                typingSpeed = pauseDuration;
+                element.classList.add('completed');
+            } else if (isDeleting && charIndex === 0) {
+                // Finished deleting
+                isDeleting = false;
+                textIndex = (textIndex + 1) % texts.length;
+                typingSpeed = pauseBetweenTexts;
+                element.classList.remove('completed');
+            }
+
+            setTimeout(type, typingSpeed);
+        };
+
+        // Start typing after a small delay
+        setTimeout(type, 500);
+    }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
 // Initialize
 // ───────────────────────────────────────────────────────────────────────────────
 
@@ -288,4 +346,5 @@ document.addEventListener('DOMContentLoaded', () => {
     FeatureCards.init();
     CtaButton.init();
     MobileMenu.init();
+    TypingAnimation.init();
 });

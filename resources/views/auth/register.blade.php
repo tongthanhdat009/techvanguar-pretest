@@ -23,8 +23,8 @@
 
     @include('components.auth.auth-logo', [
         'type' => 'client',
-        'title' => 'Tạo tài khoản mới',
-        'subtitle' => 'Bắt đầu bằng họ tên và email, xác thực OTP rồi mới thiết lập mật khẩu đăng nhập.'
+        'title' => 'Tạo tài khoản',
+        'subtitle' => 'Xác thực email rồi đặt mật khẩu.'
     ])
 
     <div id="alert-error" class="{{ $errors->any() ? '' : 'hidden' }}">
@@ -76,7 +76,6 @@
                         data-validate="required"
                         required
                         autofocus>
-                    <p class="auth-form-hint client">Tên này sẽ hiển thị trong dashboard và ở phần đánh giá deck.</p>
                 </div>
 
                 <div class="auth-form-field">
@@ -90,11 +89,10 @@
                         value="{{ old('email') }}"
                         data-validate="required|email"
                         required>
-                    <p class="auth-form-hint client">Chúng tôi sẽ gửi mã OTP xác nhận về email này trước khi bạn đặt mật khẩu.</p>
                 </div>
 
                 <button type="button" id="btn-register-send-otp" class="auth-submit client" data-loading="Đang gửi OTP...">
-                    Tiếp tục sang bước xác thực
+                    Nhận mã OTP
                 </button>
             </form>
         </div>
@@ -119,11 +117,10 @@
                         placeholder="123456"
                         required
                         autofocus>
-                    <p class="auth-form-hint client">Nhập mã 6 số vừa được gửi qua email để xác nhận quyền sở hữu email.</p>
                 </div>
 
                 <button type="button" id="btn-register-verify-otp" class="auth-submit client" data-loading="Đang xác thực OTP...">
-                    Xác nhận OTP
+                    Xác nhận mã
                 </button>
 
                 <button type="button" id="btn-register-resend-otp" class="auth-link-btn">
@@ -164,7 +161,6 @@
                             <span class="eye-icon"></span>
                         </button>
                     </div>
-                    <p class="auth-form-hint client">Mật khẩu sẽ chỉ được lưu sau khi email của bạn đã xác thực OTP thành công.</p>
                 </div>
 
                 <div class="auth-form-field">

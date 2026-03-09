@@ -105,21 +105,83 @@ class ClientPortalController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $communityDecks = Deck::query()
+        $query = Deck::query()
             ->active()
             ->public()
             ->where(function (Builder $query) use ($user) {
                 $query->whereNull('user_id')
                     ->orWhere('user_id', '!=', $user->id);
-            })
-            ->withCount('flashcards')
+            });
+
+        // Search by title or description
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function (Builder $q) use ($searchTerm) {
+                $q->where('title', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('description', 'like', '%'.$searchTerm.'%');
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
+        }
+
+        // Filter by tag
+        if ($request->filled('tag')) {
+            $query->whereJsonContains('tags', $request->input('tag'));
+        }
+
+        // Sort options
+        $sort = $request->input('sort', 'latest');
+        match ($sort) {
+            'oldest' => $query->oldest(),
+            'rating' => $query->orderByDesc('reviews_avg_rating'),
+            'cards' => $query->orderByDesc('flashcards_count'),
+            'popular' => $query->withCount('reviews')->orderByDesc('reviews_count'),
+            default => $query->latest(),
+        };
+
+        $communityDecks = $query
+            ->withCount('flashcards', 'reviews')
             ->withAvg('reviews', 'rating')
             ->with('owner')
-            ->latest()
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
+
+        // Get available categories and tags for filters
+        $categories = Deck::query()
+            ->active()
+            ->public()
+            ->whereNotNull('category')
+            ->select('category')
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values();
+
+        $allTags = Deck::query()
+            ->active()
+            ->public()
+            ->whereNotNull('tags')
+            ->select('tags')
+            ->get()
+            ->pluck('tags')
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
 
         return view('client.community', [
             'communityDecks' => $communityDecks,
+            'categories' => $categories,
+            'allTags' => $allTags,
+            'filters' => [
+                'search' => $request->input('search', ''),
+                'category' => $request->input('category', ''),
+                'tag' => $request->input('tag', ''),
+                'sort' => $sort,
+            ],
         ]);
     }
 
@@ -485,6 +547,8 @@ class ClientPortalController extends Controller
             'level' => $user->levelProgress(),
             'streak_timeline' => $this->buildStreakTimeline($user),
             'mastery' => $this->buildMasterySummary($masteredCount, $user->studyProgress()->count()),
+            'study_chart' => $this->buildStudyActivityChart($user),
+            'session_stats' => $this->buildSessionStats($user),
         ];
     }
 
@@ -559,6 +623,54 @@ class ClientPortalController extends Controller
     private function ensureDeckAccessible(User $user, Deck $deck): void
     {
         abort_unless(app(DeckAccess::class)->canAccess($user, $deck), Response::HTTP_NOT_FOUND);
+    }
+
+    private function buildStudyActivityChart(User $user, int $days = 7): array
+    {
+        $chartData = [];
+        $maxCount = 0;
+
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $count = $user->studyProgress()
+                ->whereDate('last_reviewed_at', $date->toDateString())
+                ->count();
+
+            $chartData[] = [
+                'label' => ucfirst($date->locale('vi')->translatedFormat('D')),
+                'date' => $date->format('d/m'),
+                'count' => $count,
+                'is_today' => $date->isToday(),
+            ];
+
+            $maxCount = max($maxCount, $count);
+        }
+
+        return [
+            'data' => $chartData,
+            'max' => max(1, $maxCount), // Avoid division by zero
+            'total' => array_sum(array_column($chartData, 'count')),
+        ];
+    }
+
+    private function buildSessionStats(User $user): array
+    {
+        $today = now()->toDateString();
+        $todayProgress = $user->studyProgress()
+            ->whereDate('last_reviewed_at', $today)
+            ->get();
+
+        $correctCount = $todayProgress->where('status', StudyProgress::STATUS_MASTERED)->count();
+        $totalCount = $todayProgress->count();
+        $accuracy = $totalCount > 0 ? (int) round(($correctCount / $totalCount) * 100) : 0;
+
+        return [
+            'correct' => $correctCount,
+            'total' => $totalCount,
+            'accuracy' => $accuracy,
+            'learning' => $todayProgress->where('status', StudyProgress::STATUS_LEARNING)->count(),
+            'new' => $todayProgress->where('status', StudyProgress::STATUS_NEW)->count(),
+        ];
     }
 
     private function ensureDeckOwner(User $user, Deck $deck): void
