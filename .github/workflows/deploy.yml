@@ -61,9 +61,11 @@ jobs:
 
       - name: Package release bundle
         run: |
-          # Create a temp directory and copy files there to avoid "file changed" error
-          mkdir -p /tmp/release-build
-          rsync -av \
+          # Wait a moment for any pending file operations
+          sleep 2
+
+          # Use tar with --ignore-failed-read to handle transient file changes
+          tar \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='vendor' \
@@ -72,13 +74,8 @@ jobs:
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
-            /tmp/release-build/
-
-          cd /tmp/release-build
-          tar -czf release.tar.gz .
-          mv release.tar.gz $GITHUB_WORKSPACE/
-          cd $GITHUB_WORKSPACE
-          rm -rf /tmp/release-build
+            --ignore-failed-read \
+            -czf release.tar.gz .
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
