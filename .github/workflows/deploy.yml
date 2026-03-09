@@ -228,6 +228,11 @@ jobs:
             echo "🔧 Running Laravel optimizations..."
             php artisan storage:link || true
             php artisan migrate --force
+
+            # Seed database, skip if data already exists
+            echo "📱 Seeding database (will skip if data exists)..."
+            php artisan db:seed --force || echo "⚠️  Seeding skipped or failed"
+
             php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache

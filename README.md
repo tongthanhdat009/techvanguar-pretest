@@ -24,8 +24,39 @@ php artisan serve
 
 ## Demo credentials
 
-- Admin: `admin@example.com` / `password`
-- Client: `client@example.com` / `password`
+### Admin Accounts
+| Role | Email | Password | XP | Streak |
+|------|-------|----------|-----|--------|
+| Super Admin | admin@techvanguard.com | password | 5000 | 30 |
+| Moderator | moderator@techvanguard.com | password | 2500 | 15 |
+
+### Client Accounts
+| Name | Email | Password | XP | Streak | Status |
+|------|-------|----------|-----|--------|--------|
+| John Learner | john@example.com | password | 1250 | 7 | Active |
+| Sarah Student | sarah@example.com | password | 850 | 5 | Active |
+| Mike Developer | mike@example.com | password | 2100 | 12 | Active |
+| Emily Teacher | emily@example.com | password | 3200 | 20 | Active |
+| Inactive User | inactive@example.com | password | 150 | 0 | Inactive |
+
+## Seeded Data
+
+After running `php artisan migrate:fresh --seed`, the database includes:
+
+| Table | Count | Description |
+|-------|-------|-------------|
+| Users | 17 | 2 admins, 15 clients |
+| Decks | 13 | 10 public decks across various categories |
+| Flashcards | 111 | 10 cards per deck with topic-specific content |
+| Study Progress | 100 | Progress records for demo clients |
+| Deck Reviews | 30 | Ratings and comments for decks |
+
+### Public Deck Categories
+- **Programming**: Laravel Essentials, JavaScript ES6+, Vue.js Components, Python for Data Science
+- **Languages**: Japanese Hiragana, Spanish Food Vocabulary, French Verbs
+- **DevOps**: AWS Cloud Practitioner, Docker & Kubernetes
+- **Databases**: MySQL Fundamentals
+- **Certifications**: AWS Cloud Practitioner Prep
 
 ## API overview
 
