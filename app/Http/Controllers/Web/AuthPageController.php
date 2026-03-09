@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterOtpSendRequest;
+use App\Http\Requests\RegisterOtpVerifyRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
@@ -10,6 +12,7 @@ use App\Models\Deck;
 use App\Models\DeckReview;
 use App\Models\User;
 use App\Services\PasswordResetService;
+use App\Services\RegistrationOtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,11 +58,23 @@ class AuthPageController extends Controller
 
     public function register(Request $request): RedirectResponse
     {
+        $registrationOtp = app(RegistrationOtpService::class);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+
+        $verifiedAt = $registrationOtp->verifiedAt($request->session(), $validated['name'], $validated['email']);
+
+        if ($verifiedAt === null) {
+            return back()
+                ->withErrors([
+                    'otp' => 'Bạn cần xác thực OTP cho email trước khi hoàn tất đăng ký.',
+                ])
+                ->withInput($request->except(['password', 'password_confirmation']));
+        }
 
         $user = User::create([
             'name' => $validated['name'],
@@ -68,10 +83,57 @@ class AuthPageController extends Controller
             'role' => User::ROLE_CLIENT,
         ]);
 
-        Auth::guard('client')->login($user);
-        $request->session()->regenerate();
+        $user->forceFill([
+            'email_verified_at' => $verifiedAt,
+        ])->save();
 
-        return redirect()->route('client.dashboard');
+        $registrationOtp->clearVerification($request->session(), $user->email);
+
+        return redirect()->route('client.login')->with('status', 'Đăng ký thành công. Bạn có thể đăng nhập ngay bây giờ.');
+    }
+
+    public function sendRegisterOtp(RegisterOtpSendRequest $request, RegistrationOtpService $registrationOtp): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $registrationOtp->forgetCurrentVerification($request->session());
+
+        $result = $registrationOtp->sendOtp($validated['name'], $validated['email']);
+
+        if (! $result['success']) {
+            return response()->json([
+                'code' => $result['code'] ?? 'otp_send_failed',
+                'message' => $result['message'],
+                'redirect' => ($result['code'] ?? null) === 'email_exists' ? route('client.login') : null,
+            ], ($result['code'] ?? null) === 'email_exists' ? 409 : 422);
+        }
+
+        return response()->json([
+            'code' => $result['code'] ?? 'otp_sent',
+            'message' => $result['message'],
+        ]);
+    }
+
+    public function verifyRegisterOtp(RegisterOtpVerifyRequest $request, RegistrationOtpService $registrationOtp): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $isValid = $registrationOtp->verifyOtp(
+            $request->session(),
+            $validated['name'],
+            $validated['email'],
+            $validated['otp']
+        );
+
+        if (! $isValid) {
+            return response()->json([
+                'message' => 'Mã OTP không đúng, đã hết hạn hoặc thông tin xác thực không khớp.',
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Xác thực OTP thành công. Bạn có thể thiết lập mật khẩu.',
+        ]);
     }
 
     public function clientLogin(Request $request): RedirectResponse

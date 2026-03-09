@@ -35,7 +35,16 @@ class SetSessionCookie
             return 'admin';
         }
 
-        if ($request->is('client') || $request->is('client/*') || $request->is('login/client') || $request->is('register') || $request->is('logout')) {
+        if (
+            $request->is('client')
+            || $request->is('client/*')
+            || $request->is('login/client')
+            || $request->is('register')
+            || $request->is('register/*')
+            || $request->is('forgot-password')
+            || $request->is('forgot-password/*')
+            || $request->is('logout')
+        ) {
             return 'client';
         }
 

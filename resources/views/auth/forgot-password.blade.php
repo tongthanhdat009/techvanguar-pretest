@@ -6,6 +6,13 @@
 @section('content')
     <span class="sr-only">Forgot password</span>
 
+    <div id="password-reset-data"
+         data-send-otp-url="{{ route('password.send-otp') }}"
+         data-verify-otp-url="{{ route('password.verify-otp') }}"
+         data-reset-password-url="{{ route('password.reset') }}"
+         data-client-login-url="{{ route('client.login') }}"
+         class="hidden"></div>
+
     @include('components.auth.auth-logo', [
         'type' => 'client',
         'title' => 'Quên mật khẩu?',
@@ -135,15 +142,4 @@
         </p>
     </div>
 
-    {{-- Pass URLs to JavaScript --}}
-    @push('scripts')
-    <script>
-        window.passwordResetUrls = {
-            sendOtp: '{{ route('password.send-otp') }}',
-            verifyOtp: '{{ route('password.verify-otp') }}',
-            resetPassword: '{{ route('password.reset') }}',
-            clientLogin: '{{ route('client.login') }}'
-        };
-    </script>
-    @endpush
 @endsection

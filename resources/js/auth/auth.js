@@ -46,6 +46,41 @@ const AuthForm = {
     }
 };
 
+async function postJson(url, payload) {
+    const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+        return {
+            response,
+            data: await response.json(),
+        };
+    }
+
+    const text = await response.text();
+
+    return {
+        response,
+        data: {
+            message: response.status === 419
+                ? 'Phiên làm việc đã hết hạn. Vui lòng tải lại trang và thử lại.'
+                : 'Máy chủ trả về phản hồi không hợp lệ. Vui lòng thử lại.',
+            raw: text,
+        },
+    };
+}
+
 // ───────────────────────────────────────────────────────────────────────────────
 // Password Visibility Toggle
 // ───────────────────────────────────────────────────────────────────────────────
@@ -223,6 +258,17 @@ const ForgotPassword = {
         this.resetPasswordForm = document.getElementById('form-reset-password');
         this.forgotPasswordContainer = document.getElementById('forgot-password-form');
 
+        // Get URLs from data attributes
+        const dataEl = document.getElementById('password-reset-data');
+        if (dataEl) {
+            this.urls = {
+                sendOtp: dataEl.dataset.sendOtpUrl || '/forgot-password/send-otp',
+                verifyOtp: dataEl.dataset.verifyOtpUrl || '/forgot-password/verify-otp',
+                resetPassword: dataEl.dataset.resetPasswordUrl || '/forgot-password/reset',
+                clientLogin: dataEl.dataset.clientLoginUrl || '/login/client'
+            };
+        }
+
         if (!this.sendOtpForm) return;
 
         this.bindEvents();
@@ -281,16 +327,10 @@ const ForgotPassword = {
         this.setLoading(submitBtn, true);
 
         try {
-            const response = await fetch(window.passwordResetUrls?.sendOtp || '/forgot-password/send-otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await response.json();
+            const { response, data } = await postJson(
+                this.urls?.sendOtp || '/forgot-password/send-otp',
+                { email }
+            );
 
             if (response.ok) {
                 this.state.email = email;
@@ -322,16 +362,10 @@ const ForgotPassword = {
         this.setLoading(submitBtn, true);
 
         try {
-            const response = await fetch(window.passwordResetUrls?.verifyOtp || '/forgot-password/verify-otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                },
-                body: JSON.stringify({ email: this.state.email, otp }),
-            });
-
-            const data = await response.json();
+            const { response, data } = await postJson(
+                this.urls?.verifyOtp || '/forgot-password/verify-otp',
+                { email: this.state.email, otp }
+            );
 
             if (response.ok) {
                 this.state.otp = otp;
@@ -369,26 +403,20 @@ const ForgotPassword = {
         this.setLoading(submitBtn, true);
 
         try {
-            const response = await fetch(window.passwordResetUrls?.resetPassword || '/forgot-password/reset', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                },
-                body: JSON.stringify({
+            const { response, data } = await postJson(
+                this.urls?.resetPassword || '/forgot-password/reset',
+                {
                     email: this.state.email,
                     otp: this.state.otp,
                     password: password,
                     password_confirmation: passwordConfirmation,
-                }),
-            });
-
-            const data = await response.json();
+                }
+            );
 
             if (response.ok) {
                 this.showAlert('success', 'Đặt lại mật khẩu thành công! Đang chuyển hướng...');
                 setTimeout(() => {
-                    window.location.href = data.redirect || window.passwordResetUrls?.clientLogin || '/login/client';
+                    window.location.href = data.redirect || this.urls?.clientLogin || '/login/client';
                 }, 1500);
             } else {
                 this.showAlert('error', data.message || 'Không thể đặt lại mật khẩu.');
@@ -408,16 +436,10 @@ const ForgotPassword = {
         this.setLoading(resendBtn, true);
 
         try {
-            const response = await fetch(window.passwordResetUrls?.sendOtp || '/forgot-password/send-otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                },
-                body: JSON.stringify({ email: this.state.email }),
-            });
-
-            const data = await response.json();
+            const { response, data } = await postJson(
+                this.urls?.sendOtp || '/forgot-password/send-otp',
+                { email: this.state.email }
+            );
 
             if (response.ok) {
                 this.showAlert('success', 'Đã gửi lại mã OTP. Kiểm tra email để lấy mã.');
@@ -514,14 +536,351 @@ const ForgotPassword = {
     },
 };
 
+const RegisterFlow = {
+    state: {
+        name: '',
+        email: '',
+        verified: false,
+    },
+
+    init() {
+        this.container = document.getElementById('register-stage-flow');
+
+        if (!this.container || this.container.dataset.inlineRegisterFlow === 'true') return;
+
+        this.detailsForm = document.getElementById('form-register-send-otp');
+        this.otpForm = document.getElementById('form-register-verify-otp');
+        this.passwordForm = document.getElementById('form-register-complete');
+        this.sendOtpButton = document.getElementById('btn-register-send-otp');
+        this.verifyOtpButton = document.getElementById('btn-register-verify-otp');
+
+        this.detailsStep = document.getElementById('register-step-details');
+        this.otpStep = document.getElementById('register-step-otp');
+        this.passwordStep = document.getElementById('register-step-password');
+
+        this.nameInput = document.getElementById('register_name');
+        this.emailInput = document.getElementById('register_email');
+        this.otpInput = document.getElementById('register_otp');
+        this.hiddenNameInput = document.getElementById('register_hidden_name');
+        this.hiddenEmailInput = document.getElementById('register_hidden_email');
+
+        const registerUrls = this.readJsonData(this.container.dataset.urls);
+        const initialState = this.readJsonData(this.container.dataset.state);
+        this.urls = registerUrls;
+        this.state.name = initialState.name || this.nameInput?.value || '';
+        this.state.email = initialState.email || this.emailInput?.value || '';
+        this.state.verified = (initialState.initialStep || 'details') === 'password';
+
+        this.bindEvents();
+        this.syncStateToInputs();
+        this.showStep(initialState.initialStep || this.container.dataset.initialStep || 'details');
+
+        if (initialState.serverError?.length) {
+            this.showAlert('error', initialState.serverError.join(' '));
+        }
+    },
+
+    bindEvents() {
+        this.sendOtpButton?.addEventListener('click', (event) => this.handleSendOtp(event));
+        this.verifyOtpButton?.addEventListener('click', (event) => this.handleVerifyOtp(event));
+
+        this.detailsForm?.addEventListener('submit', (event) => this.handleSendOtp(event));
+        this.otpForm?.addEventListener('submit', (event) => this.handleVerifyOtp(event));
+
+        document.getElementById('btn-register-resend-otp')?.addEventListener('click', () => this.handleResendOtp());
+        document.getElementById('btn-register-back-details')?.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.state.verified = false;
+            this.showStep('details');
+        });
+        document.getElementById('btn-register-back-otp')?.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showStep('otp');
+        });
+
+        this.nameInput?.addEventListener('input', () => {
+            this.state.name = this.nameInput.value.trim();
+            this.state.verified = false;
+            this.syncStateToInputs();
+        });
+
+        this.emailInput?.addEventListener('input', () => {
+            this.state.email = this.emailInput.value.trim();
+            this.state.verified = false;
+            this.syncStateToInputs();
+        });
+    },
+
+    async handleSendOtp(event) {
+        event.preventDefault();
+
+        this.state.name = this.nameInput?.value.trim() || '';
+        this.state.email = this.emailInput?.value.trim() || '';
+        this.state.verified = false;
+        this.syncStateToInputs();
+
+        if (!this.state.name) {
+            this.showAlert('error', 'Vui lòng nhập họ và tên.');
+            return;
+        }
+
+        if (!this.isValidEmail(this.state.email)) {
+            this.showAlert('error', 'Vui lòng nhập email hợp lệ.');
+            return;
+        }
+
+        const submitBtn = this.detailsForm?.querySelector('button[type="submit"]');
+        this.setLoading(submitBtn, true);
+
+        try {
+            const { response, data } = await postJson(
+                this.urls?.sendOtp || '/register/send-otp',
+                {
+                    name: this.state.name,
+                    email: this.state.email,
+                }
+            );
+
+            if (!response.ok) {
+                if (data.code === 'email_exists') {
+                    const shouldStayOnRegister = window.confirm(
+                        'Email này đã được sử dụng. Bạn có muốn tiếp tục đăng ký với email khác không? Chọn Hủy để quay lại trang đăng nhập.'
+                    );
+
+                    if (!shouldStayOnRegister) {
+                        window.location.href = data.redirect || this.urls?.login || '/login/client';
+                        return;
+                    }
+
+                    this.showAlert('error', data.message || 'Email này đã được sử dụng.');
+                    this.nameInput?.focus();
+                    return;
+                }
+
+                this.showAlert('error', data.message || 'Không thể gửi OTP xác nhận.');
+                return;
+            }
+
+            this.showAlert('success', data.message || 'Đã gửi mã OTP xác nhận đến email của bạn.');
+            this.showStep('otp');
+        } catch (error) {
+            console.error('Error sending register OTP:', error);
+            this.showAlert('error', 'Có lỗi xảy ra khi gửi OTP. Vui lòng thử lại.');
+        } finally {
+            this.setLoading(submitBtn, false);
+        }
+    },
+
+    async handleVerifyOtp(event) {
+        event.preventDefault();
+
+        const otp = this.otpInput?.value.trim() || '';
+
+        if (!this.state.name || !this.isValidEmail(this.state.email)) {
+            this.showAlert('error', 'Thông tin đăng ký chưa đầy đủ. Vui lòng nhập lại họ tên và email.');
+            this.showStep('details');
+            return;
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+            this.showAlert('error', 'Vui lòng nhập mã OTP gồm đúng 6 chữ số.');
+            return;
+        }
+
+        const submitBtn = this.otpForm?.querySelector('button[type="submit"]');
+        this.setLoading(submitBtn, true);
+
+        try {
+            const { response, data } = await postJson(
+                this.urls?.verifyOtp || '/register/verify-otp',
+                {
+                    name: this.state.name,
+                    email: this.state.email,
+                    otp,
+                }
+            );
+
+            if (!response.ok) {
+                this.showAlert('error', data.message || 'Mã OTP không hợp lệ.');
+                return;
+            }
+
+            this.state.verified = true;
+            this.syncStateToInputs();
+            this.showAlert('success', data.message || 'Xác thực OTP thành công.');
+            this.showStep('password');
+        } catch (error) {
+            console.error('Error verifying register OTP:', error);
+            this.showAlert('error', 'Có lỗi xảy ra khi xác thực OTP.');
+        } finally {
+            this.setLoading(submitBtn, false);
+        }
+    },
+
+    async handleResendOtp() {
+        if (!this.state.name || !this.isValidEmail(this.state.email)) {
+            this.showAlert('error', 'Vui lòng nhập lại họ tên và email trước khi gửi lại OTP.');
+            this.showStep('details');
+            return;
+        }
+
+        const resendBtn = document.getElementById('btn-register-resend-otp');
+        this.setLoading(resendBtn, true);
+
+        try {
+            const { response, data } = await postJson(
+                this.urls?.sendOtp || '/register/send-otp',
+                {
+                    name: this.state.name,
+                    email: this.state.email,
+                }
+            );
+
+            if (!response.ok) {
+                this.showAlert('error', data.message || 'Không thể gửi lại OTP.');
+                return;
+            }
+
+            this.showAlert('success', data.message || 'Đã gửi lại mã OTP xác nhận.');
+        } catch (error) {
+            console.error('Error resending register OTP:', error);
+            this.showAlert('error', 'Có lỗi xảy ra khi gửi lại OTP.');
+        } finally {
+            this.setLoading(resendBtn, false);
+        }
+    },
+
+    syncStateToInputs() {
+        if (this.hiddenNameInput) this.hiddenNameInput.value = this.state.name;
+        if (this.hiddenEmailInput) this.hiddenEmailInput.value = this.state.email;
+
+        const nameTargets = [
+            document.getElementById('register-summary-name'),
+            document.getElementById('register-password-summary-name'),
+        ];
+
+        const emailTargets = [
+            document.getElementById('register-summary-email'),
+            document.getElementById('register-password-summary-email'),
+        ];
+
+        nameTargets.forEach((target) => {
+            if (target) target.textContent = this.state.name || 'Chưa có thông tin';
+        });
+
+        emailTargets.forEach((target) => {
+            if (target) target.textContent = this.state.email || 'Bạn sẽ nhận OTP tại đây';
+        });
+    },
+
+    showStep(step) {
+        this.detailsStep?.classList.add('hidden');
+        this.otpStep?.classList.add('hidden');
+        this.passwordStep?.classList.add('hidden');
+
+        document.querySelectorAll('[data-register-progress]').forEach((item) => {
+            item.classList.remove('is-active', 'is-complete');
+
+            if (item.dataset.registerProgress === step) {
+                item.classList.add('is-active');
+            }
+        });
+
+        if (step === 'otp' || step === 'password') {
+            document.querySelector('[data-register-progress="details"]')?.classList.add('is-complete');
+        }
+
+        if (step === 'password') {
+            document.querySelector('[data-register-progress="otp"]')?.classList.add('is-complete');
+        }
+
+        if (step === 'otp') {
+            this.otpStep?.classList.remove('hidden');
+            this.otpInput?.focus();
+            return;
+        }
+
+        if (step === 'password') {
+            this.passwordStep?.classList.remove('hidden');
+            document.getElementById('register_password')?.focus();
+            return;
+        }
+
+        this.detailsStep?.classList.remove('hidden');
+        this.nameInput?.focus();
+    },
+
+    showAlert(type, message) {
+        const errorAlert = document.getElementById('alert-error');
+        const successAlert = document.getElementById('alert-success');
+
+        if (errorAlert) {
+            errorAlert.classList.add('hidden');
+            const content = errorAlert.querySelector('.auth-alert-content');
+            if (content) content.textContent = message;
+        }
+
+        if (successAlert) {
+            successAlert.classList.add('hidden');
+            const content = successAlert.querySelector('.auth-alert-content');
+            if (content) content.textContent = message;
+        }
+
+        if (type === 'error' && errorAlert) {
+            errorAlert.classList.remove('hidden');
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        if (type === 'success' && successAlert) {
+            successAlert.classList.remove('hidden');
+        }
+    },
+
+    setLoading(btn, isLoading) {
+        if (!btn) return;
+
+        if (isLoading) {
+            btn.disabled = true;
+            btn.dataset.originalText = btn.textContent;
+            btn.textContent = btn.dataset.loading || 'Đang xử lý...';
+            return;
+        }
+
+        btn.disabled = false;
+        btn.textContent = btn.dataset.originalText || btn.textContent;
+    },
+
+    isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    },
+
+    readJsonData(value) {
+        if (!value) return {};
+
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.error('Error parsing register flow data:', error);
+            return {};
+        }
+    },
+};
+
 // ───────────────────────────────────────────────────────────────────────────────
 // Initialize
 // ───────────────────────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeAuthPages() {
     AuthForm.init();
     PasswordToggle.init();
     FormValidation.init();
     RememberMe.init();
     ForgotPassword.init();
-});
+    RegisterFlow.init();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAuthPages, { once: true });
+} else {
+    initializeAuthPages();
+}

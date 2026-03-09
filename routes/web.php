@@ -11,6 +11,8 @@ Route::get('/', [AuthPageController::class, 'landing'])->name('home');
 // Auth (guests only)
 Route::middleware('guest:client')->group(function () {
     Route::get('/register', [AuthPageController::class, 'showRegister'])->name('register');
+    Route::post('/register/send-otp', [AuthPageController::class, 'sendRegisterOtp'])->name('register.send-otp');
+    Route::post('/register/verify-otp', [AuthPageController::class, 'verifyRegisterOtp'])->name('register.verify-otp');
     Route::post('/register', [AuthPageController::class, 'register'])->name('register.store');
     Route::get('/login/client', [AuthPageController::class, 'showClientLogin'])->name('client.login');
     Route::post('/login/client', [AuthPageController::class, 'clientLogin'])->name('client.login.store');
