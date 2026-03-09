@@ -21,7 +21,7 @@ class StudySessionService
 
         $flashcards = $this->fetchFlashcardsWithProgress($user, $deckIds);
 
-        $dueFlashcards = $this->filterDueFlashcards($flashcards);
+        $dueFlashcards = $this->filterDueFlashcards($user, $flashcards, $deck);
 
         return $this->prioritizeFlashcards($dueFlashcards, $flashcards, $limit);
     }
@@ -90,13 +90,13 @@ class StudySessionService
     /**
      * Filter flashcards that are due for review.
      */
-    private function filterDueFlashcards(Collection $flashcards): Collection
+    private function filterDueFlashcards(User $user, Collection $flashcards, ?Deck $deck = null): Collection
     {
-        return $flashcards->filter(function (Flashcard $flashcard) {
+        return $flashcards->filter(function (Flashcard $flashcard) use ($user, $deck) {
             $progress = $flashcard->studyProgress->first();
 
             if (! $progress) {
-                return true;
+                return $deck !== null || (int) $flashcard->deck?->user_id === (int) $user->id;
             }
 
             if ($progress->last_reviewed_at && $progress->last_reviewed_at->gte(now()->startOfDay())) {

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Flashcard;
+use App\Models\Deck;
 use App\Models\StudyProgress;
 use App\Models\User;
 use App\Services\StudyScheduler;
@@ -137,6 +138,21 @@ class StudySchedulerTest extends TestCase
             'user_id' => $user->id,
             'last_reviewed_at' => now(),
             'next_review_at' => now()->addDays(5),
+        ]);
+
+        $this->assertSame(0, app(StudyScheduler::class)->dueTodayCount($user));
+    }
+
+    public function test_due_today_count_ignores_untracked_public_flashcards_for_a_new_user(): void
+    {
+        $user = User::factory()->create();
+        $publicDeck = Deck::factory()->create([
+            'visibility' => Deck::VISIBILITY_PUBLIC,
+            'is_active' => true,
+        ]);
+
+        Flashcard::factory()->count(3)->create([
+            'deck_id' => $publicDeck->id,
         ]);
 
         $this->assertSame(0, app(StudyScheduler::class)->dueTodayCount($user));
