@@ -221,6 +221,8 @@
             const resendOtpButton = document.getElementById('btn-register-resend-otp');
             const backDetailsButton = document.getElementById('btn-register-back-details');
             const backOtpButton = document.getElementById('btn-register-back-otp');
+            let isSendingOtp = false;
+            let isVerifyingOtp = false;
             const errorAlert = document.getElementById('alert-error');
             const successAlert = document.getElementById('alert-success');
 
@@ -361,6 +363,10 @@
             const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
             const handleSendOtp = async () => {
+                if (isSendingOtp) {
+                    return;
+                }
+
                 runtime.name = nameInput?.value.trim() || '';
                 runtime.email = emailInput?.value.trim() || '';
                 syncSummary();
@@ -375,6 +381,7 @@
                     return;
                 }
 
+                isSendingOtp = true;
                 setLoading(sendOtpButton, true);
 
                 try {
@@ -402,11 +409,16 @@
                 } catch (error) {
                     showAlert('error', 'Có lỗi xảy ra khi gửi OTP. Vui lòng thử lại.');
                 } finally {
+                    isSendingOtp = false;
                     setLoading(sendOtpButton, false);
                 }
             };
 
             const handleVerifyOtp = async () => {
+                if (isVerifyingOtp) {
+                    return;
+                }
+
                 const otp = otpInput?.value.trim() || '';
 
                 if (!/^\d{6}$/.test(otp)) {
@@ -414,6 +426,7 @@
                     return;
                 }
 
+                isVerifyingOtp = true;
                 setLoading(verifyOtpButton, true);
 
                 try {
@@ -433,21 +446,10 @@
                 } catch (error) {
                     showAlert('error', 'Có lỗi xảy ra khi xác thực OTP.');
                 } finally {
+                    isVerifyingOtp = false;
                     setLoading(verifyOtpButton, false);
                 }
             };
-
-            if (sendOtpButton) {
-                sendOtpButton.onclick = () => handleSendOtp();
-            }
-
-            if (verifyOtpButton) {
-                verifyOtpButton.onclick = () => handleVerifyOtp();
-            }
-
-            if (resendOtpButton) {
-                resendOtpButton.onclick = () => handleSendOtp();
-            }
 
             sendOtpButton?.addEventListener('click', handleSendOtp);
             verifyOtpButton?.addEventListener('click', handleVerifyOtp);

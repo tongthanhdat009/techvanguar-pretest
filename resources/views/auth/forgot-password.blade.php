@@ -21,18 +21,18 @@
 
     {{-- Error Alert --}}
     <div id="alert-error" class="hidden">
-        @include('components.auth.auth-alert', [
-            'message' => '',
-            'type' => 'error'
-        ])
+        <div class="auth-alert error client">
+            <span class="auth-alert-icon" aria-hidden="true">!</span>
+            <div class="auth-alert-content"></div>
+        </div>
     </div>
 
     {{-- Success Alert --}}
     <div id="alert-success" class="hidden">
-        @include('components.auth.auth-alert', [
-            'message' => '',
-            'type' => 'success'
-        ])
+        <div class="auth-alert success client">
+            <span class="auth-alert-icon" aria-hidden="true">OK</span>
+            <div class="auth-alert-content"></div>
+        </div>
     </div>
 
     {{-- Forgot Password Form --}}

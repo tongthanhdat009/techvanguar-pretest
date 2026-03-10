@@ -498,18 +498,19 @@ const ForgotPassword = {
 
         if (errorAlert) {
             errorAlert.classList.add('hidden');
-            const msgEl = errorAlert.querySelector('.auth-alert-content p');
+            const msgEl = errorAlert.querySelector('.auth-alert-content');
             if (msgEl) msgEl.textContent = message;
         }
 
         if (successAlert) {
             successAlert.classList.add('hidden');
-            const msgEl = successAlert.querySelector('.auth-alert-content p');
+            const msgEl = successAlert.querySelector('.auth-alert-content');
             if (msgEl) msgEl.textContent = message;
         }
 
         if (type === 'error' && errorAlert) {
             errorAlert.classList.remove('hidden');
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else if (type === 'success' && successAlert) {
             successAlert.classList.remove('hidden');
         }
