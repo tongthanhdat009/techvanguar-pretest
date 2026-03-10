@@ -102,7 +102,7 @@
 {{-- Add Flashcard Modal --}}
 <div class="modal" id="addFlashcardModal" data-modal="add-flashcard" tabindex="-1" aria-hidden="true">
     <div class="modal-backdrop" data-modal-backdrop></div>
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-heading">
@@ -145,8 +145,14 @@
 
                     <div class="form-group">
                         <label for="card-audio" class="form-label">URL âm thanh</label>
-                        <input type="url" id="card-audio" name="audio_url" value="{{ old('audio_url') }}"
-                               class="form-input" placeholder="https://...">
+                        <div class="audio-preview-group" data-audio-preview-group>
+                            <input type="url" id="card-audio" name="audio_url" value="{{ old('audio_url') }}"
+                                   class="form-input" placeholder="https://..." data-audio-preview-input>
+                            <div class="audio-preview-shell" data-audio-preview-shell @if(!old('audio_url')) hidden @endif>
+                                <span class="audio-preview-label">Nghe thử âm thanh</span>
+                                <audio controls preload="none" data-audio-preview-player @if(old('audio_url')) src="{{ old('audio_url') }}" @endif></audio>
+                            </div>
+                        </div>
                         @error('audio_url') <span class="form-error">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -175,7 +181,7 @@
 {{-- Edit Flashcard Modal --}}
 <div class="modal" id="editFlashcardModal" data-modal="edit-flashcard" tabindex="-1" aria-hidden="true">
     <div class="modal-backdrop" data-modal-backdrop></div>
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-heading">
@@ -215,7 +221,13 @@
 
                     <div class="form-group">
                         <label for="edit-card-audio" class="form-label">URL âm thanh</label>
-                        <input type="url" id="edit-card-audio" name="audio_url" class="form-input">
+                        <div class="audio-preview-group" data-audio-preview-group>
+                            <input type="url" id="edit-card-audio" name="audio_url" class="form-input" data-audio-preview-input>
+                            <div class="audio-preview-shell" data-audio-preview-shell hidden>
+                                <span class="audio-preview-label">Nghe thử âm thanh</span>
+                                <audio controls preload="none" data-audio-preview-player></audio>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

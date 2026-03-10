@@ -2144,8 +2144,9 @@ body.client-app-body.mobile-dropdown-open {
 
 /* Flip Card */
 .flip-card {
-    width: 100%;
-    height: 260px;
+    width: min(100%, 760px);
+    height: 240px;
+    margin: 0 auto;
     perspective: 1000px;
     cursor: pointer;
 }
@@ -2180,12 +2181,15 @@ body.client-app-body.mobile-dropdown-open {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 1.5rem 1.75rem;
+    height: 100%;
+    box-sizing: border-box;
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 25px rgba(0, 0, 0, 0.1);
     text-align: center;
+    overflow: hidden;
 }
 
 .card-front {
@@ -2216,6 +2220,12 @@ body.client-app-body.mobile-dropdown-open {
     word-wrap: break-word;
 }
 
+.flip-card .card-content {
+    font-size: clamp(1.15rem, 1.45vw + 0.7rem, 1.85rem);
+    line-height: 1.35;
+    max-width: 34rem;
+}
+
 .card-image {
     margin: 1.5rem 0;
 }
@@ -2234,6 +2244,41 @@ body.client-app-body.mobile-dropdown-open {
 .card-audio audio {
     width: 100%;
     height: 40px;
+}
+
+.audio-preview-group {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.audio-preview-shell {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(24, 32, 51, 0.08);
+    border-radius: 0.95rem;
+    background: rgba(24, 32, 51, 0.03);
+}
+
+.audio-preview-shell[hidden] {
+    display: none;
+}
+
+.audio-preview-shell--compact {
+    padding: 0.7rem 0.8rem;
+}
+
+.audio-preview-label {
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--client-muted);
+}
+
+.audio-preview-shell audio {
+    width: 100%;
+    min-width: 0;
 }
 
 .card-hint {
@@ -2277,6 +2322,35 @@ body.client-app-body.mobile-dropdown-open {
     margin-bottom: 2rem;
     padding-bottom: 2rem;
     border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mcq-front .card-content {
+    max-width: 100%;
+}
+
+.mcq-front .card-image {
+    display: flex;
+    justify-content: center;
+}
+
+.mcq-front .card-image img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.mcq-front .card-audio {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.mcq-front .card-audio audio {
+    max-width: 100%;
 }
 
 .mcq-choices {
@@ -2765,11 +2839,16 @@ body.client-app-body.mobile-dropdown-open {
     }
 
     .flip-card {
-        height: 300px;
+        height: 240px;
     }
 
-    .card-content {
-        font-size: 1.125rem;
+    .flip-card .card-face {
+        padding: 1.2rem 1rem;
+    }
+
+    .flip-card .card-content {
+        font-size: 1rem;
+        max-width: 16rem;
     }
 
     .control-buttons-row {
@@ -3483,14 +3562,23 @@ textarea.client-form-input {
     position: relative;
     z-index: 1;
     width: min(100%, 42rem);
-    max-height: calc(100vh - 3rem);
+    max-height: calc(100dvh - 3rem);
+    display: flex;
 }
 
 .modal-dialog.modal-lg {
     width: min(100%, 54rem);
 }
 
+.modal-dialog.modal-sm {
+    width: min(100%, 20rem);
+}
+
 .modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 100%;
     overflow: hidden;
     border-radius: 1.4rem;
     background: #ffffff;
@@ -3546,6 +3634,8 @@ textarea.client-form-input {
 
 .modal-form,
 .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 1.3rem;
     overflow: auto;
 }
@@ -3652,7 +3742,7 @@ textarea.client-form-input {
     .modal-dialog,
     .modal-dialog.modal-lg {
         width: 100%;
-        max-height: calc(100vh - 1.5rem);
+        max-height: calc(100dvh - 1.5rem);
     }
 }
 

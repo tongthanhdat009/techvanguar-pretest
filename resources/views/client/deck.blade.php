@@ -84,9 +84,13 @@
                         document.getElementById('edit-card-audio').value = cardData.audio_url || '';
                         document.getElementById('edit-card-hint').value = cardData.hint || '';
 
+                        document.getElementById('edit-card-audio').dispatchEvent(new Event('input', { bubbles: true }));
+
                         // Set form action
                         const form = document.getElementById('editFlashcardForm');
                         form.action = `/client/flashcards/${cardId}`;
+
+                        window.ClientAudioPreview?.refresh(form);
 
                         this.openModal('editFlashcardModal');
                     });

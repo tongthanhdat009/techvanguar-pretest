@@ -80,6 +80,63 @@ const FlashToast = {
     }
 };
 
+const ClientAudioPreview = {
+    init(root = document) {
+        this.refresh(root);
+        window.ClientAudioPreview = this;
+    },
+
+    refresh(root = document) {
+        const groups = root.querySelectorAll?.('[data-audio-preview-group]') ?? [];
+        groups.forEach((group) => this.bind(group));
+    },
+
+    bind(group) {
+        if (group.dataset.audioPreviewBound === 'true') {
+            this.update(group);
+            return;
+        }
+
+        const input = group.querySelector('[data-audio-preview-input]');
+        if (!input) {
+            return;
+        }
+
+        const sync = () => this.update(group);
+        input.addEventListener('input', sync);
+        input.addEventListener('change', sync);
+
+        group.dataset.audioPreviewBound = 'true';
+        this.update(group);
+    },
+
+    update(group) {
+        const input = group.querySelector('[data-audio-preview-input]');
+        const shell = group.querySelector('[data-audio-preview-shell]');
+        const player = group.querySelector('[data-audio-preview-player]');
+        const url = input?.value?.trim() || '';
+
+        if (!shell || !player) {
+            return;
+        }
+
+        if (!url) {
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
+            shell.hidden = true;
+            return;
+        }
+
+        if (player.getAttribute('src') !== url) {
+            player.setAttribute('src', url);
+            player.load();
+        }
+
+        shell.hidden = false;
+    }
+};
+
 // ───────────────────────────────────────────────────────────────────────────────
 // Client App Layout (Sidebar + Topbar)
 // ───────────────────────────────────────────────────────────────────────────────
@@ -746,8 +803,11 @@ const StudyRoom = {
         // Update audio
         if (frontAudio) {
             if (card.audio_url) {
-                frontAudio.innerHTML = `<audio controls src="${card.audio_url}"></audio>`;
+                frontAudio.innerHTML = `<audio controls preload="auto" src="${card.audio_url}"></audio>`;
                 frontAudio.style.display = 'block';
+                // Auto-load the audio
+                const audioEl = frontAudio.querySelector('audio');
+                if (audioEl) audioEl.load();
             } else {
                 frontAudio.innerHTML = '';
                 frontAudio.style.display = 'none';
@@ -755,8 +815,10 @@ const StudyRoom = {
         }
         if (backAudio) {
             if (card.audio_url) {
-                backAudio.innerHTML = `<audio controls src="${card.audio_url}"></audio>`;
+                backAudio.innerHTML = `<audio controls preload="auto" src="${card.audio_url}"></audio>`;
                 backAudio.style.display = 'block';
+                const audioEl = backAudio.querySelector('audio');
+                if (audioEl) audioEl.load();
             } else {
                 backAudio.innerHTML = '';
                 backAudio.style.display = 'none';
@@ -801,8 +863,10 @@ const StudyRoom = {
         // Update audio
         if (questionAudio) {
             if (card.audio_url) {
-                questionAudio.innerHTML = `<audio controls src="${card.audio_url}"></audio>`;
+                questionAudio.innerHTML = `<audio controls preload="auto" src="${card.audio_url}"></audio>`;
                 questionAudio.style.display = 'block';
+                const audioEl = questionAudio.querySelector('audio');
+                if (audioEl) audioEl.load();
             } else {
                 questionAudio.innerHTML = '';
                 questionAudio.style.display = 'none';
@@ -848,8 +912,10 @@ const StudyRoom = {
         // Update audio
         if (questionAudio) {
             if (card.audio_url) {
-                questionAudio.innerHTML = `<audio controls src="${card.audio_url}"></audio>`;
+                questionAudio.innerHTML = `<audio controls preload="auto" src="${card.audio_url}"></audio>`;
                 questionAudio.style.display = 'block';
+                const audioEl = questionAudio.querySelector('audio');
+                if (audioEl) audioEl.load();
             } else {
                 questionAudio.innerHTML = '';
                 questionAudio.style.display = 'none';
@@ -1218,6 +1284,7 @@ const DeckDetail = {
 document.addEventListener('DOMContentLoaded', () => {
     Toast.init();
     FlashToast.init();
+    ClientAudioPreview.init();
     ClientApp.init();
     ConfirmDialog.init();
     ClientNav.init();

@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="flex items-center gap-2">
-        <a href="{{ route('admin.decks.edit', $deck) }}" class="btn-primary">Sửa bộ thẻ</a>
+        <button type="button" class="btn-primary" data-deck-edit-sidebar-open>Sửa bộ thẻ</button>
     </div>
 </div>
 
@@ -133,5 +133,8 @@
 
 {{-- Flashcard management --}}
 @include('admin.decks._flashcards', ['deck' => $deck])
+
+{{-- Deck Edit Sidebar --}}
+@include('components.admin.deck-edit-sidebar', ['deck' => $deck])
 
 @endsection

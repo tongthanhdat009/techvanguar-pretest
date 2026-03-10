@@ -70,6 +70,36 @@ select.admin-form-input option {
     border-left: 3px solid #ef4444;
 }
 
+.audio-preview-group {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.audio-preview-shell {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(96, 165, 250, 0.18);
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.audio-preview-shell[hidden] {
+    display: none;
+}
+
+.audio-preview-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #93c5fd;
+}
+
+.audio-preview-shell audio {
+    width: 100%;
+}
+
 /* ── Buttons ── */
 .btn-primary {
     display: inline-flex;

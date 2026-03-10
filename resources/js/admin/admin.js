@@ -232,6 +232,62 @@ const AdminConfirm = {
     }
 };
 
+const AdminAudioPreview = {
+    init(root = document) {
+        this.refresh(root);
+    },
+
+    refresh(root = document) {
+        const groups = root.querySelectorAll?.('[data-audio-preview-group]') ?? [];
+        groups.forEach((group) => this.bind(group));
+    },
+
+    bind(group) {
+        if (group.dataset.audioPreviewBound === 'true') {
+            this.update(group);
+            return;
+        }
+
+        const input = group.querySelector('[data-audio-preview-input]');
+        if (!input) {
+            return;
+        }
+
+        const sync = () => this.update(group);
+        input.addEventListener('input', sync);
+        input.addEventListener('change', sync);
+
+        group.dataset.audioPreviewBound = 'true';
+        this.update(group);
+    },
+
+    update(group) {
+        const input = group.querySelector('[data-audio-preview-input]');
+        const shell = group.querySelector('[data-audio-preview-shell]');
+        const player = group.querySelector('[data-audio-preview-player]');
+        const url = input?.value?.trim() || '';
+
+        if (!shell || !player) {
+            return;
+        }
+
+        if (!url) {
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
+            shell.hidden = true;
+            return;
+        }
+
+        if (player.getAttribute('src') !== url) {
+            player.setAttribute('src', url);
+            player.load();
+        }
+
+        shell.hidden = false;
+    }
+};
+
 // ───────────────────────────────────────────────────────────────────────────────
 // Theme Toggle
 // ───────────────────────────────────────────────────────────────────────────────
@@ -427,6 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     AdminSidebar.init();
     AdminToast.init();
     AdminConfirm.init();
+    AdminAudioPreview.init();
     ThemeToggle.init();
     LanguageManager.init();
     AdminDropdown.init();

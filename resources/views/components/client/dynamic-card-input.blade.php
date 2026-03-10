@@ -32,9 +32,16 @@
                     </div>
                     <div class="card-input-field card-input-field-half">
                         <label class="card-input-label">🎵 URL âm thanh</label>
-                        <input type="url" name="cards[0][audio_url]"
-                               class="card-input-input"
-                               placeholder="https://example.com/audio.mp3">
+                        <div class="audio-preview-group" data-audio-preview-group>
+                            <input type="url" name="cards[0][audio_url]"
+                                   class="card-input-input"
+                                   placeholder="https://example.com/audio.mp3"
+                                   data-audio-preview-input>
+                            <div class="audio-preview-shell audio-preview-shell--compact" data-audio-preview-shell hidden>
+                                <span class="audio-preview-label">Nghe thử</span>
+                                <audio controls preload="none" data-audio-preview-player></audio>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-input-field">
@@ -108,6 +115,7 @@ const DynamicCardInput = {
         this.list.appendChild(row);
         this.cardCount++;
         this.updateUI();
+        window.ClientAudioPreview?.refresh(row);
 
         // Focus the new input
         const newTextarea = row.querySelector('.card-input-textarea');
@@ -160,9 +168,16 @@ const DynamicCardInput = {
                     </div>
                     <div class="card-input-field card-input-field-half">
                         <label class="card-input-label">🎵 URL âm thanh</label>
-                        <input type="url" name="cards[${index}][audio_url]"
-                               class="card-input-input"
-                               placeholder="https://example.com/audio.mp3">
+                        <div class="audio-preview-group" data-audio-preview-group>
+                            <input type="url" name="cards[${index}][audio_url]"
+                                   class="card-input-input"
+                                   placeholder="https://example.com/audio.mp3"
+                                   data-audio-preview-input>
+                            <div class="audio-preview-shell audio-preview-shell--compact" data-audio-preview-shell hidden>
+                                <span class="audio-preview-label">Nghe thử</span>
+                                <audio controls preload="none" data-audio-preview-player></audio>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-input-field">

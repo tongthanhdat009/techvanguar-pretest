@@ -56,9 +56,15 @@
                 </div>
                 <div class="admin-form-group">
                     <label class="admin-form-label">URL Audio</label>
-                    <input type="url" name="audio_url" value="{{ old('audio_url') }}"
-                        class="admin-form-input {{ $errors->has('audio_url') ? 'has-error' : '' }}"
-                        placeholder="https://...">
+                    <div class="audio-preview-group" data-audio-preview-group>
+                        <input type="url" name="audio_url" value="{{ old('audio_url') }}"
+                            class="admin-form-input {{ $errors->has('audio_url') ? 'has-error' : '' }}"
+                            placeholder="https://..." data-audio-preview-input>
+                        <div class="audio-preview-shell" data-audio-preview-shell @if(!old('audio_url')) hidden @endif>
+                            <span class="audio-preview-label">Nghe thử âm thanh</span>
+                            <audio controls preload="none" data-audio-preview-player @if(old('audio_url')) src="{{ old('audio_url') }}" @endif></audio>
+                        </div>
+                    </div>
                     @error('audio_url')
                         <p class="admin-form-error">{{ $message }}</p>
                     @enderror
@@ -155,7 +161,13 @@
                             </div>
                             <div class="admin-form-group">
                                 <label class="admin-form-label">URL Audio</label>
-                                <input type="url" name="audio_url" value="{{ $fc->audio_url }}" class="admin-form-input" placeholder="https://...">
+                                <div class="audio-preview-group" data-audio-preview-group>
+                                    <input type="url" name="audio_url" value="{{ $fc->audio_url }}" class="admin-form-input" placeholder="https://..." data-audio-preview-input>
+                                    <div class="audio-preview-shell" data-audio-preview-shell @if(!$fc->audio_url) hidden @endif>
+                                        <span class="audio-preview-label">Nghe thử âm thanh</span>
+                                        <audio controls preload="none" data-audio-preview-player @if($fc->audio_url) src="{{ $fc->audio_url }}" @endif></audio>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">

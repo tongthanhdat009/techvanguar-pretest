@@ -145,11 +145,9 @@
                                         <img src="{{ $currentCard['flashcard']->image_url }}" alt="Card image">
                                     </div>
                                 @endif
-                                @if($currentCard['flashcard']->audio_url)
-                                    <div class="card-audio">
-                                        <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
-                                    </div>
-                                @endif
+                                <div class="card-audio" @if(!$currentCard['flashcard']->audio_url) style="display: none;" @endif>
+                                    <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
+                                </div>
                                 @if($currentCard['flashcard']->hint)
                                     <div class="card-hint-text">
                                         <span class="hint-label">💡 Gợi ý:</span> {{ $currentCard['flashcard']->hint }}
@@ -164,11 +162,9 @@
                             <div class="card-face card-back">
                                 <div class="card-label">Mặt sau</div>
                                 <div class="card-content">{{ $currentCard['flashcard']->back_content }}</div>
-                                @if($currentCard['flashcard']->audio_url)
-                                    <div class="card-audio">
-                                        <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
-                                    </div>
-                                @endif
+                                <div class="card-audio" @if(!$currentCard['flashcard']->audio_url) style="display: none;" @endif>
+                                    <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -188,11 +184,9 @@
                                 <img src="{{ $currentCard['flashcard']->image_url }}" alt="Card image">
                             </div>
                         @endif
-                        @if($currentCard['flashcard']->audio_url)
-                            <div class="card-audio">
-                                <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
-                            </div>
-                        @endif
+                        <div class="card-audio" @if(!$currentCard['flashcard']->audio_url) style="display: none;" @endif>
+                            <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
+                        </div>
                     </div>
                     <div class="mcq-choices" data-mcq-choices>
                         @foreach($choices as $index => $choice)
@@ -215,11 +209,9 @@
                                 <img src="{{ $currentCard['flashcard']->image_url }}" alt="Card image">
                             </div>
                         @endif
-                        @if($currentCard['flashcard']->audio_url)
-                            <div class="card-audio">
-                                <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
-                            </div>
-                        @endif
+                        <div class="card-audio" @if(!$currentCard['flashcard']->audio_url) style="display: none;" @endif>
+                            <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
+                        </div>
                     </div>
                     <div class="typed-input-section">
                         <textarea class="typed-input"
