@@ -137,7 +137,7 @@
                     <div class="flip-card-inner" data-flip-card-inner>
                         {{-- Front --}}
                         <div class="flip-card-front">
-                            <div class="card-face card-front">
+                            <div class="card-face card-front {{ $currentCard['flashcard']->image_url ? 'card-face--with-media' : 'card-face--text-only' }}">
                                 <div class="card-label">Mặt trước</div>
                                 <div class="card-content">{{ $currentCard['flashcard']->front_content }}</div>
                                 @if($currentCard['flashcard']->image_url)
@@ -159,9 +159,14 @@
 
                         {{-- Back --}}
                         <div class="flip-card-back">
-                            <div class="card-face card-back">
+                            <div class="card-face card-back {{ $currentCard['flashcard']->image_url ? 'card-face--with-media' : 'card-face--text-only' }}">
                                 <div class="card-label">Mặt sau</div>
                                 <div class="card-content">{{ $currentCard['flashcard']->back_content }}</div>
+                                @if($currentCard['flashcard']->image_url)
+                                    <div class="card-image">
+                                        <img src="{{ $currentCard['flashcard']->image_url }}" alt="Card image">
+                                    </div>
+                                @endif
                                 <div class="card-audio" @if(!$currentCard['flashcard']->audio_url) style="display: none;" @endif>
                                     <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
                                 </div>

@@ -768,6 +768,8 @@ const StudyRoom = {
     },
 
     updateFlipCardContent(card) {
+        const frontFace = this.studyRoom.querySelector('.flip-card-front .card-face');
+        const backFace = this.studyRoom.querySelector('.flip-card-back .card-face');
         const frontContent = this.studyRoom.querySelector('.flip-card-front .card-content');
         const backContent = this.studyRoom.querySelector('.flip-card-back .card-content');
         const frontImage = this.studyRoom.querySelector('.flip-card-front .card-image');
@@ -779,6 +781,13 @@ const StudyRoom = {
         // Update text content
         if (frontContent) frontContent.textContent = card.front;
         if (backContent) backContent.textContent = card.back;
+
+        [frontFace, backFace].forEach((face) => {
+            if (!face) return;
+
+            face.classList.toggle('card-face--with-media', Boolean(card.image_url));
+            face.classList.toggle('card-face--text-only', !card.image_url);
+        });
 
         // Update image
         if (frontImage) {
