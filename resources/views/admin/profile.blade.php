@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="max-w-2xl">
-    <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('admin.profile.update') }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -17,7 +17,7 @@
         <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
             <h3 class="text-white font-medium mb-4">Ảnh đại diện</h3>
             <div class="flex items-center gap-6">
-                <div class="relative">
+                <div>
                     <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
                         @if($user->avatar)
                             <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
@@ -25,17 +25,11 @@
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         @endif
                     </div>
-                    <label for="avatar" class="absolute -bottom-2 -right-2 w-8 h-8 bg-indigo-600 hover:bg-indigo-500 rounded-lg flex items-center justify-center cursor-pointer transition-colors shadow-lg">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </label>
-                    <input type="file" id="avatar" name="avatar" accept="image/*" class="hidden">
                 </div>
                 <div>
                     <p class="text-white font-medium">{{ $user->name }}</p>
                     <p class="text-sm text-slate-400">{{ $user->email }}</p>
-                    <p class="text-xs text-slate-500 mt-1">Nhấn vào icon để thay đổi ảnh đại diện</p>
+                    <p class="text-xs text-slate-500 mt-1">Ảnh đại diện hiện tại của tài khoản quản trị.</p>
                 </div>
             </div>
         </div>

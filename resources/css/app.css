@@ -100,6 +100,14 @@ table {
 .gap-4 { gap: 1rem; }
 .gap-6 { gap: 1.5rem; }
 
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+	margin-top: 1rem;
+}
+
+.space-y-6 > :not([hidden]) ~ :not([hidden]) {
+	margin-top: 1.5rem;
+}
+
 .w-2 { width: 0.5rem; }
 .w-3 { width: 0.75rem; }
 .w-3\.5 { width: 0.875rem; }

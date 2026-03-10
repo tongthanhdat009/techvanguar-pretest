@@ -724,6 +724,13 @@ select.admin-form-input option {
     align-items: center;
     cursor: pointer;
     gap: 0.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .toggle-switch input[type="checkbox"] {
@@ -731,6 +738,7 @@ select.admin-form-input option {
     opacity: 0;
     width: 0;
     height: 0;
+    pointer-events: none;
 }
 
 .toggle-track {

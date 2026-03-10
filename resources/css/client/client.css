@@ -571,7 +571,7 @@
     left: 0;
     top: 0;
     bottom: 0;
-    z-index: 50;
+    z-index: 65;
     transition: transform 0.3s ease;
 }
 
@@ -2648,7 +2648,7 @@ body.client-app-body.mobile-dropdown-open {
         visibility: hidden;
         pointer-events: none;
         transition: opacity 0.3s ease, visibility 0.3s ease;
-        z-index: 45;
+        z-index: 60;
     }
 
     .client-app-layout.sidebar-open .client-sidebar-overlay {
