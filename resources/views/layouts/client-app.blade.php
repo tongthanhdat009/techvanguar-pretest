@@ -31,18 +31,6 @@
                 @yield('content')
             </main>
 
-            {{-- Footer --}}
-            <footer class="client-footer">
-                <div class="footer-content">
-                    <p>&copy; {{ date('Y') }} Flashcard Learning Hub. Không gian học cho nhịp ôn có chủ đích.</p>
-                    <div class="footer-links">
-                        <a href="{{ route('client.dashboard') }}">Tổng quan</a>
-                        <a href="{{ route('client.community') }}">Cộng đồng</a>
-                        <a href="{{ route('client.profile') }}">Hồ sơ</a>
-                    </div>
-                </div>
-            </footer>
-
         </div>
 
     </div>
