@@ -325,12 +325,28 @@ class AdminDashboardController extends Controller
     {
         $deck = Deck::create($request->validatedPayload());
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Bộ thẻ \"{$deck->title}\" đã được tạo.",
+                'redirect' => route('admin.decks'),
+            ]);
+        }
+
         return redirect()->route('admin.decks.show', $deck)->with('status', 'Bộ thẻ đã được tạo.');
     }
 
     public function updateDeck(AdminDeckRequest $request, Deck $deck): RedirectResponse
     {
         $deck->update($request->validatedPayload());
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Bộ thẻ \"{$deck->title}\" đã được cập nhật.",
+                'redirect' => route('admin.decks'),
+            ]);
+        }
 
         return redirect()->route('admin.decks.show', $deck)->with('status', 'Bộ thẻ đã được cập nhật.');
     }

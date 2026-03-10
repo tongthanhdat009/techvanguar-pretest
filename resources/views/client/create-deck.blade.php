@@ -50,12 +50,29 @@
                 <label for="category">Danh mục</label>
                 <select id="category" name="category" class="client-form-input client-form-select">
                     <option value="">Chọn danh mục</option>
-                    <option value="Language" {{ old('category') === 'Language' ? 'selected' : '' }}>Ngôn ngữ</option>
-                    <option value="Science" {{ old('category') === 'Science' ? 'selected' : '' }}>Khoa học</option>
-                    <option value="History" {{ old('category') === 'History' ? 'selected' : '' }}>Lịch sử</option>
-                    <option value="Math" {{ old('category') === 'Math' ? 'selected' : '' }}>Toán học</option>
-                    <option value="Technology" {{ old('category') === 'Technology' ? 'selected' : '' }}>Công nghệ</option>
-                    <option value="Other" {{ old('category') === 'Other' ? 'selected' : '' }}>Khác</option>
+                    <option value="Ngôn ngữ" {{ old('category') === 'Ngôn ngữ' ? 'selected' : '' }}>🌐 Ngôn ngữ</option>
+                    <option value="Tiếng Anh" {{ old('category') === 'Tiếng Anh' ? 'selected' : '' }}>🇬🇧 Tiếng Anh</option>
+                    <option value="Tiếng Trung" {{ old('category') === 'Tiếng Trung' ? 'selected' : '' }}>🇨🇳 Tiếng Trung</option>
+                    <option value="Tiếng Nhật" {{ old('category') === 'Tiếng Nhật' ? 'selected' : '' }}>🇯🇵 Tiếng Nhật</option>
+                    <option value="Tiếng Hàn" {{ old('category') === 'Tiếng Hàn' ? 'selected' : '' }}>🇰🇷 Tiếng Hàn</option>
+                    <option value="Toán học" {{ old('category') === 'Toán học' ? 'selected' : '' }}>📐 Toán học</option>
+                    <option value="Khoa học" {{ old('category') === 'Khoa học' ? 'selected' : '' }}>🔬 Khoa học</option>
+                    <option value="Vật lý" {{ old('category') === 'Vật lý' ? 'selected' : '' }}>⚛️ Vật lý</option>
+                    <option value="Hóa học" {{ old('category') === 'Hóa học' ? 'selected' : '' }}>🧪 Hóa học</option>
+                    <option value="Sinh học" {{ old('category') === 'Sinh học' ? 'selected' : '' }}>🧬 Sinh học</option>
+                    <option value="Lịch sử" {{ old('category') === 'Lịch sử' ? 'selected' : '' }}>📜 Lịch sử</option>
+                    <option value="Địa lý" {{ old('category') === 'Địa lý' ? 'selected' : '' }}>🌍 Địa lý</option>
+                    <option value="Văn học" {{ old('category') === 'Văn học' ? 'selected' : '' }}>📚 Văn học</option>
+                    <option value="Triết học" {{ old('category') === 'Triết học' ? 'selected' : '' }}>💭 Triết học</option>
+                    <option value="Kinh tế" {{ old('category') === 'Kinh tế' ? 'selected' : '' }}>💰 Kinh tế</option>
+                    <option value="Tin học" {{ old('category') === 'Tin học' ? 'selected' : '' }}>💻 Tin học</option>
+                    <option value="Lập trình" {{ old('category') === 'Lập trình' ? 'selected' : '' }}>👨‍💻 Lập trình</option>
+                    <option value="Âm nhạc" {{ old('category') === 'Âm nhạc' ? 'selected' : '' }}>🎵 Âm nhạc</option>
+                    <option value="Mỹ thuật" {{ old('category') === 'Mỹ thuật' ? 'selected' : '' }}>🎨 Mỹ thuật</option>
+                    <option value="Thể thao" {{ old('category') === 'Thể thao' ? 'selected' : '' }}>⚽ Thể thao</option>
+                    <option value="Y học" {{ old('category') === 'Y học' ? 'selected' : '' }}>🏥 Y học</option>
+                    <option value="Luật" {{ old('category') === 'Luật' ? 'selected' : '' }}>⚖️ Luật</option>
+                    <option value="Khác" {{ old('category') === 'Khác' ? 'selected' : '' }}>📁 Khác</option>
                 </select>
                 @error('category') <span class="client-form-error">{{ $message }}</span> @enderror
             </div>

@@ -349,6 +349,7 @@ select.admin-form-input option {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    pointer-events: none;
 }
 
 [data-admin-toast-stack] .toast {
@@ -358,6 +359,87 @@ select.admin-form-input option {
     padding: 0.75rem 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     animation: slideIn 0.3s ease;
+    animation-fill-mode: forwards;
+    pointer-events: auto;
+    min-width: 280px;
+    max-width: 400px;
+    word-wrap: break-word;
+    color: #1f2937;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/* Success toast - màu xanh lá */
+[data-admin-toast-stack] .toast.success {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(to right, #ecfdf5, #ffffff);
+}
+
+[data-admin-toast-stack] .toast.success::before {
+    content: '✓';
+    display: inline-block;
+    margin-right: 0.5rem;
+    color: #10b981;
+    font-weight: bold;
+}
+
+/* Error toast - màu đỏ */
+[data-admin-toast-stack] .toast.error {
+    border-left: 4px solid #ef4444;
+    background: linear-gradient(to right, #fef2f2, #ffffff);
+    color: #991b1b;
+}
+
+[data-admin-toast-stack] .toast.error::before {
+    content: '✕';
+    display: inline-block;
+    margin-right: 0.5rem;
+    color: #ef4444;
+    font-weight: bold;
+}
+
+/* Info toast - màu xanh dương */
+[data-admin-toast-stack] .toast.info {
+    border-left: 4px solid #3b82f6;
+    background: linear-gradient(to right, #eff6ff, #ffffff);
+}
+
+[data-admin-toast-stack] .toast.info::before {
+    content: 'ℹ';
+    display: inline-block;
+    margin-right: 0.5rem;
+    color: #3b82f6;
+    font-weight: bold;
+}
+
+/* Warning toast - màu cam */
+[data-admin-toast-stack] .toast.warning {
+    border-left: 4px solid #f59e0b;
+    background: linear-gradient(to right, #fffbeb, #ffffff);
+}
+
+[data-admin-toast-stack] .toast.warning::before {
+    content: '⚠';
+    display: inline-block;
+    margin-right: 0.5rem;
+    color: #f59e0b;
+    font-weight: bold;
+}
+
+/* Hide animation for auto-dismiss */
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+[data-admin-toast-stack] .toast.hiding {
+    animation: slideOut 0.3s ease forwards;
 }
 
 @keyframes slideIn {
@@ -1293,4 +1375,274 @@ body.admin-shell {
         flex-wrap: wrap;
     }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────────
+   Admin User Dropdown (giống Client)
+   ─────────────────────────────────────────────────────────────────────────────── */
+
+.admin-topnav-right {
+    margin-left: auto;
+}
+
+/* User Dropdown Container */
+.user-dropdown {
+    position: relative;
+}
+
+/* User Dropdown Button */
+.user-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(30, 41, 59, 0.5);
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.user-dropdown-btn:hover {
+    background: rgba(51, 65, 85, 0.7);
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.user-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #f1f5f9;
+}
+
+.dropdown-arrow {
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    transition: transform 0.2s;
+}
+
+.user-dropdown-btn[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Backdrop (for mobile) */
+.dropdown-backdrop {
+    display: none;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 280px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.25s ease;
+    will-change: transform, opacity;
+    z-index: 100;
+}
+
+.user-dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.dropdown-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* Dropdown Header */
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid #334155;
+}
+
+.dropdown-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.dropdown-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dropdown-user-name {
+    font-weight: 600;
+    color: #f1f5f9;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-user-email {
+    font-size: 0.8125rem;
+    color: #94a3b8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Dropdown Divider */
+.dropdown-divider {
+    height: 1px;
+    background: #334155;
+    margin: 0.5rem 0;
+}
+
+/* Dropdown Item */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: rgba(51, 65, 85, 0.8);
+}
+
+.dropdown-item-icon {
+    width: 18px;
+    height: 18px;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.dropdown-item-danger {
+    color: #f87171;
+}
+
+.dropdown-item-danger:hover {
+    background: rgba(220, 38, 38, 0.15);
+    color: #fca5a5;
+}
+
+.dropdown-item-danger .dropdown-item-icon {
+    color: #f87171;
+}
+
+.dropdown-logout-form {
+    margin: 0;
+}
+
+.dropdown-logout-form button {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+/* Mobile Responsive for Dropdown */
+@media (max-width: 640px) {
+    .user-name,
+    .dropdown-arrow {
+        display: none;
+    }
+
+    .user-dropdown {
+        position: static;
+        margin-left: auto;
+        flex: 0 0 auto;
+    }
+
+    .user-dropdown-btn {
+        width: 2.75rem;
+        padding: 0.5rem;
+        justify-content: center;
+    }
+
+    .dropdown-menu {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 1.25rem 1.25rem 0 0;
+        border-bottom: none;
+        box-shadow: 0 -24px 48px rgba(2, 6, 23, 0.45);
+        max-height: min(80vh, calc(100vh - 4rem));
+        overflow-y: auto;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        transform: translateY(calc(100% + 1rem));
+        z-index: 2000;
+        background: #1e293b;
+    }
+
+    .user-dropdown.active .dropdown-menu {
+        transform: translateY(0);
+    }
+
+    .dropdown-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+        z-index: 1999;
+    }
+
+    .dropdown-backdrop.is-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+}
+
+/* Body scroll lock when dropdown is open on mobile */
+body.mobile-dropdown-open {
+    overflow: hidden;
+}
+
 

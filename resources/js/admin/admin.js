@@ -117,6 +117,12 @@ const AdminToast = {
     init() {
         this.stack = document.querySelector('[data-admin-toast-stack]');
         if (!this.stack) return;
+
+        // Auto-dismiss existing toasts from server-rendered HTML
+        const existingToasts = this.stack.querySelectorAll('.toast');
+        existingToasts.forEach(toast => {
+            this.scheduleAutoDismiss(toast);
+        });
     },
 
     show(message, type = 'success') {
@@ -128,10 +134,20 @@ const AdminToast = {
 
         this.stack.appendChild(toast);
 
-        // Auto remove after 5 seconds
+        this.scheduleAutoDismiss(toast);
+    },
+
+    scheduleAutoDismiss(toast) {
+        // Auto remove after 4 seconds
         setTimeout(() => {
-            toast.remove();
-        }, 5000);
+            // Add hiding class for slide out animation
+            toast.classList.add('hiding');
+
+            // Remove after animation completes (300ms)
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 4000);
     },
 
     success(message) {
@@ -140,6 +156,14 @@ const AdminToast = {
 
     error(message) {
         this.show(message, 'error');
+    },
+
+    info(message) {
+        this.show(message, 'info');
+    },
+
+    warning(message) {
+        this.show(message, 'warning');
     }
 };
 
@@ -297,6 +321,105 @@ const LanguageManager = {
 };
 
 // ───────────────────────────────────────────────────────────────────────────────
+// Admin User Dropdown
+// ───────────────────────────────────────────────────────────────────────────────
+
+const AdminDropdown = {
+    init() {
+        // User dropdown
+        const dropdown = document.querySelector('[data-user-dropdown]');
+        const toggleBtn = dropdown?.querySelector('[data-dropdown-toggle]');
+        const dropdownMenu = dropdown?.querySelector('.dropdown-menu');
+        const dropdownBackdrop = dropdown?.querySelector('[data-dropdown-backdrop]');
+        const mobileDropdownMediaQuery = window.matchMedia('(max-width: 640px)');
+
+        const placeDropdownInViewport = () => {
+            if (!mobileDropdownMediaQuery.matches || !dropdownMenu || !dropdownBackdrop) {
+                return;
+            }
+
+            if (dropdownBackdrop.parentElement !== document.body) {
+                document.body.appendChild(dropdownBackdrop);
+            }
+
+            if (dropdownMenu.parentElement !== document.body) {
+                document.body.appendChild(dropdownMenu);
+            }
+        };
+
+        const restoreDropdownPlacement = () => {
+            if (!dropdown || !dropdownMenu || !dropdownBackdrop) {
+                return;
+            }
+
+            if (dropdownBackdrop.parentElement !== dropdown) {
+                dropdown.insertBefore(dropdownBackdrop, dropdownMenu.parentElement === dropdown ? dropdownMenu : null);
+            }
+
+            if (dropdownMenu.parentElement !== dropdown) {
+                dropdown.appendChild(dropdownMenu);
+            }
+        };
+
+        const syncDropdownPlacement = () => {
+            if (mobileDropdownMediaQuery.matches) {
+                placeDropdownInViewport();
+                return;
+            }
+
+            restoreDropdownPlacement();
+        };
+
+        const syncMobileDropdownState = (isOpen) => {
+            document.body.classList.toggle('mobile-dropdown-open', isOpen && mobileDropdownMediaQuery.matches);
+            dropdownMenu?.classList.toggle('is-open', isOpen);
+            dropdownBackdrop?.classList.toggle('is-open', isOpen);
+        };
+
+        const closeDropdown = () => {
+            dropdown?.classList.remove('active');
+            toggleBtn?.setAttribute('aria-expanded', 'false');
+            syncMobileDropdownState(false);
+        };
+
+        const openDropdown = () => {
+            dropdown?.classList.add('active');
+            toggleBtn?.setAttribute('aria-expanded', 'true');
+            syncMobileDropdownState(true);
+        };
+
+        toggleBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            if (expanded) {
+                closeDropdown();
+                return;
+            }
+
+            syncDropdownPlacement();
+            openDropdown();
+        });
+
+        dropdownBackdrop?.addEventListener('click', closeDropdown);
+        dropdownMenu?.addEventListener('click', (e) => e.stopPropagation());
+
+        // Close dropdown on outside click
+        document.addEventListener('click', closeDropdown);
+
+        syncDropdownPlacement();
+
+        mobileDropdownMediaQuery.addEventListener('change', () => {
+            if (!mobileDropdownMediaQuery.matches) {
+                document.body.classList.remove('mobile-dropdown-open');
+            }
+
+            syncDropdownPlacement();
+            syncMobileDropdownState(dropdown?.classList.contains('active') ?? false);
+        });
+    }
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
 // Initialize
 // ───────────────────────────────────────────────────────────────────────────────
 
@@ -306,6 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
     AdminConfirm.init();
     ThemeToggle.init();
     LanguageManager.init();
+    AdminDropdown.init();
 
     // Show flash messages as toasts
     const flashMessage = document.querySelector('[data-flash-message]');
