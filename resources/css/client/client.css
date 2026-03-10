@@ -2139,7 +2139,7 @@ body.client-app-body.mobile-dropdown-open {
 /* Study Card Container */
 .study-card-container {
     margin-bottom: 1rem;
-    min-height: 100px;
+    min-height: 250px;
 }
 
 /* Flip Card */
