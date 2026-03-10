@@ -233,8 +233,4 @@ Các thành phần này phù hợp với chức năng hệ thống học flashca
 
 Bạn có thể dán link DB diagram tại đây sau khi hoàn thiện sơ đồ:
 
-- DB Diagram: `<DAN_LINK_DB_DIAGRAM_TAI_DAY>`
-
-Gợi ý trình bày khi nộp:
-
-- DB Diagram: `https://dbdiagram.io/...`
+- DB Diagram: `https://dbdiagram.io/d/techvanguard-pretest-69afaba477d079431b44cbae`
