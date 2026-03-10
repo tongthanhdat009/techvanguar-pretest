@@ -935,6 +935,7 @@
             }
 
             const formData = new FormData(form);
+            const csrfToken = formData.get('_token') || '';
             const submitBtn = formSubmitBtn;
             const originalText = submitBtn.textContent;
 
@@ -943,11 +944,14 @@
 
             try {
                 const response = await fetch(form.action, {
-                    method: formMethod.value,
+                    method: 'POST',
                     body: formData,
                     headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
                         'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    },
+                    credentials: 'same-origin'
                 });
 
                 const data = await response.json();

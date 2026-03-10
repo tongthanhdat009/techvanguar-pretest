@@ -18,9 +18,6 @@
             <p class="text-slate-400 mt-0.5 text-sm">Chi tiết bộ thẻ</p>
         </div>
     </div>
-    <div class="flex items-center gap-2">
-        <button type="button" class="btn-primary" data-deck-edit-sidebar-open>Sửa bộ thẻ</button>
-    </div>
 </div>
 
 {{-- Deck info card --}}
@@ -133,8 +130,5 @@
 
 {{-- Flashcard management --}}
 @include('admin.decks._flashcards', ['deck' => $deck])
-
-{{-- Deck Edit Sidebar --}}
-@include('components.admin.deck-edit-sidebar', ['deck' => $deck])
 
 @endsection

@@ -21,9 +21,13 @@ class SetSessionCookie
         $guard ??= $this->resolveGuardFromRequest($request);
 
         if ($guard !== null) {
-            config([
-                'session.cookie' => 'flashcard_learning_hub_' . $guard . '_session',
-            ]);
+            $cookieName = 'flashcard_learning_hub_' . $guard . '_session';
+            config(['session.cookie' => $cookieName]);
+
+            // Also update session manager for current request
+            if (app()->resolved('session')) {
+                app('session')->setCookieName($cookieName);
+            }
         }
 
         return $next($request);

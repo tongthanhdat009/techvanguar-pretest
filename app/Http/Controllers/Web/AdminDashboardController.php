@@ -321,7 +321,7 @@ class AdminDashboardController extends Controller
         return back()->with('status', 'User deleted.');
     }
 
-    public function storeDeck(AdminDeckRequest $request): RedirectResponse
+    public function storeDeck(AdminDeckRequest $request): Response
     {
         $deck = Deck::create($request->validatedPayload());
 
@@ -336,7 +336,7 @@ class AdminDashboardController extends Controller
         return redirect()->route('admin.decks.show', $deck)->with('status', 'Bộ thẻ đã được tạo.');
     }
 
-    public function updateDeck(AdminDeckRequest $request, Deck $deck): RedirectResponse
+    public function updateDeck(AdminDeckRequest $request, Deck $deck): Response
     {
         $deck->update($request->validatedPayload());
 
