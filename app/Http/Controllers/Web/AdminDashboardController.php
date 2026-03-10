@@ -443,7 +443,7 @@ class AdminDashboardController extends Controller
         return back()->with('status', "Tài khoản \"{$user->name}\" đã {$label}.");
     }
 
-    // Profile, Account, Settings
+    // Profile, Account
     public function profile(): View
     {
         $user = auth('admin')->user();
@@ -495,15 +495,6 @@ class AdminDashboardController extends Controller
         ]);
 
         return back()->with('status', 'Mật khẩu đã được cập nhật.');
-    }
-
-    public function settings(): View
-    {
-        $user = auth('admin')->user();
-
-        return view('admin.settings', [
-            'user' => $user,
-        ]);
     }
 
 }

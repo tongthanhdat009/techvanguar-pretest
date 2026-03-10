@@ -87,12 +87,11 @@ Route::middleware('auth:admin')
         Route::get('/decks/{deck}/export', [AdminDashboardController::class, 'exportDeck'])->name('decks.export');
         Route::post('/decks/{deck}/import', [AdminDashboardController::class, 'importDeck'])->name('decks.import');
 
-        // Profile, Account, Settings
+        // Profile, Account
         Route::get('/profile', [AdminDashboardController::class, 'profile'])->name('profile');
         Route::put('/profile', [AdminDashboardController::class, 'updateProfile'])->name('profile.update');
         Route::get('/account', [AdminDashboardController::class, 'account'])->name('account');
         Route::put('/account/password', [AdminDashboardController::class, 'updatePassword'])->name('account.password');
-        Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('settings');
         Route::post('/logout', [AuthPageController::class, 'logout'])
             ->defaults('guard', 'admin')
             ->name('logout');
