@@ -120,21 +120,93 @@ const ClientApp = {
         // User dropdown
         const dropdown = document.querySelector('[data-user-dropdown]');
         const toggleBtn = dropdown?.querySelector('[data-dropdown-toggle]');
+        const dropdownMenu = dropdown?.querySelector('.dropdown-menu');
+        const dropdownBackdrop = dropdown?.querySelector('[data-dropdown-backdrop]');
+        const mobileDropdownMediaQuery = window.matchMedia('(max-width: 640px)');
+
+        const placeDropdownInViewport = () => {
+            if (!mobileDropdownMediaQuery.matches || !dropdownMenu || !dropdownBackdrop) {
+                return;
+            }
+
+            if (dropdownBackdrop.parentElement !== document.body) {
+                document.body.appendChild(dropdownBackdrop);
+            }
+
+            if (dropdownMenu.parentElement !== document.body) {
+                document.body.appendChild(dropdownMenu);
+            }
+        };
+
+        const restoreDropdownPlacement = () => {
+            if (!dropdown || !dropdownMenu || !dropdownBackdrop) {
+                return;
+            }
+
+            if (dropdownBackdrop.parentElement !== dropdown) {
+                dropdown.insertBefore(dropdownBackdrop, dropdownMenu.parentElement === dropdown ? dropdownMenu : null);
+            }
+
+            if (dropdownMenu.parentElement !== dropdown) {
+                dropdown.appendChild(dropdownMenu);
+            }
+        };
+
+        const syncDropdownPlacement = () => {
+            if (mobileDropdownMediaQuery.matches) {
+                placeDropdownInViewport();
+                return;
+            }
+
+            restoreDropdownPlacement();
+        };
+
+        const syncMobileDropdownState = (isOpen) => {
+            document.body.classList.toggle('mobile-dropdown-open', isOpen && mobileDropdownMediaQuery.matches);
+            dropdownMenu?.classList.toggle('is-open', isOpen);
+            dropdownBackdrop?.classList.toggle('is-open', isOpen);
+        };
+
+        const closeDropdown = () => {
+            dropdown?.classList.remove('active');
+            toggleBtn?.setAttribute('aria-expanded', 'false');
+            syncMobileDropdownState(false);
+        };
+
+        const openDropdown = () => {
+            dropdown?.classList.add('active');
+            toggleBtn?.setAttribute('aria-expanded', 'true');
+            syncMobileDropdownState(true);
+        };
 
         toggleBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
             const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-            toggleBtn.setAttribute('aria-expanded', !expanded);
-            dropdown.classList.toggle('active', !expanded);
+            if (expanded) {
+                closeDropdown();
+                return;
+            }
+
+            syncDropdownPlacement();
+            openDropdown();
         });
+
+        dropdownBackdrop?.addEventListener('click', closeDropdown);
+        dropdownMenu?.addEventListener('click', (e) => e.stopPropagation());
 
         // Close dropdown on outside click
-        document.addEventListener('click', () => {
-            dropdown?.classList.remove('active');
-            toggleBtn?.setAttribute('aria-expanded', 'false');
-        });
+        document.addEventListener('click', closeDropdown);
 
-        dropdown?.addEventListener('click', (e) => e.stopPropagation());
+        syncDropdownPlacement();
+
+        mobileDropdownMediaQuery.addEventListener('change', () => {
+            if (!mobileDropdownMediaQuery.matches) {
+                document.body.classList.remove('mobile-dropdown-open');
+            }
+
+            syncDropdownPlacement();
+            syncMobileDropdownState(dropdown?.classList.contains('active') ?? false);
+        });
     },
 
     initMobileMenu() {
@@ -395,12 +467,16 @@ const StudyRoom = {
         const buttons = this.studyRoom.querySelectorAll('.control-btn[data-result]');
         const resultInput = this.studyRoom.querySelector('[data-result-input]');
 
+        console.log('StudyRoom.initControlButtons:', { form, buttons: buttons.length, resultInput });
+
         buttons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 if (this.isSubmitting) return;
 
                 const result = btn.dataset.result;
+                console.log('Control button clicked:', result);
                 if (resultInput) {
                     resultInput.value = result;
                 }
@@ -507,7 +583,7 @@ const StudyRoom = {
             await this.persistProgress(result, form?.action);
             this.showRatingFeedback(result);
             setTimeout(() => {
-                this.showNextCard();
+                this.showNextCard(result);
             }, 300);
         } catch (error) {
             console.error('Error submitting result:', error);
@@ -549,9 +625,20 @@ const StudyRoom = {
         }, 520);
     },
 
-    showNextCard() {
+    showNextCard(result = null) {
         // Reset flip state
         this.isFlipped = false;
+
+        // Get current card before moving
+        const currentCard = this.cards[this.currentIndex];
+
+        // If user chose "Again" or "Hard", add current card to the end for review
+        if (result === 'again' || result === 'hard') {
+            if (currentCard) {
+                this.cards.push(currentCard);
+                this.totalCards = this.cards.length;
+            }
+        }
 
         // Move to next card
         this.currentIndex++;
@@ -573,11 +660,18 @@ const StudyRoom = {
         const progressFill = this.studyRoom.querySelector('.progress-fill');
         const progressMeter = this.studyRoom.querySelector('.study-progress-meter');
         const currentNum = this.studyRoom.querySelector('.current-num');
+        const totalNum = this.studyRoom.querySelector('.total-num');
+
+        // Update total cards count in case cards were added for review
+        if (totalNum) {
+            totalNum.textContent = this.cards.length;
+        }
+
         if (progressFill) {
-            progressFill.style.width = `${((this.currentIndex + 1) / this.totalCards) * 100}%`;
+            progressFill.style.width = `${((this.currentIndex + 1) / this.cards.length) * 100}%`;
         }
         if (progressMeter) {
-            progressMeter.value = ((this.currentIndex + 1) / this.totalCards) * 100;
+            progressMeter.value = ((this.currentIndex + 1) / this.cards.length) * 100;
         }
         if (currentNum) {
             currentNum.textContent = this.currentIndex + 1;
@@ -623,7 +717,7 @@ const StudyRoom = {
         const backImage = this.studyRoom.querySelector('.flip-card-back .card-image');
         const frontAudio = this.studyRoom.querySelector('.flip-card-front .card-audio');
         const backAudio = this.studyRoom.querySelector('.flip-card-back .card-audio');
-        const hintText = this.studyRoom.querySelector('.card-hint-text');
+        const hintText = this.studyRoom.querySelector('.flip-card-front .card-hint-text');
 
         // Update text content
         if (frontContent) frontContent.textContent = card.front;
@@ -768,9 +862,10 @@ const StudyRoom = {
 
     showCompletionMessage() {
         const studyRoom = this.studyRoom;
+        const totalReviewed = this.cards.length;
         const message = this.deckId
-            ? `Bạn đã lưu tiến độ cho toàn bộ ${this.totalCards} thẻ trong deck này.`
-            : `Bạn đã hoàn thành ${this.totalCards} thẻ trong phiên ôn tập này.`;
+            ? `Bạn đã lưu tiến độ cho toàn bộ ${totalReviewed} thẻ trong deck này.`
+            : `Bạn đã hoàn thành ${totalReviewed} thẻ trong phiên ôn tập này.`;
         const backLabel = this.deckId ? 'Quay lại chi tiết deck' : 'Quay lại dashboard';
         
         // Haptic Feedback (if supported) & Sound

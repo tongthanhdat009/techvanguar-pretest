@@ -25,15 +25,15 @@
             <div class="dashboard-hero-highlights">
                 <div class="dashboard-hero-highlight">
                     <strong>{{ $user->daily_streak ?? 0 }} ngày</strong>
-                    <span>streak hiện tại</span>
+                    <span>Streak hiện tại</span>
                 </div>
                 <div class="dashboard-hero-highlight">
                     <strong>{{ $ownedDecks->count() }}</strong>
-                    <span>deck cá nhân đang quản lý</span>
+                    <span>Deck cá nhân</span>
                 </div>
                 <div class="dashboard-hero-highlight">
                     <strong>{{ $communityDecks->count() }}</strong>
-                    <span>deck cộng đồng đang sẵn sàng sao chép</span>
+                    <span>Deck cộng đồng</span>
                 </div>
             </div>
         </div>
@@ -63,14 +63,14 @@
     </section>
 
     @include('components.client.progress-summary', ['summary' => $progressSummary])
-    {{-- Study Activity Chart --}}
-    <section class="dashboard-grid" style="margin-bottom: 1rem;">
-            {{-- Stats Card --}}
-        <article class="dashboard-card" style="margin-bottom: 1rem;">
+
+    {{-- Session Stats Card - Tách riêng với width 100% --}}
+    <section class="session-stats-section">
+        <article class="dashboard-card">
             <div class="dashboard-card-header">
                 <div>
                     <span class="dashboard-card-kicker">📊 Phiên hôm nay</span>
-                    <h2>thống kê học tập</h2>
+                    <h2>Thống kê học tập</h2>
                 </div>
             </div>
             <div class="session-stats-grid">
@@ -100,7 +100,10 @@
                 <p class="dashboard-empty" style="margin: 0;">Chưa có hoạt động học tập hôm nay.</p>
             @endif
         </article>
+    </section>
 
+    {{-- Study Activity Chart --}}
+    <section class="dashboard-grid">
         <article class="dashboard-card dashboard-card-wide">
             <div class="dashboard-card-header">
                 <div>

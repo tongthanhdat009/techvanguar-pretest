@@ -63,6 +63,8 @@
                 </svg>
             </button>
 
+            <div class="dropdown-backdrop" data-dropdown-backdrop aria-hidden="true"></div>
+
             <div class="dropdown-menu">
                 <div class="dropdown-header">
                     <div class="dropdown-avatar">{{ substr($user->name, 0, 1) }}</div>

@@ -152,6 +152,11 @@
                                         <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
                                     </div>
                                 @endif
+                                @if($currentCard['flashcard']->hint)
+                                    <div class="card-hint-text">
+                                        <span class="hint-label">💡 Gợi ý:</span> {{ $currentCard['flashcard']->hint }}
+                                    </div>
+                                @endif
                                 <div class="card-hint">Nhấn để lật thẻ</div>
                             </div>
                         </div>
@@ -164,11 +169,6 @@
                                 @if($currentCard['flashcard']->audio_url)
                                     <div class="card-audio">
                                         <audio controls src="{{ $currentCard['flashcard']->audio_url }}"></audio>
-                                    </div>
-                                @endif
-                                @if($currentCard['flashcard']->hint)
-                                    <div class="card-hint-text">
-                                        <span class="hint-label">💡 Gợi ý:</span> {{ $currentCard['flashcard']->hint }}
                                     </div>
                                 @endif
                             </div>
@@ -235,46 +235,46 @@
                 </div>
             @endif
 
+            {{-- Control Buttons --}}
+            @if($mode === 'flip')
+                <div class="study-controls" data-study-controls style="display: none;">
+                    <div class="control-buttons">
+                        <form action="{{ route('client.study.progress') }}" method="POST" class="control-form" data-control-form>
+                            @csrf
+                            <input type="hidden" name="flashcard_id" value="{{ $currentCard['flashcard']->id }}">
+                            @if($deck) <input type="hidden" name="deck_id" value="{{ $deck->id }}"> @endif
+                            <input type="hidden" name="study_mode" value="{{ $mode }}">
+                            <input type="hidden" name="card_index" value="{{ $currentIndex }}" data-card-index-input>
+                            <input type="hidden" name="result" value="again" data-result-input>
+    
+                            <div class="control-buttons-row">
+                                <button type="submit" class="control-btn control-btn-again" data-result="again">
+                                    <span class="btn-icon">🔴</span>
+                                    <span class="btn-label">Quên</span>
+                                    <span class="btn-subtitle">Ôn lại ngay</span>
+                                </button>
+                                <button type="submit" class="control-btn control-btn-hard" data-result="hard">
+                                    <span class="btn-icon">🟠</span>
+                                    <span class="btn-label">Khó</span>
+                                    <span class="btn-subtitle">Cần thêm nhịp</span>
+                                </button>
+                                <button type="submit" class="control-btn control-btn-good" data-result="good">
+                                    <span class="btn-icon">🔵</span>
+                                    <span class="btn-label">Ổn</span>
+                                    <span class="btn-subtitle">Giữ nhịp hiện tại</span>
+                                </button>
+                                <button type="submit" class="control-btn control-btn-easy" data-result="easy">
+                                    <span class="btn-icon">🟢</span>
+                                    <span class="btn-label">Dễ</span>
+                                    <span class="btn-subtitle">Giãn lịch dài hơn</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
         </div>
 
-        {{-- Control Buttons --}}
-        @if($mode === 'flip')
-            <div class="study-controls" data-study-controls style="display: none;">
-                <div class="control-buttons">
-                    <form action="{{ route('client.study.progress') }}" method="POST" class="control-form" data-control-form>
-                        @csrf
-                        <input type="hidden" name="flashcard_id" value="{{ $currentCard['flashcard']->id }}">
-                        @if($deck) <input type="hidden" name="deck_id" value="{{ $deck->id }}"> @endif
-                        <input type="hidden" name="study_mode" value="{{ $mode }}">
-                        <input type="hidden" name="card_index" value="{{ $currentIndex }}" data-card-index-input>
-                        <input type="hidden" name="result" value="again" data-result-input>
-
-                        <div class="control-buttons-row">
-                            <button type="submit" class="control-btn control-btn-again" data-result="again">
-                                <span class="btn-icon">🔴</span>
-                                <span class="btn-label">Quên</span>
-                                <span class="btn-subtitle">Ôn lại ngay</span>
-                            </button>
-                            <button type="submit" class="control-btn control-btn-hard" data-result="hard">
-                                <span class="btn-icon">🟠</span>
-                                <span class="btn-label">Khó</span>
-                                <span class="btn-subtitle">Cần thêm nhịp</span>
-                            </button>
-                            <button type="submit" class="control-btn control-btn-good" data-result="good">
-                                <span class="btn-icon">🔵</span>
-                                <span class="btn-label">Ổn</span>
-                                <span class="btn-subtitle">Giữ nhịp hiện tại</span>
-                            </button>
-                            <button type="submit" class="control-btn control-btn-easy" data-result="easy">
-                                <span class="btn-icon">🟢</span>
-                                <span class="btn-label">Dễ</span>
-                                <span class="btn-subtitle">Giãn lịch dài hơn</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        @endif
 
         {{-- Keyboard Shortcuts Hint --}}
         @if($mode === 'flip')
